@@ -13,6 +13,8 @@ public partial class PostCaptureWindow : Window
     public PostCaptureWindow(BitmapSource capturedImage)
     {
         InitializeComponent();
+        ThemeManager.ApplyDarkTitleBar(this);
+        
         _originalImage = capturedImage;
         _currentImage = capturedImage;
         PreviewImage.Source = _currentImage;

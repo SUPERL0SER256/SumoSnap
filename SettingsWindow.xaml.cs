@@ -9,6 +9,7 @@ public partial class SettingsWindow : Window
     public SettingsWindow()
     {
         InitializeComponent();
+        ThemeManager.ApplyDarkTitleBar(this);
         
         var settings = SettingsManager.LoadSettings();
         TxtRemoveBg.Text = settings.RemoveBgApiKey;

@@ -3,7 +3,41 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="SumoSnap Editor" Height="450" Width="750"
         WindowStartupLocation="CenterScreen"
-        WindowStyle="ToolWindow">
+        WindowStyle="ToolWindow"
+        Background="#1E1E1E">
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="#333333"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#555555"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="5">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#444444"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#222222"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.5"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -13,16 +47,16 @@
         <Image x:Name="PreviewImage" Stretch="Uniform" Margin="10" />
         
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
-            <Button Content="Copy" Width="80" Margin="5" Click="CopyButton_Click"/>
-            <Button Content="Save" Width="80" Margin="5" Click="SaveButton_Click"/>
-            <Button x:Name="UndoButton" Content="Undo" Width="80" Margin="5" Click="UndoButton_Click" IsEnabled="False"/>
-            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="5,0"/>
-            <Button Content="✨ Enhance" Width="100" Margin="5" Click="EnhanceButton_Click"/>
-            <Button Content="↗ Reframe" Width="100" Margin="5" Click="ReframeButton_Click"/>
-            <Button Content="◉ Remove BG" Width="100" Margin="5" Click="RemoveBgButton_Click"/>
+            <Button Content="Copy" Margin="8" Click="CopyButton_Click"/>
+            <Button Content="Save" Margin="8" Click="SaveButton_Click"/>
+            <Button x:Name="UndoButton" Content="Undo" Margin="8" Click="UndoButton_Click" IsEnabled="False"/>
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="10,0"/>
+            <Button Content="Enhance" Margin="8" Click="EnhanceButton_Click"/>
+            <Button Content="Reframe" Margin="8" Click="ReframeButton_Click"/>
+            <Button Content="Remove BG" Margin="8" Click="RemoveBgButton_Click"/>
         </StackPanel>
         
-        <Grid x:Name="LoadingOverlay" Visibility="Collapsed" Background="#80FFFFFF">
+        <Grid x:Name="LoadingOverlay" Visibility="Collapsed" Background="#B0000000">
             <TextBlock Text="Processing..." HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" FontWeight="Bold"/>
         </Grid>
     </Grid>

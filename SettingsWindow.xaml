@@ -4,7 +4,47 @@
         Title="SumoSnap Settings" Height="300" Width="400"
         WindowStartupLocation="CenterScreen"
         WindowStyle="ToolWindow"
-        Topmost="True">
+        Topmost="True"
+        Background="#1E1E1E">
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="#333333"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#555555"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="15,8"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="5">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#444444"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#222222"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.5"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="#2A2A2A"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#444"/>
+            <Setter Property="CaretBrush" Value="White"/>
+        </Style>
+    </Window.Resources>
     <Grid Margin="15">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -31,6 +71,6 @@
         </StackPanel>
         <TextBox Grid.Row="4" x:Name="TxtStability" Margin="0,0,0,15" Padding="5"/>
 
-        <Button Grid.Row="7" Content="Save Settings" Width="120" HorizontalAlignment="Right" Padding="5" Click="SaveButton_Click"/>
+        <Button Grid.Row="7" Content="Save Settings" HorizontalAlignment="Right" Click="SaveButton_Click"/>
     </Grid>
 </Window>
