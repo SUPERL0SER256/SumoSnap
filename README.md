@@ -1,25 +1,47 @@
+<div align="center">
+  
 # SumoSnap
+**The heavy-hitting, lightweight screenshot utility that brings real AI to your desktop.**
 
-SumoSnap is a heavy hitting but incredibly lightweight screenshot utility that brings real AI tools right to your desktop. 
+![Windows 11](https://img.shields.io/badge/Windows-11%20%7C%2010-0078D6?style=for-the-badge&logo=windows)
+![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4?style=for-the-badge&logo=dotnet)
+![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
-I built this because I was tired of the default Windows Snipping Tool aggressively taking over the Print Screen key just to give me a boring rectangle. SumoSnap sits silently in your system tray, taking up practically zero memory, until you summon it. When you do, it hits your screenshots with state of the art AI without getting in your way.
+<!-- TODO: USER, record a 5-second GIF of you using SumoSnap and drag-and-drop it into the GitHub web editor right here to replace this placeholder text! -->
+<br>
+<i>[ 🛑 PLACEHOLDER: Insert your demo GIF here! ]</i>
+<br><br>
+</div>
 
-There are no bulky windows or loading screens. You just press the hotkey, drag a box, and your screenshot pops up with a few extra superpowers. You can instantly strip out backgrounds using the Remove.bg API, which turns any screenshot into a perfect transparent PNG. If your screenshot is too tiny or the text is blurry, you can hit the Enhance button to upscale it using Stability AI to generate crisp, high resolution pixels out of thin air. And if you grabbed a screenshot but realized you missed the edges, the Reframe button outpaints the image, magically generating a couple hundred pixels of extra context around your image based on what it thinks should be there.
+SumoSnap is a completely free, background screenshot utility built to replace the default Windows Snipping Tool. It sits silently in your system tray taking up virtually zero memory until you summon it. When you do, it hits your screenshots with state-of-the-art AI.
 
-The best part is the architecture. There are no expensive monthly SaaS subscriptions here. SumoSnap uses a "Bring Your Own Key" system. You just plug in your own API keys for Remove.bg and Stability AI, they get saved securely to your local Windows profile, and you only pay the AI providers for exactly what you use.
+There are no bulky windows or loading screens. Just press the hotkey, drag a box, and your screenshot pops up with a few extra superpowers. 
 
-## How to run it
+## Features
 
-You don't need to do anything complicated to get this running on your machine. 
+- **⚡ Instant Capture:** Press `Ctrl + Shift + Q` (or `Print Screen`) to instantly freeze your screen and drag a region.
+- **◉ AI Background Removal:** Powered by the Remove.bg API. Turn any screenshot into a perfect transparent PNG instantly.
+- **✨ AI Enhance:** Screenshot too tiny or blurry? SumoSnap uses Stability AI to generate crisp, high-resolution pixels out of thin air.
+- **↗️ AI Reframe:** Grabbed a screenshot but missed the edges? The Reframe button outpaints the image, magically generating 200 pixels of extra context around your edges based on what it thinks should be there.
+- **🔒 Bring Your Own Key (BYOK):** No expensive monthly SaaS subscriptions. You plug in your own API keys, they get saved securely to your local Windows profile, and you only pay for exactly what you use.
 
-First, clone this repository. Open your terminal in the folder and run the provided runner script by typing `.\run.ps1`. 
+## How to Install & Run
 
-A balloon will pop up in your system tray letting you know it is running in the background. From there, just press Ctrl + Shift + Q (or your Print Screen key) to freeze time and grab a region of your screen.
+You don't need to touch any code to get SumoSnap running.
 
-## Getting your API keys
+1. Go to the [Releases page](../../releases) and download the latest `SumoSnap-v1.0.zip`.
+2. Extract the folder anywhere on your computer.
+3. Double-click `SumoSnap.exe`. 
+4. A balloon will pop up in your system tray letting you know it is running in the background! 
 
-When you first try to use an AI feature, SumoSnap will gently ask for your API keys. It is totally free to get started. You can grab a free key for background removal at remove.bg/api, and you can get a key for the upscaling and outpainting features at platform.stability.ai. 
+## Getting Your API Keys
 
-Just right click the SumoSnap icon in your system tray, open Settings, paste them in, and you are officially unstoppable.
+When you first try to use an AI feature, SumoSnap will gently ask for your API keys. It is totally free to get started:
 
-Built for Windows 11. Powered by C# and WPF.
+1. Grab a free key for background removal at [remove.bg/api](https://www.remove.bg/api)
+2. Grab a key for upscaling and outpainting at [platform.stability.ai](https://platform.stability.ai/account/keys)
+
+Just right-click the SumoSnap icon in your system tray, click **Settings**, paste them in, and you are officially unstoppable.
+
+---
+*Built for Windows. Powered by C# and WPF.*
