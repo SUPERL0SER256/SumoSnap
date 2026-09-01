@@ -14,11 +14,12 @@ public partial class App : System.Windows.Application
 
     private void Application_Startup(object sender, StartupEventArgs e)
     {
-        _notifyIcon = new System.Windows.Forms.NotifyIcon();
-        _notifyIcon.Icon = System.Drawing.SystemIcons.Application;
-        _notifyIcon.Visible = true;
-        _notifyIcon.Text = "SumoSnap";
-
+        _notifyIcon = new System.Windows.Forms.NotifyIcon
+        {
+            Icon = new System.Drawing.Icon("icon.ico"),
+            Visible = true,
+            Text = "SumoSnap"
+        };
         var contextMenu = new System.Windows.Forms.ContextMenuStrip();
         contextMenu.Items.Add("New Screenshot", null, OnNewScreenshotClicked);
         contextMenu.Items.Add("Settings", null, OnSettingsClicked);
