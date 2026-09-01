@@ -7,9 +7,9 @@
 ![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4?style=for-the-badge&logo=dotnet)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
-<!-- TODO: USER, record a 5-second GIF of you using SumoSnap and drag-and-drop it into the GitHub web editor right here to replace this placeholder text! -->
+<!-- TODO: USER, take a screenshot of the SumoSnap editor and drag-and-drop it into the GitHub web editor right here to replace this placeholder text! -->
 <br>
-<i>[ 🛑 PLACEHOLDER: Insert your demo GIF here! ]</i>
+<i>[ PLACEHOLDER: Insert your screenshot here! ]</i>
 <br><br>
 </div>
 
@@ -19,11 +19,11 @@ There are no bulky windows or loading screens. Just press the hotkey, drag a box
 
 ## Features
 
-- **⚡ Instant Capture:** Press `Ctrl + Shift + Q` (or `Print Screen`) to instantly freeze your screen and drag a region.
-- **◉ AI Background Removal:** Powered by the Remove.bg API. Turn any screenshot into a perfect transparent PNG instantly.
-- **✨ AI Enhance:** Screenshot too tiny or blurry? SumoSnap uses Stability AI to generate crisp, high-resolution pixels out of thin air.
-- **↗️ AI Reframe:** Grabbed a screenshot but missed the edges? The Reframe button outpaints the image, magically generating 200 pixels of extra context around your edges based on what it thinks should be there.
-- **🔒 Bring Your Own Key (BYOK):** No expensive monthly SaaS subscriptions. You plug in your own API keys, they get saved securely to your local Windows profile, and you only pay for exactly what you use.
+- **Instant Capture:** Press `Ctrl + Shift + Q` (or `Print Screen`) to instantly freeze your screen and drag a region.
+- **AI Background Removal:** Powered by the Remove.bg API. Turn any screenshot into a perfect transparent PNG instantly.
+- **AI Enhance:** Screenshot too tiny or blurry? SumoSnap uses Stability AI to generate crisp, high-resolution pixels out of thin air.
+- **AI Reframe:** Grabbed a screenshot but missed the edges? The Reframe button outpaints the image, magically generating 200 pixels of extra context around your edges based on what it thinks should be there.
+- **Bring Your Own Key (BYOK):** No expensive monthly SaaS subscriptions. You plug in your own API keys, they get saved securely to your local Windows profile, and you only pay for exactly what you use.
 
 ## How to Install & Run
 
