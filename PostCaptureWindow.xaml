@@ -1,0 +1,29 @@
+<Window x:Class="AIScreenshotUtility.PostCaptureWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="AI Screenshot Editor" Height="450" Width="600"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="ToolWindow">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        
+        <Image x:Name="PreviewImage" Stretch="Uniform" Margin="10" />
+        
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+            <Button Content="Copy" Width="80" Margin="5" Click="CopyButton_Click"/>
+            <Button Content="Save" Width="80" Margin="5" Click="SaveButton_Click"/>
+            <Button x:Name="UndoButton" Content="Undo" Width="80" Margin="5" Click="UndoButton_Click" IsEnabled="False"/>
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="5,0"/>
+            <Button Content="✨ Enhance" Width="100" Margin="5" Click="EnhanceButton_Click"/>
+            <Button Content="↗ Reframe" Width="100" Margin="5" Click="ReframeButton_Click"/>
+            <Button Content="◉ Remove BG" Width="100" Margin="5" Click="RemoveBgButton_Click"/>
+        </StackPanel>
+        
+        <Grid x:Name="LoadingOverlay" Visibility="Collapsed" Background="#80FFFFFF">
+            <TextBlock Text="Processing..." HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" FontWeight="Bold"/>
+        </Grid>
+    </Grid>
+</Window>
