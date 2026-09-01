@@ -32,7 +32,14 @@ There are no bulky windows or loading screens. Just press the hotkey, drag a box
 3. Right-click **`install.ps1`** and select **"Run with PowerShell"**. This will safely copy the app to your local AppData folder and create a permanent Start Menu shortcut!
 4. Press the Windows Key, type "SumoSnap", and hit enter. 
    - *Note: Because this is a new open-source app, Windows Defender SmartScreen might pop up a blue warning. Click **"More info"**, and then click **"Run anyway"**.*
-5. A balloon will pop up in your system tray letting you know it is running in the background! 
+
+## Post-Installation (How to Use)
+
+Once installed and running, SumoSnap operates entirely in the background.
+
+1. **Take a Screenshot:** Press **`Ctrl + Shift + Q`** at any time to freeze your screen. Click and drag to select an area.
+2. **Edit & AI:** The dark-mode editor will instantly pop up. You can immediately click "Copy" or use one of the AI tools.
+3. **Configure API Keys:** Right-click the SumoSnap icon in your Windows System Tray (bottom right corner of your screen by the clock) and click **Settings** to add your free API keys! 
 
 ## Getting Your API Keys
 
