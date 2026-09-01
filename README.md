@@ -27,12 +27,12 @@ There are no bulky windows or loading screens. Just press the hotkey, drag a box
 
 ## How to Install & Run
 
-You don't need to touch any code to get SumoSnap running.
-
 1. Go to the [Releases page](../../releases) and download the latest `SumoSnap-v1.0.zip`.
 2. Extract the folder anywhere on your computer.
-3. Double-click `SumoSnap.exe`. 
-4. A balloon will pop up in your system tray letting you know it is running in the background! 
+3. Right-click **`install.ps1`** and select **"Run with PowerShell"**. This will safely copy the app to your local AppData folder and create a permanent Start Menu shortcut!
+4. Press the Windows Key, type "SumoSnap", and hit enter. 
+   - *Note: Because this is a new open-source app, Windows Defender SmartScreen might pop up a blue warning. Click **"More info"**, and then click **"Run anyway"**.*
+5. A balloon will pop up in your system tray letting you know it is running in the background! 
 
 ## Getting Your API Keys
 
