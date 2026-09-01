@@ -5,7 +5,7 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Media.Imaging;
 
-namespace AIScreenshotUtility;
+namespace SumoSnap;
 
 public partial class App : System.Windows.Application
 {
@@ -17,7 +17,7 @@ public partial class App : System.Windows.Application
         _notifyIcon = new System.Windows.Forms.NotifyIcon();
         _notifyIcon.Icon = System.Drawing.SystemIcons.Application;
         _notifyIcon.Visible = true;
-        _notifyIcon.Text = "AI Screenshot Utility";
+        _notifyIcon.Text = "SumoSnap";
 
         var contextMenu = new System.Windows.Forms.ContextMenuStrip();
         contextMenu.Items.Add("New Screenshot", null, OnNewScreenshotClicked);
@@ -31,7 +31,7 @@ public partial class App : System.Windows.Application
         _hotkeyManager.OnPrintScreenPressed += HandleScreenshot;
 
         // Let the user know the app is ready
-        _notifyIcon.ShowBalloonTip(3000, "AI Screenshot Utility", "Ready! Press Ctrl+Shift+Q to capture.", System.Windows.Forms.ToolTipIcon.Info);
+        _notifyIcon.ShowBalloonTip(3000, "SumoSnap", "Ready! Press Ctrl+Shift+Q to capture.", System.Windows.Forms.ToolTipIcon.Info);
     }
 
     private void HandleScreenshot()

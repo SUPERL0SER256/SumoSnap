@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Navigation;
 
-namespace AIScreenshotUtility;
+namespace SumoSnap;
 
 public partial class SettingsWindow : Window
 {

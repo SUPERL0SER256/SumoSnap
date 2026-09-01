@@ -2,7 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Windows.Interop;
 
-namespace AIScreenshotUtility;
+namespace SumoSnap;
 
 public class HotkeyManager : IDisposable
 {

@@ -1,7 +1,7 @@
-<Window x:Class="AIScreenshotUtility.PostCaptureWindow"
+<Window x:Class="SumoSnap.PostCaptureWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="AI Screenshot Editor" Height="450" Width="600"
+        Title="SumoSnap Editor" Height="450" Width="750"
         WindowStartupLocation="CenterScreen"
         WindowStyle="ToolWindow">
     <Grid>

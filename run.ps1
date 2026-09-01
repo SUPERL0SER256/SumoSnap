@@ -1,4 +1,4 @@
-$ExePath = Join-Path $PSScriptRoot "bin\Debug\net8.0-windows\AIScreenshotUtility.exe"
+$ExePath = Join-Path $PSScriptRoot "bin\Debug\net8.0-windows\SumoSnap.exe"
 
 if (-not (Test-Path $ExePath)) {
     Write-Host "Building first..." -ForegroundColor Yellow

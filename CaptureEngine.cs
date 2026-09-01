@@ -1,7 +1,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace AIScreenshotUtility;
+namespace SumoSnap;
 
 public static class CaptureEngine
 {

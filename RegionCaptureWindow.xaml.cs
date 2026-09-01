@@ -4,7 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace AIScreenshotUtility;
+namespace SumoSnap;
 
 public partial class RegionCaptureWindow : Window
 {

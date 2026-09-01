@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Text.Json;
 
-namespace AIScreenshotUtility;
+namespace SumoSnap;
 
 public class AppSettings
 {
@@ -12,7 +12,7 @@ public class AppSettings
 
 public static class SettingsManager
 {
-    private static readonly string AppDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "AIScreenshotUtility");
+    private static readonly string AppDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SumoSnap");
     private static readonly string SettingsFilePath = Path.Combine(AppDataFolder, "settings.json");
 
     public static AppSettings LoadSettings()
