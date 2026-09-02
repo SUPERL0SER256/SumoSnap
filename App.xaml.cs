@@ -17,7 +17,7 @@ public partial class App : System.Windows.Application
         CreateStartMenuShortcut();
         _notifyIcon = new System.Windows.Forms.NotifyIcon
         {
-            Icon = new System.Drawing.Icon("icon.ico"),
+            Icon = System.Drawing.Icon.ExtractAssociatedIcon(Environment.ProcessPath!),
             Visible = true,
             Text = "SumoSnap"
         };
