@@ -14,6 +14,7 @@ public partial class App : System.Windows.Application
 
     private void Application_Startup(object sender, StartupEventArgs e)
     {
+        CreateStartMenuShortcut();
         _notifyIcon = new System.Windows.Forms.NotifyIcon
         {
             Icon = new System.Drawing.Icon("icon.ico"),
@@ -89,5 +90,32 @@ public partial class App : System.Windows.Application
             _notifyIcon.Dispose();
         }
         Current.Shutdown();
+    }
+
+    private void CreateStartMenuShortcut()
+    {
+        try
+        {
+            string startMenuPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Programs), "SumoSnap.lnk");
+            if (!File.Exists(startMenuPath))
+            {
+                Type? shellType = Type.GetTypeFromProgID("WScript.Shell");
+                if (shellType != null)
+                {
+                    object shell = Activator.CreateInstance(shellType)!;
+                    object shortcut = shellType.InvokeMember("CreateShortcut", System.Reflection.BindingFlags.InvokeMethod, null, shell, new object[] { startMenuPath })!;
+                    
+                    Type shortcutType = shortcut.GetType();
+                    shortcutType.InvokeMember("TargetPath", System.Reflection.BindingFlags.SetProperty, null, shortcut, new object[] { Environment.ProcessPath! });
+                    shortcutType.InvokeMember("WorkingDirectory", System.Reflection.BindingFlags.SetProperty, null, shortcut, new object[] { Path.GetDirectoryName(Environment.ProcessPath)! });
+                    shortcutType.InvokeMember("Description", System.Reflection.BindingFlags.SetProperty, null, shortcut, new object[] { "AI-Powered Screenshot Utility" });
+                    shortcutType.InvokeMember("Save", System.Reflection.BindingFlags.InvokeMethod, null, shortcut, null);
+                }
+            }
+        }
+        catch
+        {
+            // Fail silently if shortcut creation fails
+        }
     }
 }
