@@ -58,6 +58,28 @@ public class AiClient
         return LoadImage(resultBytes);
     }
 
+    private StringContent CreateStringContent(string name, string value)
+    {
+        var content = new StringContent(value);
+        content.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+        {
+            Name = $"\"{name}\""
+        };
+        return content;
+    }
+
+    private ByteArrayContent CreateImageContent(byte[] imageBytes)
+    {
+        var content = new ByteArrayContent(imageBytes);
+        content.Headers.ContentType = MediaTypeHeaderValue.Parse("image/png");
+        content.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+        {
+            Name = "\"image\"",
+            FileName = "\"screenshot.png\""
+        };
+        return content;
+    }
+
     public async Task<BitmapSource> EnhanceAsync(BitmapSource sourceImage)
     {
         if (string.IsNullOrWhiteSpace(_settings.StabilityApiKey))
@@ -68,11 +90,9 @@ public class AiClient
         byte[] imageBytes = GetImageBytes(sourceImage);
 
         using var requestContent = new MultipartFormDataContent();
-        var imageContent = new ByteArrayContent(imageBytes);
-        imageContent.Headers.ContentType = MediaTypeHeaderValue.Parse("image/png");
-        requestContent.Add(imageContent, "\"image\"", "\"screenshot.png\"");
-        requestContent.Add(new StringContent("A high quality, high resolution, sharp version of this image"), "\"prompt\"");
-        requestContent.Add(new StringContent("png"), "\"output_format\"");
+        requestContent.Add(CreateImageContent(imageBytes));
+        requestContent.Add(CreateStringContent("prompt", "A high quality, high resolution, sharp version of this image"));
+        requestContent.Add(CreateStringContent("output_format", "png"));
 
         var request = new HttpRequestMessage(HttpMethod.Post, "https://api.stability.ai/v2beta/stable-image/upscale/conservative");
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _settings.StabilityApiKey);
@@ -101,16 +121,14 @@ public class AiClient
         byte[] imageBytes = GetImageBytes(sourceImage);
 
         using var requestContent = new MultipartFormDataContent();
-        var imageContent = new ByteArrayContent(imageBytes);
-        imageContent.Headers.ContentType = MediaTypeHeaderValue.Parse("image/png");
-        requestContent.Add(imageContent, "\"image\"", "\"screenshot.png\"");
+        requestContent.Add(CreateImageContent(imageBytes));
         
         // Expand the image by 200 pixels in every direction
-        requestContent.Add(new StringContent("200"), "\"left\"");
-        requestContent.Add(new StringContent("200"), "\"right\"");
-        requestContent.Add(new StringContent("200"), "\"up\"");
-        requestContent.Add(new StringContent("200"), "\"down\"");
-        requestContent.Add(new StringContent("png"), "\"output_format\"");
+        requestContent.Add(CreateStringContent("left", "200"));
+        requestContent.Add(CreateStringContent("right", "200"));
+        requestContent.Add(CreateStringContent("up", "200"));
+        requestContent.Add(CreateStringContent("down", "200"));
+        requestContent.Add(CreateStringContent("output_format", "png"));
 
         var request = new HttpRequestMessage(HttpMethod.Post, "https://api.stability.ai/v2beta/stable-image/edit/outpaint");
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _settings.StabilityApiKey);
