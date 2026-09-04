@@ -34,7 +34,27 @@ public partial class PostCaptureWindow : Window
 
     private void CopyButton_Click(object sender, RoutedEventArgs e)
     {
-        System.Windows.Clipboard.SetImage(_currentImage);
+        try
+        {
+            var dataObject = new System.Windows.DataObject();
+            
+            // 1. Standard DIB format for legacy apps (Word, Paint, etc)
+            dataObject.SetImage(_currentImage);
+
+            // 2. Explicit PNG format for modern apps that support transparency (Discord, Chrome, Slack, etc)
+            var pngEncoder = new PngBitmapEncoder();
+            pngEncoder.Frames.Add(BitmapFrame.Create(_currentImage));
+            var ms = new MemoryStream();
+            pngEncoder.Save(ms);
+            dataObject.SetData("PNG", ms, false);
+
+            System.Windows.Clipboard.SetDataObject(dataObject, true);
+        }
+        catch (Exception ex)
+        {
+            System.Windows.MessageBox.Show($"Failed to copy: {ex.Message}");
+        }
+        
         Close();
     }
 
