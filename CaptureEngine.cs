@@ -7,7 +7,7 @@ public static class CaptureEngine
 {
     public static Bitmap CaptureFullScreen()
     {
-        var bounds = Screen.PrimaryScreen.Bounds;
+        var bounds = Screen.PrimaryScreen!.Bounds;
         return CaptureRegion(new System.Windows.Rect(bounds.X, bounds.Y, bounds.Width, bounds.Height));
     }
 
