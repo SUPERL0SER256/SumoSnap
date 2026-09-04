@@ -131,11 +131,56 @@ public class AiClient
 
     private byte[] GetImageBytes(BitmapSource sourceImage)
     {
+        var paddedImage = PadForStability(sourceImage);
         using var memoryStream = new MemoryStream();
         var encoder = new PngBitmapEncoder();
-        encoder.Frames.Add(BitmapFrame.Create(sourceImage));
+        encoder.Frames.Add(BitmapFrame.Create(paddedImage));
         encoder.Save(memoryStream);
         return memoryStream.ToArray();
+    }
+
+    private BitmapSource PadForStability(BitmapSource source)
+    {
+        double width = source.PixelWidth;
+        double height = source.PixelHeight;
+
+        // Stability API requires aspect ratio between 1:2.5 and 2.5:1
+        double ratio = width / height;
+        double targetWidth = width;
+        double targetHeight = height;
+
+        if (ratio > 2.5)
+        {
+            // Too wide, pad height
+            targetHeight = width / 2.5;
+        }
+        else if (ratio < (1.0 / 2.5))
+        {
+            // Too tall, pad width
+            targetWidth = height / 2.5;
+        }
+        
+        // Also ensure minimum 64x64 as per Stability API docs
+        if (targetWidth < 64) targetWidth = 64;
+        if (targetHeight < 64) targetHeight = 64;
+
+        if (targetWidth == source.PixelWidth && targetHeight == source.PixelHeight)
+        {
+            return source;
+        }
+
+        var visual = new System.Windows.Media.DrawingVisual();
+        using (var ctx = visual.RenderOpen())
+        {
+            // Center the original image in the new padded transparent canvas
+            double x = (targetWidth - width) / 2;
+            double y = (targetHeight - height) / 2;
+            ctx.DrawImage(source, new System.Windows.Rect(x, y, width, height));
+        }
+
+        var padded = new RenderTargetBitmap((int)Math.Ceiling(targetWidth), (int)Math.Ceiling(targetHeight), 96, 96, System.Windows.Media.PixelFormats.Pbgra32);
+        padded.Render(visual);
+        return padded;
     }
 
     private BitmapSource LoadImage(byte[] imageData)
