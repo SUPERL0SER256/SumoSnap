@@ -54,6 +54,8 @@
             <Button Content="Enhance" Margin="8" Click="EnhanceButton_Click"/>
             <Button Content="Reframe" Margin="8" Click="ReframeButton_Click"/>
             <Button Content="Remove BG" Margin="8" Click="RemoveBgButton_Click"/>
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="10,0"/>
+            <Button Content="Settings" Margin="8" Click="SettingsButton_Click"/>
         </StackPanel>
         
         <Grid x:Name="LoadingOverlay" Visibility="Collapsed" Background="#B0000000">

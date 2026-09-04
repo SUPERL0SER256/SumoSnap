@@ -165,4 +165,8 @@ public partial class PostCaptureWindow : Window
             LoadingOverlay.Visibility = Visibility.Collapsed;
         }
     }
+    private void SettingsButton_Click(object sender, RoutedEventArgs e)
+    {
+        new SettingsWindow().ShowDialog();
+    }
 }
