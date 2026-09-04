@@ -12,7 +12,6 @@ public partial class SettingsWindow : Window
         ThemeManager.ApplyDarkTitleBar(this);
         
         var settings = SettingsManager.LoadSettings();
-        TxtGemini.Text = settings.GeminiApiKey;
         TxtRemoveBg.Text = settings.RemoveBgApiKey;
         TxtStability.Text = settings.StabilityApiKey;
     }
@@ -31,7 +30,6 @@ public partial class SettingsWindow : Window
     {
         var settings = new AppSettings
         {
-            GeminiApiKey = TxtGemini.Text.Trim(),
             RemoveBgApiKey = TxtRemoveBg.Text.Trim(),
             StabilityApiKey = TxtStability.Text.Trim()
         };
