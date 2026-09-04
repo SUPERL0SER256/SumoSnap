@@ -8,6 +8,7 @@ public class AppSettings
 {
     public string RemoveBgApiKey { get; set; } = "";
     public string StabilityApiKey { get; set; } = "";
+    public string GeminiApiKey { get; set; } = "";
 }
 
 public static class SettingsManager
