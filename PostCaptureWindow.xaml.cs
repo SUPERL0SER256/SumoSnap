@@ -123,7 +123,7 @@ public partial class PostCaptureWindow : Window
 
     private void AddChatBubble(string text, bool isUser)
     {
-        var userColor = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#1E3A8A"); // Deep blue
+        var userColor = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#0A1429"); // Much darker blue
         var aiColor = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#2A2A2A");
 
         var bubble = new Border
