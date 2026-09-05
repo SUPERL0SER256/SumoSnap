@@ -1,54 +1,38 @@
-<div align="center">
-  
 # SumoSnap
-**The heavy-hitting, lightweight screenshot utility that brings real AI to your desktop.**
 
-![Windows 11](https://img.shields.io/badge/Windows-11%20%7C%2010-0078D6?style=for-the-badge&logo=windows)
-![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4?style=for-the-badge&logo=dotnet)
-![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
-
-<!-- TODO: USER, take a screenshot of the SumoSnap editor and drag-and-drop it into the GitHub web editor right here to replace this placeholder text! -->
-<br>
-<i>[ PLACEHOLDER: Insert your screenshot here! ]</i>
-<br><br>
-</div>
-
-SumoSnap is a completely free, background screenshot utility built to replace the default Windows Snipping Tool. It sits silently in your system tray taking up virtually zero memory until you summon it. When you do, it hits your screenshots with state-of-the-art AI.
-
-There are no bulky windows or loading screens. Just press the hotkey, drag a box, and your screenshot pops up with a few extra superpowers. 
+SumoSnap is a lightning-fast, distraction-free AI screenshot companion for Windows. Built for power users who want instant answers about what's on their screen without juggling multiple browser tabs or bloated apps.
 
 ## Features
 
-- **Instant Capture:** Press `Ctrl + Shift + Q` (or `Print Screen`) to instantly freeze your screen and drag a region.
-- **AI Background Removal:** Powered by the Remove.bg API. Turn any screenshot into a perfect transparent PNG instantly.
-- **AI Enhance:** Screenshot too tiny or blurry? SumoSnap uses Stability AI to generate crisp, high-resolution pixels out of thin air.
-- **AI Reframe:** Grabbed a screenshot but missed the edges? The Reframe button outpaints the image, magically generating 200 pixels of extra context around your edges based on what it thinks should be there.
-- **Bring Your Own Key (BYOK):** No expensive monthly SaaS subscriptions. You plug in your own API keys, they get saved securely to your local Windows profile, and you only pay for exactly what you use.
+- **Instant Capture:** Runs silently in your system tray and binds to your screenshot hotkey.
+- **Multi-Model AI Chat:** Seamlessly switch between the best vision models in the world:
+  - Google Gemini (3.6 Flash)
+  - OpenAI (GPT-4o)
+  - Anthropic (Claude 3.5 Sonnet)
+- **Zero Distractions:** An ultra-minimal UI focused entirely on your screenshot and your conversation.
+- **Brief & Direct:** The AI is strictly prompted to avoid conversational filler and give you the exact information you need instantly.
+- **Local Keys:** Your API keys are saved locally on your machine and requests are sent directly to the AI providers. No subscriptions, no middlemen.
 
-## How to Install & Run
+## Installation
 
-1. Go to the [Releases page](../../releases) and download the latest `SumoSnap-v1.0.zip`.
-2. Extract the folder anywhere on your computer.
-3. Right-click **`install.ps1`** and select **"Run with PowerShell"**. This will safely copy the app to your local AppData folder and create a permanent Start Menu shortcut!
-4. Press the Windows Key, type "SumoSnap", and hit enter. 
-   - *Note: Because this is a new open-source app, Windows Defender SmartScreen might pop up a blue warning. Click **"More info"**, and then click **"Run anyway"**.*
+Download the latest standalone `.exe` from the [Releases](#) page.
 
-## Post-Installation (How to Use)
+Alternatively, to run the source directly:
+```powershell
+.\run.ps1
+```
 
-Once installed and running, SumoSnap operates entirely in the background.
+## How to Use
 
-1. **Take a Screenshot:** Press **`Ctrl + Shift + Q`** at any time to freeze your screen. Click and drag to select an area.
-2. **Edit & AI:** The dark-mode editor will instantly pop up. You can immediately click "Copy" or use one of the AI tools.
-3. **Configure API Keys:** Right-click the SumoSnap icon in your Windows System Tray (bottom right corner of your screen by the clock) and click **Settings** to add your free API keys! 
+1. Launch `SumoSnap.exe`. It will minimize to your system tray.
+2. Hit `PrintScreen` (or your configured hotkey) to capture your screen.
+3. The SumoSnap editor will instantly pop up. 
+4. Type your question in the bottom chat bar and hit Enter. The AI will analyze your screenshot and respond immediately!
 
-## Getting Your API Keys
+## Configuration
 
-When you first try to use an AI feature, SumoSnap will gently ask for your API keys. It is totally free to get started:
+Click the ⚙ (Settings) icon in the top right corner of the editor to enter your preferred API keys and toggle between Gemini, OpenAI, and Anthropic.
 
-1. Grab a free key for background removal at [remove.bg/api](https://www.remove.bg/api)
-2. Grab a key for upscaling and outpainting at [platform.stability.ai](https://platform.stability.ai/account/keys)
+## License
 
-Just right-click the SumoSnap icon in your system tray, click **Settings**, paste them in, and you are officially unstoppable.
-
----
-*Built for Windows. Powered by C# and WPF.*
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
