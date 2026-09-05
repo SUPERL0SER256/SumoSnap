@@ -13,8 +13,15 @@ public partial class SettingsWindow : Window
         
         var settings = SettingsManager.LoadSettings();
         TxtGemini.Text = settings.GeminiApiKey;
-        TxtRemoveBg.Text = settings.RemoveBgApiKey;
-        TxtStability.Text = settings.StabilityApiKey;
+        TxtOpenAI.Text = settings.OpenAiApiKey;
+        TxtAnthropic.Text = settings.AnthropicApiKey;
+
+        if (settings.ActiveProvider == "OpenAI")
+            RadioOpenAI.IsChecked = true;
+        else if (settings.ActiveProvider == "Anthropic")
+            RadioAnthropic.IsChecked = true;
+        else
+            RadioGemini.IsChecked = true;
     }
 
     private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
@@ -29,11 +36,16 @@ public partial class SettingsWindow : Window
 
     private void SaveButton_Click(object sender, RoutedEventArgs e)
     {
+        string active = "Gemini";
+        if (RadioOpenAI.IsChecked == true) active = "OpenAI";
+        if (RadioAnthropic.IsChecked == true) active = "Anthropic";
+
         var settings = new AppSettings
         {
             GeminiApiKey = TxtGemini.Text.Trim(),
-            RemoveBgApiKey = TxtRemoveBg.Text.Trim(),
-            StabilityApiKey = TxtStability.Text.Trim()
+            OpenAiApiKey = TxtOpenAI.Text.Trim(),
+            AnthropicApiKey = TxtAnthropic.Text.Trim(),
+            ActiveProvider = active
         };
 
         SettingsManager.SaveSettings(settings);

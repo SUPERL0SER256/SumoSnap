@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -8,19 +9,19 @@ using System.Windows.Media.Imaging;
 
 namespace SumoSnap;
 
-public class GeminiClient : IAiClient
+public class OpenAiClient : IAiClient
 {
     private static readonly HttpClient _httpClient = new HttpClient();
     private readonly string _apiKey;
 
-    public GeminiClient()
+    public OpenAiClient()
     {
         var settings = SettingsManager.LoadSettings();
-        if (string.IsNullOrWhiteSpace(settings.GeminiApiKey))
+        if (string.IsNullOrWhiteSpace(settings.OpenAiApiKey))
         {
-            throw new MissingKeyException("Gemini");
+            throw new MissingKeyException("OpenAI");
         }
-        _apiKey = settings.GeminiApiKey;
+        _apiKey = settings.OpenAiApiKey;
     }
 
     public async Task<string> ChatWithImageAsync(BitmapSource image, string userMessage)
@@ -29,36 +30,40 @@ public class GeminiClient : IAiClient
 
         var requestBody = new
         {
-            system_instruction = new
-            {
-                parts = new[]
-                {
-                    new { text = "You are a helpful AI screenshot companion. Keep answers extremely brief, direct, and actionable. Do not use conversational filler like 'Here is the answer' or 'Sure!'. Return exactly what the user needs to know instantly." }
-                }
-            },
-            contents = new[]
+            model = "gpt-4o",
+            messages = new object[]
             {
                 new
                 {
-                    parts = new object[]
+                    role = "system",
+                    content = "You are a helpful AI screenshot companion. Keep answers extremely brief, direct, and actionable. Do not use conversational filler like 'Here is the answer' or 'Sure!'. Return exactly what the user needs to know instantly."
+                },
+                new
+                {
+                    role = "user",
+                    content = new object[]
                     {
-                        new { text = userMessage },
-                        new { inline_data = new { mime_type = "image/png", data = base64Image } }
+                        new { type = "text", text = userMessage },
+                        new { type = "image_url", image_url = new { url = $"data:image/png;base64,{base64Image}" } }
                     }
                 }
-            }
+            },
+            max_tokens = 500
         };
 
         var json = JsonSerializer.Serialize(requestBody);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-        var url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key={_apiKey}";
-        var response = await _httpClient.PostAsync(url, content);
+        var request = new HttpRequestMessage(HttpMethod.Post, "https://api.openai.com/v1/chat/completions");
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
+        request.Content = content;
+
+        var response = await _httpClient.SendAsync(request);
 
         if (!response.IsSuccessStatusCode)
         {
             var errorBody = await response.Content.ReadAsStringAsync();
-            throw new Exception($"Gemini API failed: {response.StatusCode} - {errorBody}");
+            throw new Exception($"OpenAI API failed: {response.StatusCode} - {errorBody}");
         }
 
         var responseJson = await response.Content.ReadAsStringAsync();
@@ -80,16 +85,14 @@ public class GeminiClient : IAiClient
         {
             using var doc = JsonDocument.Parse(responseJson);
             var root = doc.RootElement;
-            var candidates = root.GetProperty("candidates");
-            var firstCandidate = candidates[0];
-            var contentObj = firstCandidate.GetProperty("content");
-            var parts = contentObj.GetProperty("parts");
-            var firstPart = parts[0];
-            return firstPart.GetProperty("text").GetString() ?? "No response received.";
+            var choices = root.GetProperty("choices");
+            var firstChoice = choices[0];
+            var message = firstChoice.GetProperty("message");
+            return message.GetProperty("content").GetString() ?? "No response received.";
         }
         catch
         {
-            return "Failed to parse Gemini response.";
+            return "Failed to parse OpenAI response.";
         }
     }
 }

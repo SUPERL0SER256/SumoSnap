@@ -6,9 +6,10 @@ namespace SumoSnap;
 
 public class AppSettings
 {
-    public string RemoveBgApiKey { get; set; } = "";
-    public string StabilityApiKey { get; set; } = "";
     public string GeminiApiKey { get; set; } = "";
+    public string OpenAiApiKey { get; set; } = "";
+    public string AnthropicApiKey { get; set; } = "";
+    public string ActiveProvider { get; set; } = "Gemini"; // "Gemini", "OpenAI", or "Anthropic"
 }
 
 public static class SettingsManager
