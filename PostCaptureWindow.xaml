@@ -12,7 +12,7 @@
             <Setter Property="Foreground" Value="Gray"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding" Value="5"/>
-            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontSize" Value="16"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -33,17 +33,16 @@
 
         <!-- Send Button Style -->
         <Style x:Key="SendButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="#3B82F6"/> <!-- Blue accent -->
+            <Setter Property="Background" Value="#111"/> <!-- Black background -->
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="15,8"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="FontSize" Value="13"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}" CornerRadius="18">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="15">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
                         </Border>
                     </ControlTemplate>
@@ -51,7 +50,7 @@
             </Setter>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#2563EB"/>
+                    <Setter Property="Background" Value="#222"/>
                 </Trigger>
                 <Trigger Property="IsEnabled" Value="False">
                     <Setter Property="Opacity" Value="0.5"/>
@@ -88,7 +87,7 @@
         </ScrollViewer>
 
         <!-- Persistent Input Bar at Bottom -->
-        <Border Grid.Row="2" Background="#2A2A2A" BorderBrush="#333" BorderThickness="0,1,0,0" Padding="15">
+        <Border Grid.Row="2" Background="#2A2A2A" BorderBrush="#333" BorderThickness="0,1,0,0" Padding="10">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -97,7 +96,7 @@
                 
                 <TextBox x:Name="ChatInput" Grid.Column="0" 
                          Background="#333" Foreground="White" CaretBrush="White" 
-                         BorderThickness="0" Padding="15,10" FontSize="15" 
+                         BorderThickness="0" Padding="10,6" FontSize="14" 
                          AcceptsReturn="False" KeyDown="ChatInput_KeyDown" 
                          VerticalContentAlignment="Center">
                     <TextBox.Resources>

@@ -1,7 +1,7 @@
 <Window x:Class="SumoSnap.SettingsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="SumoSnap Settings" Height="450" Width="450"
+        Title="SumoSnap Settings" Height="450" Width="550"
         WindowStartupLocation="CenterScreen"
         WindowStyle="ToolWindow"
         Topmost="True"
@@ -61,16 +61,16 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Text="AI Chat Providers" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
-        <TextBlock Text="Select your preferred AI and enter its API key. Your keys are saved locally on this computer." TextWrapping="Wrap" Foreground="Gray" Margin="0,0,0,20"/>
+        <TextBlock Grid.Row="0" Text="AI Chat Providers" FontSize="16" Margin="0,0,0,10"/>
+        <TextBlock Grid.Row="1" Text="Select your preferred AI and enter its API key. Your keys are saved locally on this computer." TextWrapping="Wrap" Foreground="Gray" Margin="0,0,0,20"/>
 
         <!-- Active Provider Selection -->
-        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,0,0,20">
+        <WrapPanel Grid.Row="2" Margin="0,0,0,20">
             <TextBlock Text="Active AI:" FontWeight="Bold" Margin="0,0,15,0" VerticalAlignment="Center"/>
-            <RadioButton x:Name="RadioGemini" Content="Gemini 3.6 Flash" IsChecked="True"/>
-            <RadioButton x:Name="RadioOpenAI" Content="OpenAI (GPT-4o)"/>
-            <RadioButton x:Name="RadioAnthropic" Content="Anthropic (Claude 3.5)"/>
-        </StackPanel>
+            <RadioButton x:Name="RadioGemini" Content="Gemini 3.6 Flash" IsChecked="True" VerticalAlignment="Center"/>
+            <RadioButton x:Name="RadioOpenAI" Content="OpenAI (GPT-4o)" VerticalAlignment="Center"/>
+            <RadioButton x:Name="RadioAnthropic" Content="Anthropic (Claude 3.5)" VerticalAlignment="Center"/>
+        </WrapPanel>
 
         <!-- Gemini -->
         <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,5">
