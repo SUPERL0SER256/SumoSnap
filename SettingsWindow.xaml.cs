@@ -16,7 +16,6 @@ public partial class SettingsWindow : Window
         TxtOpenAI.Text = settings.OpenAiApiKey;
         TxtAnthropic.Text = settings.AnthropicApiKey;
         TxtOllamaUrl.Text = settings.OllamaUrl;
-        TxtOllamaModel.Text = settings.OllamaModel;
 
         if (settings.ActiveProvider == "OpenAI")
             RadioOpenAI.IsChecked = true;
@@ -51,7 +50,7 @@ public partial class SettingsWindow : Window
             OpenAiApiKey = TxtOpenAI.Text.Trim(),
             AnthropicApiKey = TxtAnthropic.Text.Trim(),
             OllamaUrl = TxtOllamaUrl.Text.Trim(),
-            OllamaModel = TxtOllamaModel.Text.Trim(),
+            OllamaModel = "moondream", // Hardcoded per user request
             ActiveProvider = active
         };
 
