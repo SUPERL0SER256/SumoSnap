@@ -46,6 +46,32 @@
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="Margin" Value="0,0,15,0"/>
         </Style>
+        
+        <!-- ScrollBar Styles -->
+        <Style TargetType="ScrollBar">
+            <Setter Property="Background" Value="#1E1E1E"/>
+            <Setter Property="Foreground" Value="#444"/>
+            <Setter Property="Width" Value="8"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Grid Background="{TemplateBinding Background}">
+                            <Track x:Name="PART_Track" IsDirectionReversed="true">
+                                <Track.Thumb>
+                                    <Thumb>
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="Thumb">
+                                                <Border Background="{TemplateBinding Foreground}" CornerRadius="4" Margin="2,0"/>
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <Grid Margin="20">
@@ -74,7 +100,7 @@
                 <RadioButton x:Name="RadioGemini" Content="Gemini 3.6 Flash" IsChecked="True" VerticalAlignment="Center"/>
                 <RadioButton x:Name="RadioOpenAI" Content="OpenAI (GPT-4o)" VerticalAlignment="Center"/>
                 <RadioButton x:Name="RadioAnthropic" Content="Anthropic (Claude 3.5)" VerticalAlignment="Center"/>
-                <RadioButton x:Name="RadioOllama" Content="Moondream (Local AI)" VerticalAlignment="Center" Margin="0,5,15,0"/>
+                <RadioButton x:Name="RadioOllama" Content="LLaVA (Local AI)" VerticalAlignment="Center" Margin="0,5,15,0"/>
             </WrapPanel>
 
             <!-- Gemini -->
@@ -98,22 +124,22 @@
             </StackPanel>
             <TextBox Grid.Row="8" x:Name="TxtAnthropic" Margin="0,0,0,15"/>
 
-            <!-- Ollama / Moondream -->
+            <!-- Ollama / LLaVA -->
             <StackPanel Grid.Row="9" Margin="0,0,0,5">
-                <TextBlock Text="Local AI Setup (Moondream)" FontWeight="Bold" Margin="0,0,0,5"/>
+                <TextBlock Text="Local AI Setup (LLaVA)" FontWeight="Bold" Margin="0,0,0,5"/>
                 <TextBlock TextWrapping="Wrap" Foreground="Gray" Margin="0,0,0,5">
-                    To run locally for free, you must first <Hyperlink NavigateUri="https://ollama.com/download" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#8AB4F8">install Ollama</Hyperlink>, then open your terminal and run this command to <Hyperlink NavigateUri="https://ollama.com/library/moondream" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#8AB4F8">download Moondream</Hyperlink>:
+                    To run locally for free, you must first <Hyperlink NavigateUri="https://ollama.com/download" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#8AB4F8">install Ollama</Hyperlink>, then open your terminal and run this command to pull the <Hyperlink NavigateUri="https://ollama.com/library/llava" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#8AB4F8">LLaVA vision model</Hyperlink>:
                 </TextBlock>
                 <Border Background="#111" CornerRadius="4" Padding="8" Margin="0,0,0,10" HorizontalAlignment="Left" BorderBrush="#333" BorderThickness="1">
-                    <TextBlock Text="ollama pull moondream" Foreground="LightGray" FontFamily="Consolas"/>
+                    <TextBlock Text="ollama pull llava" Foreground="LightGray" FontFamily="Consolas"/>
                 </Border>
                 
                 <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                     <TextBlock Text="Local API URL" FontWeight="Bold" Width="140"/>
                     <TextBlock Text="(Default: http://localhost:11434)" Foreground="Gray"/>
                 </StackPanel>
+                <TextBox x:Name="TxtOllamaUrl" Margin="0,0,0,10"/>
             </StackPanel>
-            <TextBox Grid.Row="10" x:Name="TxtOllamaUrl" Margin="0,0,0,15"/>
 
             <Button Grid.Row="12" Content="Save Settings" HorizontalAlignment="Right" Click="SaveButton_Click" Margin="0,15,0,0"/>
         </Grid>

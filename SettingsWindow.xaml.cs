@@ -50,7 +50,7 @@ public partial class SettingsWindow : Window
             OpenAiApiKey = TxtOpenAI.Text.Trim(),
             AnthropicApiKey = TxtAnthropic.Text.Trim(),
             OllamaUrl = TxtOllamaUrl.Text.Trim(),
-            OllamaModel = "moondream", // Hardcoded per user request
+            OllamaModel = "llava", // Hardcoded per user request
             ActiveProvider = active
         };
 
