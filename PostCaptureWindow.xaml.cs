@@ -135,15 +135,19 @@ public partial class PostCaptureWindow : Window
             HorizontalAlignment = isUser ? System.Windows.HorizontalAlignment.Right : System.Windows.HorizontalAlignment.Left
         };
 
-        var textBlock = new TextBlock
+        var textBox = new System.Windows.Controls.TextBox
         {
             Text = text,
             Foreground = System.Windows.Media.Brushes.White,
+            Background = System.Windows.Media.Brushes.Transparent,
+            BorderThickness = new Thickness(0),
             FontSize = 14,
-            TextWrapping = TextWrapping.Wrap
+            TextWrapping = TextWrapping.Wrap,
+            IsReadOnly = true,
+            Cursor = System.Windows.Input.Cursors.IBeam
         };
 
-        bubble.Child = textBlock;
+        bubble.Child = textBox;
         ChatMessages.Children.Add(bubble);
         MainScroll.ScrollToEnd();
     }
