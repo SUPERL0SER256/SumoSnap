@@ -20,6 +20,8 @@ public partial class SettingsWindow : Window
             RadioOpenAI.IsChecked = true;
         else if (settings.ActiveProvider == "Anthropic")
             RadioAnthropic.IsChecked = true;
+        else if (settings.ActiveProvider == "GeminiPro")
+            RadioGeminiPro.IsChecked = true;
         else
             RadioGemini.IsChecked = true;
     }
@@ -37,6 +39,7 @@ public partial class SettingsWindow : Window
     private void SaveButton_Click(object sender, RoutedEventArgs e)
     {
         string active = "Gemini";
+        if (RadioGeminiPro.IsChecked == true) active = "GeminiPro";
         if (RadioOpenAI.IsChecked == true) active = "OpenAI";
         if (RadioAnthropic.IsChecked == true) active = "Anthropic";
 

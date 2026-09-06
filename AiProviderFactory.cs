@@ -12,7 +12,8 @@ public static class AiProviderFactory
         {
             "OpenAI" => new OpenAiClient(),
             "Anthropic" => new AnthropicClient(),
-            _ => new GeminiClient() // Default to Gemini
+            "GeminiPro" => new GeminiClient(isPro: true),
+            _ => new GeminiClient(isPro: false) // Default to Gemini Flash
         };
     }
 }

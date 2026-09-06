@@ -87,7 +87,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
@@ -97,7 +97,8 @@
             <!-- Active Provider Selection -->
             <WrapPanel Grid.Row="2" Margin="0,0,0,20">
                 <TextBlock Text="Active AI:" FontWeight="Bold" Margin="0,0,15,0" VerticalAlignment="Center"/>
-                <RadioButton x:Name="RadioGemini" Content="Gemini 3.6 Flash" IsChecked="True" VerticalAlignment="Center"/>
+                <RadioButton x:Name="RadioGemini" Content="Gemini Flash (Fast)" IsChecked="True" VerticalAlignment="Center"/>
+                <RadioButton x:Name="RadioGeminiPro" Content="Gemini Pro (Advanced)" VerticalAlignment="Center"/>
                 <RadioButton x:Name="RadioOpenAI" Content="OpenAI (GPT-4o)" VerticalAlignment="Center"/>
                 <RadioButton x:Name="RadioAnthropic" Content="Anthropic (Claude 3.5)" VerticalAlignment="Center"/>
             </WrapPanel>

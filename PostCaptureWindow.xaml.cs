@@ -94,14 +94,19 @@ public partial class PostCaptureWindow : Window
         LoadingIndicator.Visibility = Visibility.Visible;
         ChatInput.IsEnabled = false;
 
+        Border thinkingBubble = AddChatBubble("Thinking...", isUser: false);
+
         try
         {
             var aiClient = AiProviderFactory.CreateClient();
             string response = await aiClient.ChatWithImageAsync(_currentImage, userMessage);
+            
+            ChatMessages.Children.Remove(thinkingBubble);
             AddChatBubble(response, isUser: false);
         }
         catch (MissingKeyException ex)
         {
+            ChatMessages.Children.Remove(thinkingBubble);
             var result = System.Windows.MessageBox.Show($"Please enter your {ex.Message} API key in Settings.", "Missing API Key", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
             if (result == MessageBoxResult.OK)
             {
@@ -110,6 +115,7 @@ public partial class PostCaptureWindow : Window
         }
         catch (Exception ex)
         {
+            ChatMessages.Children.Remove(thinkingBubble);
             AddChatBubble($"Error: {ex.Message}", isUser: false);
         }
         finally
@@ -121,7 +127,7 @@ public partial class PostCaptureWindow : Window
         }
     }
 
-    private void AddChatBubble(string text, bool isUser)
+    private Border AddChatBubble(string text, bool isUser)
     {
         var userColor = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#000000"); // Pure black
         var aiColor = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#2A2A2A");
@@ -150,5 +156,6 @@ public partial class PostCaptureWindow : Window
         bubble.Child = textBox;
         ChatMessages.Children.Add(bubble);
         MainScroll.ScrollToEnd();
+        return bubble;
     }
 }

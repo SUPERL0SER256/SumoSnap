@@ -12,8 +12,9 @@ public class GeminiClient : IAiClient
 {
     private static readonly HttpClient _httpClient = new HttpClient();
     private readonly string _apiKey;
+    private readonly string _modelName;
 
-    public GeminiClient()
+    public GeminiClient(bool isPro = false)
     {
         var settings = SettingsManager.LoadSettings();
         if (string.IsNullOrWhiteSpace(settings.GeminiApiKey))
@@ -21,6 +22,7 @@ public class GeminiClient : IAiClient
             throw new MissingKeyException("Gemini");
         }
         _apiKey = settings.GeminiApiKey;
+        _modelName = isPro ? "gemini-1.5-pro" : "gemini-1.5-flash"; // Valid current model names
     }
 
     public async Task<string> ChatWithImageAsync(BitmapSource image, string userMessage)
@@ -52,7 +54,7 @@ public class GeminiClient : IAiClient
         var json = JsonSerializer.Serialize(requestBody);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-        var url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key={_apiKey}";
+        var url = $"https://generativelanguage.googleapis.com/v1beta/models/{_modelName}:generateContent?key={_apiKey}";
         var response = await _httpClient.PostAsync(url, content);
 
         if (!response.IsSuccessStatusCode)
