@@ -100,7 +100,6 @@
                 <RadioButton x:Name="RadioGemini" Content="Gemini 3.6 Flash" IsChecked="True" VerticalAlignment="Center"/>
                 <RadioButton x:Name="RadioOpenAI" Content="OpenAI (GPT-4o)" VerticalAlignment="Center"/>
                 <RadioButton x:Name="RadioAnthropic" Content="Anthropic (Claude 3.5)" VerticalAlignment="Center"/>
-                <RadioButton x:Name="RadioOllama" Content="LLaVA (Local AI)" VerticalAlignment="Center" Margin="0,5,15,0"/>
             </WrapPanel>
 
             <!-- Gemini -->
@@ -123,23 +122,6 @@
                 <TextBlock><Hyperlink NavigateUri="https://console.anthropic.com/settings/keys" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#8AB4F8">Get key here</Hyperlink></TextBlock>
             </StackPanel>
             <TextBox Grid.Row="8" x:Name="TxtAnthropic" Margin="0,0,0,15"/>
-
-            <!-- Ollama / LLaVA -->
-            <StackPanel Grid.Row="9" Margin="0,0,0,5">
-                <TextBlock Text="Local AI Setup (LLaVA)" FontWeight="Bold" Margin="0,0,0,5"/>
-                <TextBlock TextWrapping="Wrap" Foreground="Gray" Margin="0,0,0,5">
-                    To run locally for free, you must first <Hyperlink NavigateUri="https://ollama.com/download" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#8AB4F8">install Ollama</Hyperlink>, then open your terminal and run this command to pull the <Hyperlink NavigateUri="https://ollama.com/library/llava" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#8AB4F8">LLaVA vision model</Hyperlink>:
-                </TextBlock>
-                <Border Background="#111" CornerRadius="4" Padding="8" Margin="0,0,0,10" HorizontalAlignment="Left" BorderBrush="#333" BorderThickness="1">
-                    <TextBlock Text="ollama pull llava" Foreground="LightGray" FontFamily="Consolas"/>
-                </Border>
-                
-                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                    <TextBlock Text="Local API URL" FontWeight="Bold" Width="140"/>
-                    <TextBlock Text="(Default: http://localhost:11434)" Foreground="Gray"/>
-                </StackPanel>
-                <TextBox x:Name="TxtOllamaUrl" Margin="0,0,0,10"/>
-            </StackPanel>
 
             <Button Grid.Row="12" Content="Save Settings" HorizontalAlignment="Right" Click="SaveButton_Click" Margin="0,15,0,0"/>
         </Grid>

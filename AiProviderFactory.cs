@@ -12,7 +12,6 @@ public static class AiProviderFactory
         {
             "OpenAI" => new OpenAiClient(),
             "Anthropic" => new AnthropicClient(),
-            "Ollama" => new OllamaClient(),
             _ => new GeminiClient() // Default to Gemini
         };
     }

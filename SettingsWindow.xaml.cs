@@ -15,14 +15,11 @@ public partial class SettingsWindow : Window
         TxtGemini.Text = settings.GeminiApiKey;
         TxtOpenAI.Text = settings.OpenAiApiKey;
         TxtAnthropic.Text = settings.AnthropicApiKey;
-        TxtOllamaUrl.Text = settings.OllamaUrl;
 
         if (settings.ActiveProvider == "OpenAI")
             RadioOpenAI.IsChecked = true;
         else if (settings.ActiveProvider == "Anthropic")
             RadioAnthropic.IsChecked = true;
-        else if (settings.ActiveProvider == "Ollama")
-            RadioOllama.IsChecked = true;
         else
             RadioGemini.IsChecked = true;
     }
@@ -42,15 +39,12 @@ public partial class SettingsWindow : Window
         string active = "Gemini";
         if (RadioOpenAI.IsChecked == true) active = "OpenAI";
         if (RadioAnthropic.IsChecked == true) active = "Anthropic";
-        if (RadioOllama.IsChecked == true) active = "Ollama";
 
         var settings = new AppSettings
         {
             GeminiApiKey = TxtGemini.Text.Trim(),
             OpenAiApiKey = TxtOpenAI.Text.Trim(),
             AnthropicApiKey = TxtAnthropic.Text.Trim(),
-            OllamaUrl = TxtOllamaUrl.Text.Trim(),
-            OllamaModel = "llava", // Hardcoded per user request
             ActiveProvider = active
         };
 
