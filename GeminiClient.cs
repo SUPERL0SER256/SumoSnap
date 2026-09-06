@@ -22,7 +22,7 @@ public class GeminiClient : IAiClient
             throw new MissingKeyException("Gemini");
         }
         _apiKey = settings.GeminiApiKey;
-        _modelName = isPro ? "gemini-1.5-pro" : "gemini-1.5-flash"; // Valid current model names
+        _modelName = isPro ? "gemini-3.1-pro" : "gemini-3.6-flash"; // Reverting to user-specified models
     }
 
     public async Task<string> ChatWithImageAsync(BitmapSource image, string userMessage)
