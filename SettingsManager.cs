@@ -9,7 +9,12 @@ public class AppSettings
     public string GeminiApiKey { get; set; } = "";
     public string OpenAiApiKey { get; set; } = "";
     public string AnthropicApiKey { get; set; } = "";
-    public string ActiveProvider { get; set; } = "Gemini"; // "Gemini", "OpenAI", or "Anthropic"
+    
+    // Ollama settings
+    public string OllamaUrl { get; set; } = "http://localhost:11434";
+    public string OllamaModel { get; set; } = "llava";
+
+    public string ActiveProvider { get; set; } = "Gemini"; // "Gemini", "OpenAI", "Anthropic", "Ollama"
 }
 
 public static class SettingsManager
