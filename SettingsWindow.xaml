@@ -47,74 +47,75 @@
             <Setter Property="Margin" Value="0,0,15,0"/>
         </Style>
     </Window.Resources>
-    <Grid Margin="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Text="AI Chat Providers" FontSize="16" Margin="0,0,0,10"/>
-        <TextBlock Grid.Row="1" Text="Select your preferred AI and enter its API key. Your keys are saved locally on this computer." TextWrapping="Wrap" Foreground="Gray" Margin="0,0,0,20"/>
+            <TextBlock Grid.Row="0" Text="AI Chat Providers" FontSize="16" Margin="0,0,0,10"/>
+            <TextBlock Grid.Row="1" Text="Select your preferred AI and enter its API key. Your keys are saved locally on this computer." TextWrapping="Wrap" Foreground="Gray" Margin="0,0,0,20"/>
 
-        <!-- Active Provider Selection -->
-        <WrapPanel Grid.Row="2" Margin="0,0,0,20">
-            <TextBlock Text="Active AI:" FontWeight="Bold" Margin="0,0,15,0" VerticalAlignment="Center"/>
-            <RadioButton x:Name="RadioGemini" Content="Gemini 3.6 Flash" IsChecked="True" VerticalAlignment="Center"/>
-            <RadioButton x:Name="RadioOpenAI" Content="OpenAI (GPT-4o)" VerticalAlignment="Center"/>
-            <RadioButton x:Name="RadioAnthropic" Content="Anthropic (Claude 3.5)" VerticalAlignment="Center"/>
-            <RadioButton x:Name="RadioOllama" Content="Moondream (Local AI)" VerticalAlignment="Center" Margin="0,5,15,0"/>
-        </WrapPanel>
+            <!-- Active Provider Selection -->
+            <WrapPanel Grid.Row="2" Margin="0,0,0,20">
+                <TextBlock Text="Active AI:" FontWeight="Bold" Margin="0,0,15,0" VerticalAlignment="Center"/>
+                <RadioButton x:Name="RadioGemini" Content="Gemini 3.6 Flash" IsChecked="True" VerticalAlignment="Center"/>
+                <RadioButton x:Name="RadioOpenAI" Content="OpenAI (GPT-4o)" VerticalAlignment="Center"/>
+                <RadioButton x:Name="RadioAnthropic" Content="Anthropic (Claude 3.5)" VerticalAlignment="Center"/>
+                <RadioButton x:Name="RadioOllama" Content="Moondream (Local AI)" VerticalAlignment="Center" Margin="0,5,15,0"/>
+            </WrapPanel>
 
-        <!-- Gemini -->
-        <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,5">
-            <TextBlock Text="Google Gemini Key" FontWeight="Bold" Width="140"/>
-            <TextBlock><Hyperlink NavigateUri="https://aistudio.google.com/apikey" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#8AB4F8">Get free key here</Hyperlink></TextBlock>
-        </StackPanel>
-        <TextBox Grid.Row="4" x:Name="TxtGemini" Margin="0,0,0,15"/>
-
-        <!-- OpenAI -->
-        <StackPanel Grid.Row="5" Orientation="Horizontal" Margin="0,0,0,5">
-            <TextBlock Text="OpenAI Key" FontWeight="Bold" Width="140"/>
-            <TextBlock><Hyperlink NavigateUri="https://platform.openai.com/api-keys" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#8AB4F8">Get key here</Hyperlink></TextBlock>
-        </StackPanel>
-        <TextBox Grid.Row="6" x:Name="TxtOpenAI" Margin="0,0,0,15"/>
-
-        <!-- Anthropic -->
-        <StackPanel Grid.Row="7" Orientation="Horizontal" Margin="0,0,0,5">
-            <TextBlock Text="Anthropic Key" FontWeight="Bold" Width="140"/>
-            <TextBlock><Hyperlink NavigateUri="https://console.anthropic.com/settings/keys" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#8AB4F8">Get key here</Hyperlink></TextBlock>
-        </StackPanel>
-        <TextBox Grid.Row="8" x:Name="TxtAnthropic" Margin="0,0,0,15"/>
-
-        <!-- Ollama / Moondream -->
-        <StackPanel Grid.Row="9" Margin="0,0,0,5">
-            <TextBlock Text="Local AI Setup (Moondream)" FontWeight="Bold" Margin="0,0,0,5"/>
-            <TextBlock TextWrapping="Wrap" Foreground="Gray" Margin="0,0,0,5">
-                To run locally for free, you must first <Hyperlink NavigateUri="https://ollama.com/download" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#8AB4F8">install Ollama</Hyperlink>, then open your terminal and run this command to <Hyperlink NavigateUri="https://ollama.com/library/moondream" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#8AB4F8">download Moondream</Hyperlink>:
-            </TextBlock>
-            <Border Background="#111" CornerRadius="4" Padding="8" Margin="0,0,0,10" HorizontalAlignment="Left" BorderBrush="#333" BorderThickness="1">
-                <TextBlock Text="ollama pull moondream" Foreground="LightGray" FontFamily="Consolas"/>
-            </Border>
-            
-            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                <TextBlock Text="Local API URL" FontWeight="Bold" Width="140"/>
-                <TextBlock Text="(Default: http://localhost:11434)" Foreground="Gray"/>
+            <!-- Gemini -->
+            <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,5">
+                <TextBlock Text="Google Gemini Key" FontWeight="Bold" Width="140"/>
+                <TextBlock><Hyperlink NavigateUri="https://aistudio.google.com/apikey" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#8AB4F8">Get free key here</Hyperlink></TextBlock>
             </StackPanel>
-        </StackPanel>
-        <TextBox Grid.Row="10" x:Name="TxtOllamaUrl" Margin="0,0,0,15"/>
+            <TextBox Grid.Row="4" x:Name="TxtGemini" Margin="0,0,0,15"/>
 
-        <Button Grid.Row="13" Content="Save Settings" HorizontalAlignment="Right" Click="SaveButton_Click"/>
-    </Grid>
+            <!-- OpenAI -->
+            <StackPanel Grid.Row="5" Orientation="Horizontal" Margin="0,0,0,5">
+                <TextBlock Text="OpenAI Key" FontWeight="Bold" Width="140"/>
+                <TextBlock><Hyperlink NavigateUri="https://platform.openai.com/api-keys" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#8AB4F8">Get key here</Hyperlink></TextBlock>
+            </StackPanel>
+            <TextBox Grid.Row="6" x:Name="TxtOpenAI" Margin="0,0,0,15"/>
+
+            <!-- Anthropic -->
+            <StackPanel Grid.Row="7" Orientation="Horizontal" Margin="0,0,0,5">
+                <TextBlock Text="Anthropic Key" FontWeight="Bold" Width="140"/>
+                <TextBlock><Hyperlink NavigateUri="https://console.anthropic.com/settings/keys" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#8AB4F8">Get key here</Hyperlink></TextBlock>
+            </StackPanel>
+            <TextBox Grid.Row="8" x:Name="TxtAnthropic" Margin="0,0,0,15"/>
+
+            <!-- Ollama / Moondream -->
+            <StackPanel Grid.Row="9" Margin="0,0,0,5">
+                <TextBlock Text="Local AI Setup (Moondream)" FontWeight="Bold" Margin="0,0,0,5"/>
+                <TextBlock TextWrapping="Wrap" Foreground="Gray" Margin="0,0,0,5">
+                    To run locally for free, you must first <Hyperlink NavigateUri="https://ollama.com/download" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#8AB4F8">install Ollama</Hyperlink>, then open your terminal and run this command to <Hyperlink NavigateUri="https://ollama.com/library/moondream" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#8AB4F8">download Moondream</Hyperlink>:
+                </TextBlock>
+                <Border Background="#111" CornerRadius="4" Padding="8" Margin="0,0,0,10" HorizontalAlignment="Left" BorderBrush="#333" BorderThickness="1">
+                    <TextBlock Text="ollama pull moondream" Foreground="LightGray" FontFamily="Consolas"/>
+                </Border>
+                
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                    <TextBlock Text="Local API URL" FontWeight="Bold" Width="140"/>
+                    <TextBlock Text="(Default: http://localhost:11434)" Foreground="Gray"/>
+                </StackPanel>
+            </StackPanel>
+            <TextBox Grid.Row="10" x:Name="TxtOllamaUrl" Margin="0,0,0,15"/>
+
+            <Button Grid.Row="12" Content="Save Settings" HorizontalAlignment="Right" Click="SaveButton_Click" Margin="0,15,0,0"/>
+        </Grid>
+    </ScrollViewer>
 </Window>
