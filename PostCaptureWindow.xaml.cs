@@ -90,23 +90,24 @@ public partial class PostCaptureWindow : Window
         AddChatBubble(userMessage, isUser: true);
         ChatInput.Text = "";
         
-        SendButton.Visibility = Visibility.Collapsed;
-        LoadingIndicator.Visibility = Visibility.Visible;
-        ChatInput.IsEnabled = false;
-
-        Border thinkingBubble = AddChatBubble("Thinking...", isUser: false);
-
+        Border thinkingBubble = null;
         try
         {
+            SendButton.Visibility = Visibility.Collapsed;
+            LoadingIndicator.Visibility = Visibility.Visible;
+            ChatInput.IsEnabled = false;
+
+            thinkingBubble = AddChatBubble("Thinking...", isUser: false);
+
             var aiClient = AiProviderFactory.CreateClient();
             string response = await aiClient.ChatWithImageAsync(_currentImage, userMessage);
             
-            ChatMessages.Children.Remove(thinkingBubble);
+            if (thinkingBubble != null) ChatMessages.Children.Remove(thinkingBubble);
             AddChatBubble(response, isUser: false);
         }
         catch (MissingKeyException ex)
         {
-            ChatMessages.Children.Remove(thinkingBubble);
+            if (thinkingBubble != null) ChatMessages.Children.Remove(thinkingBubble);
             var result = System.Windows.MessageBox.Show($"Please enter your {ex.Message} API key in Settings.", "Missing API Key", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
             if (result == MessageBoxResult.OK)
             {
@@ -115,7 +116,7 @@ public partial class PostCaptureWindow : Window
         }
         catch (Exception ex)
         {
-            ChatMessages.Children.Remove(thinkingBubble);
+            if (thinkingBubble != null) ChatMessages.Children.Remove(thinkingBubble);
             AddChatBubble($"Error: {ex.Message}", isUser: false);
         }
         finally
