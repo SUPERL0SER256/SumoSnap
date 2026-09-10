@@ -31,7 +31,7 @@ public class AnthropicClient : IAiClient
         {
             model = "claude-3-5-sonnet-20240620",
             max_tokens = 500,
-            system = "You are a helpful AI screenshot companion. Keep answers extremely brief, direct, and actionable. Do not use conversational filler like 'Here is the answer' or 'Sure!'. Return exactly what the user needs to know instantly.",
+            system = "You are a helpful AI screenshot companion. Keep answers extremely brief, direct, and actionable. Do not use conversational filler. IMPORTANT: Do NOT use LaTeX, Markdown math ($ or $$), or complex formatting. Write all math, symbols, and equations in plain, simple text (e.g., use the word 'alpha' instead of Greek symbols). Return exactly what the user needs to know instantly.",
             messages = new[]
             {
                 new

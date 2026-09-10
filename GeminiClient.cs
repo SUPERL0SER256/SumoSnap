@@ -35,7 +35,7 @@ public class GeminiClient : IAiClient
             {
                 parts = new[]
                 {
-                    new { text = "You are a helpful AI screenshot companion. Keep answers extremely brief, direct, and actionable. Do not use conversational filler like 'Here is the answer' or 'Sure!'. Return exactly what the user needs to know instantly." }
+                    new { text = "You are a helpful AI screenshot companion. Keep answers extremely brief, direct, and actionable. Do not use conversational filler. IMPORTANT: Do NOT use LaTeX, Markdown math ($ or $$), or complex formatting. Write all math, symbols, and equations in plain, simple text (e.g., use the word 'alpha' instead of Greek symbols, use standard text formatting for fractions). Return exactly what the user needs to know instantly." }
                 }
             },
             contents = new[]
