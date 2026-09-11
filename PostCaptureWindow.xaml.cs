@@ -22,6 +22,10 @@ public partial class PostCaptureWindow : Window
         UpdateUsageDisplay();
         
         ChatInput.Focus();
+        this.PreviewKeyDown += (s, e) => 
+        {
+            if (e.Key == Key.Escape) this.Close();
+        };
     }
 
     private void CopyButton_Click(object sender, RoutedEventArgs e)
@@ -181,7 +185,35 @@ public partial class PostCaptureWindow : Window
             Cursor = System.Windows.Input.Cursors.IBeam
         };
 
-        bubble.Child = textBox;
+        var grid = new Grid();
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+        Grid.SetColumn(textBox, 0);
+        grid.Children.Add(textBox);
+
+        if (!isUser && text != "Thinking...")
+        {
+            var copyBtn = new System.Windows.Controls.Button
+            {
+                Content = "📋",
+                Background = System.Windows.Media.Brushes.Transparent,
+                Foreground = System.Windows.Media.Brushes.Gray,
+                BorderThickness = new Thickness(0),
+                Cursor = System.Windows.Input.Cursors.Hand,
+                ToolTip = "Copy this response",
+                VerticalAlignment = VerticalAlignment.Top,
+                Margin = new Thickness(10, 0, 0, 0)
+            };
+            copyBtn.Click += (s, e) => 
+            { 
+                System.Windows.Clipboard.SetText(text); 
+            };
+            Grid.SetColumn(copyBtn, 1);
+            grid.Children.Add(copyBtn);
+        }
+
+        bubble.Child = grid;
         ChatMessages.Children.Add(bubble);
         MainScroll.ScrollToEnd();
         return bubble;

@@ -109,21 +109,21 @@
                 <TextBlock Text="Google Gemini Key" FontWeight="Bold" Width="140"/>
                 <TextBlock><Hyperlink NavigateUri="https://aistudio.google.com/apikey" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#8AB4F8">Get free key here</Hyperlink></TextBlock>
             </StackPanel>
-            <TextBox Grid.Row="4" x:Name="TxtGemini" Margin="0,0,0,15"/>
+            <PasswordBox Grid.Row="4" x:Name="TxtGemini" Margin="0,0,0,15" Background="#2A2A2A" Foreground="White" BorderBrush="#444" Padding="5"/>
 
             <!-- OpenAI -->
             <StackPanel Grid.Row="5" Orientation="Horizontal" Margin="0,0,0,5">
                 <TextBlock Text="OpenAI Key" FontWeight="Bold" Width="140"/>
                 <TextBlock><Hyperlink NavigateUri="https://platform.openai.com/api-keys" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#8AB4F8">Get key here</Hyperlink></TextBlock>
             </StackPanel>
-            <TextBox Grid.Row="6" x:Name="TxtOpenAI" Margin="0,0,0,15"/>
+            <PasswordBox Grid.Row="6" x:Name="TxtOpenAI" Margin="0,0,0,15" Background="#2A2A2A" Foreground="White" BorderBrush="#444" Padding="5"/>
 
             <!-- Anthropic -->
             <StackPanel Grid.Row="7" Orientation="Horizontal" Margin="0,0,0,5">
                 <TextBlock Text="Anthropic Key" FontWeight="Bold" Width="140"/>
                 <TextBlock><Hyperlink NavigateUri="https://console.anthropic.com/settings/keys" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#8AB4F8">Get key here</Hyperlink></TextBlock>
             </StackPanel>
-            <TextBox Grid.Row="8" x:Name="TxtAnthropic" Margin="0,0,0,15"/>
+            <PasswordBox Grid.Row="8" x:Name="TxtAnthropic" Margin="0,0,0,15" Background="#2A2A2A" Foreground="White" BorderBrush="#444" Padding="5"/>
 
             <!-- Token Budget -->
             <StackPanel Grid.Row="9" Orientation="Horizontal" Margin="0,0,0,5">

@@ -22,6 +22,7 @@ public partial class App : System.Windows.Application
             Text = "SumoSnap"
         };
         var contextMenu = new System.Windows.Forms.ContextMenuStrip();
+        contextMenu.Items.Add("Show Active Chat", null, OnShowChatClicked);
         contextMenu.Items.Add("New Screenshot", null, OnNewScreenshotClicked);
         contextMenu.Items.Add("Settings", null, OnSettingsClicked);
         contextMenu.Items.Add(new System.Windows.Forms.ToolStripSeparator());
@@ -36,6 +37,8 @@ public partial class App : System.Windows.Application
         _notifyIcon.ShowBalloonTip(3000, "SumoSnap", "Ready! Press Ctrl+Shift+Q to capture.", System.Windows.Forms.ToolTipIcon.Info);
     }
 
+    private PostCaptureWindow? _currentSessionWindow;
+
     private void HandleScreenshot()
     {
         try
@@ -46,8 +49,13 @@ public partial class App : System.Windows.Application
                 using var bmp = CaptureEngine.CaptureRegion(window.SelectedRegion);
                 var imageSource = BitmapToImageSource(bmp);
                 
-                var postCaptureWindow = new PostCaptureWindow(imageSource);
-                postCaptureWindow.ShowDialog();
+                if (_currentSessionWindow != null)
+                {
+                    _currentSessionWindow.Close();
+                }
+
+                _currentSessionWindow = new PostCaptureWindow(imageSource);
+                _currentSessionWindow.Show();
             }
         }
         catch (Exception ex)
@@ -68,6 +76,19 @@ public partial class App : System.Windows.Application
             bitmapimage.CacheOption = BitmapCacheOption.OnLoad;
             bitmapimage.EndInit();
             return bitmapimage;
+        }
+    }
+
+    private void OnShowChatClicked(object? sender, EventArgs e)
+    {
+        if (_currentSessionWindow != null)
+        {
+            _currentSessionWindow.Show();
+            _currentSessionWindow.Activate();
+        }
+        else
+        {
+            System.Windows.MessageBox.Show("No active chat. Take a screenshot first (Ctrl+Shift+Q).", "SumoSnap", MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
 

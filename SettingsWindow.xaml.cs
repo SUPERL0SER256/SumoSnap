@@ -12,9 +12,9 @@ public partial class SettingsWindow : Window
         ThemeManager.ApplyDarkTitleBar(this);
         
         var settings = SettingsManager.LoadSettings();
-        TxtGemini.Text = settings.GeminiApiKey;
-        TxtOpenAI.Text = settings.OpenAiApiKey;
-        TxtAnthropic.Text = settings.AnthropicApiKey;
+        TxtGemini.Password = settings.GeminiApiKey;
+        TxtOpenAI.Password = settings.OpenAiApiKey;
+        TxtAnthropic.Password = settings.AnthropicApiKey;
         TxtTokenBudget.Text = settings.MonthlyTokenBudget.ToString();
 
         if (settings.ActiveProvider == "OpenAI")
@@ -48,9 +48,9 @@ public partial class SettingsWindow : Window
 
         var settings = new AppSettings
         {
-            GeminiApiKey = TxtGemini.Text.Trim(),
-            OpenAiApiKey = TxtOpenAI.Text.Trim(),
-            AnthropicApiKey = TxtAnthropic.Text.Trim(),
+            GeminiApiKey = TxtGemini.Password.Trim(),
+            OpenAiApiKey = TxtOpenAI.Password.Trim(),
+            AnthropicApiKey = TxtAnthropic.Password.Trim(),
             ActiveProvider = active,
             MonthlyTokenBudget = tokenBudget
         };
