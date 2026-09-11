@@ -15,6 +15,7 @@ public partial class SettingsWindow : Window
         TxtGemini.Text = settings.GeminiApiKey;
         TxtOpenAI.Text = settings.OpenAiApiKey;
         TxtAnthropic.Text = settings.AnthropicApiKey;
+        TxtTokenBudget.Text = settings.MonthlyTokenBudget.ToString();
 
         if (settings.ActiveProvider == "OpenAI")
             RadioOpenAI.IsChecked = true;
@@ -43,12 +44,15 @@ public partial class SettingsWindow : Window
         if (RadioOpenAI.IsChecked == true) active = "OpenAI";
         if (RadioAnthropic.IsChecked == true) active = "Anthropic";
 
+        int.TryParse(TxtTokenBudget.Text.Trim(), out int tokenBudget);
+
         var settings = new AppSettings
         {
             GeminiApiKey = TxtGemini.Text.Trim(),
             OpenAiApiKey = TxtOpenAI.Text.Trim(),
             AnthropicApiKey = TxtAnthropic.Text.Trim(),
-            ActiveProvider = active
+            ActiveProvider = active,
+            MonthlyTokenBudget = tokenBudget
         };
 
         SettingsManager.SaveSettings(settings);

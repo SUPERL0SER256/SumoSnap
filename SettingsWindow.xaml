@@ -89,6 +89,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <TextBlock Grid.Row="0" Text="AI Chat Providers" FontSize="16" Margin="0,0,0,10"/>
@@ -123,6 +124,13 @@
                 <TextBlock><Hyperlink NavigateUri="https://console.anthropic.com/settings/keys" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#8AB4F8">Get key here</Hyperlink></TextBlock>
             </StackPanel>
             <TextBox Grid.Row="8" x:Name="TxtAnthropic" Margin="0,0,0,15"/>
+
+            <!-- Token Budget -->
+            <StackPanel Grid.Row="9" Orientation="Horizontal" Margin="0,0,0,5">
+                <TextBlock Text="Monthly Token Budget" FontWeight="Bold" Width="140"/>
+                <TextBlock Text="Total tokens allowed before quota turns red" Foreground="Gray"/>
+            </StackPanel>
+            <TextBox Grid.Row="10" x:Name="TxtTokenBudget" Margin="0,0,0,15"/>
 
             <Button Grid.Row="12" Content="Save Settings" HorizontalAlignment="Right" Click="SaveButton_Click" Margin="0,15,0,0"/>
         </Grid>

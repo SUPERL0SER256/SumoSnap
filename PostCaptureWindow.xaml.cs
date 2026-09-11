@@ -144,40 +144,15 @@ public partial class PostCaptureWindow : Window
     {
         var settings = SettingsManager.LoadSettings();
 
-        // Check if the day has rolled over for Gemini quota
-        if (settings.LastRequestDate.Date < DateTime.Now.Date)
-        {
-            settings.DailyRequestsCount = 0;
-            settings.LastRequestDate = DateTime.Now;
-            SettingsManager.SaveSettings(settings);
-        }
-
-        if (settings.ActiveProvider == "Gemini" || settings.ActiveProvider == "GeminiPro")
-        {
-            int maxRequests = settings.ActiveProvider == "GeminiPro" ? 50 : 1500;
-            int remaining = Math.Max(0, maxRequests - settings.DailyRequestsCount);
-            double percent = (double)remaining / maxRequests * 100;
-            
-            UsageText.Text = $"{remaining:N0} / {maxRequests:N0} Today ({percent:F0}%)";
-            UsageBar.Value = percent;
-
-            UsageBar.Foreground = percent < 10 ? System.Windows.Media.Brushes.Red : 
-                                  percent < 30 ? System.Windows.Media.Brushes.Orange : 
-                                  new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#8AB4F8"));
-        }
-        else
-        {
-            int maxTokens = settings.MonthlyTokenBudget > 0 ? settings.MonthlyTokenBudget : 100000;
-            int remaining = Math.Max(0, maxTokens - settings.TotalTokensUsed);
-            double percent = (double)remaining / maxTokens * 100;
-
-            UsageText.Text = $"Tokens: {remaining:N0} Left ({percent:F0}%)";
-            UsageBar.Value = percent;
-
-            UsageBar.Foreground = percent < 10 ? System.Windows.Media.Brushes.Red : 
-                                  percent < 30 ? System.Windows.Media.Brushes.Orange : 
-                                  new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#34A853"));
-        }
+        int maxTokens = settings.MonthlyTokenBudget > 0 ? settings.MonthlyTokenBudget : 100000;
+        int remaining = Math.Max(0, maxTokens - settings.TotalTokensUsed);
+        
+        UsageText.Text = $"Tokens: {settings.TotalTokensUsed:N0} / {maxTokens:N0}";
+        
+        // Highlight in red if they exceed the budget
+        UsageText.Foreground = settings.TotalTokensUsed >= maxTokens 
+            ? System.Windows.Media.Brushes.Red 
+            : new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#888888"));
     }
 
     private Border AddChatBubble(string text, bool isUser)

@@ -93,10 +93,7 @@
 
         <!-- Top Right Actions -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
-            <StackPanel VerticalAlignment="Center" Margin="0,0,15,0">
-                <TextBlock x:Name="UsageText" Text="Quota: 100% Left" Foreground="#888" FontSize="11" HorizontalAlignment="Right" Margin="0,0,0,4"/>
-                <ProgressBar x:Name="UsageBar" Width="120" Height="4" Value="0" Maximum="100" BorderThickness="0" Foreground="#8AB4F8" Background="#333"/>
-            </StackPanel>
+            <TextBlock x:Name="UsageText" Text="Quota: 100% Left" Foreground="#888" FontSize="12" VerticalAlignment="Center" Margin="0,0,15,0"/>
             <Button Content="📋" ToolTip="Copy to Clipboard" Style="{StaticResource IconButtonStyle}" Click="CopyButton_Click"/>
             <Button Content="💾" ToolTip="Save to Disk" Style="{StaticResource IconButtonStyle}" Click="SaveButton_Click" Margin="5,0"/>
             <Button Content="⚙" ToolTip="Settings" Style="{StaticResource IconButtonStyle}" Click="SettingsButton_Click"/>
