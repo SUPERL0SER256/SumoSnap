@@ -10,6 +10,7 @@ public class AppSettings
     public string OpenAiApiKey { get; set; } = "";
     public string AnthropicApiKey { get; set; } = "";
     public string ActiveProvider { get; set; } = "Gemini"; // "Gemini", "OpenAI", or "Anthropic"
+    public int TotalTokensUsed { get; set; } = 0;
 }
 
 public static class SettingsManager

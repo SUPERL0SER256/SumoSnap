@@ -25,7 +25,7 @@ public class GeminiClient : IAiClient
         _modelName = isPro ? "gemini-3.1-pro" : "gemini-3.6-flash";
     }
 
-    public async Task<string> ChatWithImageAsync(BitmapSource image, string userMessage)
+    public async Task<AiResponse> ChatWithImageAsync(BitmapSource image, string userMessage)
     {
         string base64Image = ImageToBase64(image);
 
@@ -76,8 +76,9 @@ public class GeminiClient : IAiClient
         return Convert.ToBase64String(ms.ToArray());
     }
 
-    private string ExtractTextFromResponse(string responseJson)
+    private AiResponse ExtractTextFromResponse(string responseJson)
     {
+        var response = new AiResponse();
         try
         {
             using var doc = JsonDocument.Parse(responseJson);
@@ -87,11 +88,17 @@ public class GeminiClient : IAiClient
             var contentObj = firstCandidate.GetProperty("content");
             var parts = contentObj.GetProperty("parts");
             var firstPart = parts[0];
-            return firstPart.GetProperty("text").GetString() ?? "No response received.";
+            response.Text = firstPart.GetProperty("text").GetString() ?? "No response received.";
+
+            if (root.TryGetProperty("usageMetadata", out var usageObj) && usageObj.TryGetProperty("totalTokenCount", out var tokenProp))
+            {
+                response.TokensUsed = tokenProp.GetInt32();
+            }
         }
         catch
         {
-            return "Failed to parse Gemini response.";
+            response.Text = "Failed to parse Gemini response.";
         }
+        return response;
     }
 }

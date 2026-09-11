@@ -24,7 +24,7 @@ public class OpenAiClient : IAiClient
         _apiKey = settings.OpenAiApiKey;
     }
 
-    public async Task<string> ChatWithImageAsync(BitmapSource image, string userMessage)
+    public async Task<AiResponse> ChatWithImageAsync(BitmapSource image, string userMessage)
     {
         string base64Image = ImageToBase64(image);
 
@@ -79,20 +79,25 @@ public class OpenAiClient : IAiClient
         return Convert.ToBase64String(ms.ToArray());
     }
 
-    private string ExtractTextFromResponse(string responseJson)
+    private AiResponse ExtractTextFromResponse(string responseJson)
     {
+        var response = new AiResponse();
         try
         {
             using var doc = JsonDocument.Parse(responseJson);
             var root = doc.RootElement;
             var choices = root.GetProperty("choices");
-            var firstChoice = choices[0];
-            var message = firstChoice.GetProperty("message");
-            return message.GetProperty("content").GetString() ?? "No response received.";
+            response.Text = choices[0].GetProperty("message").GetProperty("content").GetString() ?? "No response received.";
+
+            if (root.TryGetProperty("usage", out var usageObj) && usageObj.TryGetProperty("total_tokens", out var tokenProp))
+            {
+                response.TokensUsed = tokenProp.GetInt32();
+            }
         }
         catch
         {
-            return "Failed to parse OpenAI response.";
+            response.Text = "Failed to parse OpenAI response.";
         }
+        return response;
     }
 }

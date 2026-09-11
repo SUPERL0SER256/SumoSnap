@@ -19,6 +19,10 @@ public partial class PostCaptureWindow : Window
         
         _currentImage = capturedImage;
         PreviewImage.Source = _currentImage;
+        
+        var settings = SettingsManager.LoadSettings();
+        TokenCountText.Text = $"Total Tokens: {settings.TotalTokensUsed:N0}";
+        
         ChatInput.Focus();
     }
 
@@ -100,10 +104,18 @@ public partial class PostCaptureWindow : Window
             thinkingBubble = AddChatBubble("Thinking...", isUser: false);
 
             var aiClient = AiProviderFactory.CreateClient();
-            string response = await aiClient.ChatWithImageAsync(_currentImage, userMessage);
+            AiResponse response = await aiClient.ChatWithImageAsync(_currentImage, userMessage);
             
             if (thinkingBubble != null) ChatMessages.Children.Remove(thinkingBubble);
-            AddChatBubble(response, isUser: false);
+            AddChatBubble(response.Text, isUser: false);
+
+            if (response.TokensUsed > 0)
+            {
+                var settings = SettingsManager.LoadSettings();
+                settings.TotalTokensUsed += response.TokensUsed;
+                SettingsManager.SaveSettings(settings);
+                TokenCountText.Text = $"Total Tokens: {settings.TotalTokensUsed:N0}";
+            }
         }
         catch (MissingKeyException ex)
         {

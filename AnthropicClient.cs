@@ -23,7 +23,7 @@ public class AnthropicClient : IAiClient
         _apiKey = settings.AnthropicApiKey;
     }
 
-    public async Task<string> ChatWithImageAsync(BitmapSource image, string userMessage)
+    public async Task<AiResponse> ChatWithImageAsync(BitmapSource image, string userMessage)
     {
         string base64Image = ImageToBase64(image);
 
@@ -75,19 +75,27 @@ public class AnthropicClient : IAiClient
         return Convert.ToBase64String(ms.ToArray());
     }
 
-    private string ExtractTextFromResponse(string responseJson)
+    private AiResponse ExtractTextFromResponse(string responseJson)
     {
+        var response = new AiResponse();
         try
         {
             using var doc = JsonDocument.Parse(responseJson);
             var root = doc.RootElement;
-            var content = root.GetProperty("content");
-            var firstContent = content[0];
-            return firstContent.GetProperty("text").GetString() ?? "No response received.";
+            var contentArray = root.GetProperty("content");
+            response.Text = contentArray[0].GetProperty("text").GetString() ?? "No response received.";
+
+            if (root.TryGetProperty("usage", out var usageObj))
+            {
+                int inputTokens = usageObj.TryGetProperty("input_tokens", out var inProp) ? inProp.GetInt32() : 0;
+                int outputTokens = usageObj.TryGetProperty("output_tokens", out var outProp) ? outProp.GetInt32() : 0;
+                response.TokensUsed = inputTokens + outputTokens;
+            }
         }
         catch
         {
-            return "Failed to parse Anthropic response.";
+            response.Text = "Failed to parse Anthropic response.";
         }
+        return response;
     }
 }

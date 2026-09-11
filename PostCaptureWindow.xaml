@@ -134,6 +134,9 @@
                 <!-- Loading Spinner / Indicator -->
                 <TextBlock x:Name="LoadingIndicator" Grid.Column="1" Text="Thinking..." Foreground="Gray" VerticalAlignment="Center" Margin="15,0" Visibility="Collapsed" FontStyle="Italic"/>
 
+                <!-- Token Counter -->
+                <TextBlock x:Name="TokenCountText" Grid.Column="1" Text="Tokens: 0" Foreground="#666" FontSize="11" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,80,-18"/>
+
                 <Button x:Name="SendButton" Grid.Column="1" Content="Ask" Style="{StaticResource SendButtonStyle}" Margin="15,0,0,0" Click="SendButton_Click"/>
             </Grid>
         </Border>
