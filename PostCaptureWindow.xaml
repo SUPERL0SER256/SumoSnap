@@ -93,6 +93,7 @@
 
         <!-- Top Right Actions -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
+            <TextBlock x:Name="TokenCountText" Text="Tokens: 0" Foreground="#666" FontSize="12" VerticalAlignment="Center" Margin="0,0,15,0"/>
             <Button Content="📋" ToolTip="Copy to Clipboard" Style="{StaticResource IconButtonStyle}" Click="CopyButton_Click"/>
             <Button Content="💾" ToolTip="Save to Disk" Style="{StaticResource IconButtonStyle}" Click="SaveButton_Click" Margin="5,0"/>
             <Button Content="⚙" ToolTip="Settings" Style="{StaticResource IconButtonStyle}" Click="SettingsButton_Click"/>
@@ -132,12 +133,9 @@
                 </TextBox>
 
                 <!-- Loading Spinner / Indicator -->
-                <TextBlock x:Name="LoadingIndicator" Grid.Column="1" Text="Thinking..." Foreground="Gray" VerticalAlignment="Center" Margin="15,0" Visibility="Collapsed" FontStyle="Italic"/>
+                <TextBlock x:Name="LoadingIndicator" Grid.Column="1" Text="Thinking..." Foreground="Gray" VerticalAlignment="Center" Margin="10,0" Visibility="Collapsed" FontStyle="Italic"/>
 
-                <!-- Token Counter -->
-                <TextBlock x:Name="TokenCountText" Grid.Column="1" Text="Tokens: 0" Foreground="#666" FontSize="11" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,80,-18"/>
-
-                <Button x:Name="SendButton" Grid.Column="1" Content="Ask" Style="{StaticResource SendButtonStyle}" Margin="15,0,0,0" Click="SendButton_Click"/>
+                <Button x:Name="SendButton" Grid.Column="1" Content="Ask" Style="{StaticResource SendButtonStyle}" Margin="10,0,0,0" Padding="20,6" Click="SendButton_Click"/>
             </Grid>
         </Border>
     </Grid>
