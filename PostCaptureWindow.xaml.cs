@@ -185,32 +185,7 @@ public partial class PostCaptureWindow : Window
             Cursor = System.Windows.Input.Cursors.IBeam
         };
 
-        var grid = new Grid();
-        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-
-        Grid.SetColumn(textBox, 0);
-        grid.Children.Add(textBox);
-
-        if (!isUser && text != "Thinking...")
-        {
-            var copyBtn = new System.Windows.Controls.Button
-            {
-                Content = "📋",
-                Style = (Style)FindResource("PlainIconButtonStyle"),
-                ToolTip = "Copy this response",
-                VerticalAlignment = VerticalAlignment.Bottom,
-                Margin = new Thickness(10, 0, 0, 0)
-            };
-            copyBtn.Click += (s, e) => 
-            { 
-                System.Windows.Clipboard.SetText(text); 
-            };
-            Grid.SetColumn(copyBtn, 1);
-            grid.Children.Add(copyBtn);
-        }
-
-        bubble.Child = grid;
+        bubble.Child = textBox;
         ChatMessages.Children.Add(bubble);
         MainScroll.ScrollToEnd();
         return bubble;
