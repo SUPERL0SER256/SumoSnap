@@ -24,7 +24,7 @@ public partial class PostCaptureWindow : Window
         ChatInput.Focus();
         this.PreviewKeyDown += (s, e) => 
         {
-            if (e.Key == Key.Escape) this.Close();
+            if (e.Key == Key.Escape) this.WindowState = WindowState.Minimized;
         };
     }
 
@@ -197,12 +197,9 @@ public partial class PostCaptureWindow : Window
             var copyBtn = new System.Windows.Controls.Button
             {
                 Content = "📋",
-                Background = System.Windows.Media.Brushes.Transparent,
-                Foreground = System.Windows.Media.Brushes.Gray,
-                BorderThickness = new Thickness(0),
-                Cursor = System.Windows.Input.Cursors.Hand,
+                Style = (Style)FindResource("PlainIconButtonStyle"),
                 ToolTip = "Copy this response",
-                VerticalAlignment = VerticalAlignment.Top,
+                VerticalAlignment = VerticalAlignment.Bottom,
                 Margin = new Thickness(10, 0, 0, 0)
             };
             copyBtn.Click += (s, e) => 
