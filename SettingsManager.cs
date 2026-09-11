@@ -11,6 +11,9 @@ public class AppSettings
     public string AnthropicApiKey { get; set; } = "";
     public string ActiveProvider { get; set; } = "Gemini"; // "Gemini", "OpenAI", or "Anthropic"
     public int TotalTokensUsed { get; set; } = 0;
+    public int DailyRequestsCount { get; set; } = 0;
+    public DateTime LastRequestDate { get; set; } = DateTime.MinValue;
+    public int MonthlyTokenBudget { get; set; } = 500000;
 }
 
 public static class SettingsManager
