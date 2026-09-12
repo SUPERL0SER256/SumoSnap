@@ -15,9 +15,10 @@ public partial class App : System.Windows.Application
     private void Application_Startup(object sender, StartupEventArgs e)
     {
         CreateStartMenuShortcut();
+        string iconPath = Path.Combine(AppContext.BaseDirectory, "icon.ico");
         _notifyIcon = new System.Windows.Forms.NotifyIcon
         {
-            Icon = System.Drawing.Icon.ExtractAssociatedIcon(Environment.ProcessPath!),
+            Icon = File.Exists(iconPath) ? new System.Drawing.Icon(iconPath) : System.Drawing.Icon.ExtractAssociatedIcon(Environment.ProcessPath!),
             Visible = true,
             Text = "SumoSnap"
         };
