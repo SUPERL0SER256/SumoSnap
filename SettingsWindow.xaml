@@ -130,18 +130,17 @@
                 <TextBlock Text="Set Token Limit" FontWeight="Bold" Width="140"/>
                 <TextBlock Text="Total tokens allowed before quota turns red" Foreground="Gray"/>
             </StackPanel>
-            <TextBox Grid.Row="10" x:Name="TxtTokenBudget" Margin="0,0,0,15"/>
+            <TextBox Grid.Row="10" x:Name="TxtTokenBudget" Margin="0,0,0,5"/>
+            
+            <Button Grid.Row="11" Content="Reset Usage to 0" HorizontalAlignment="Left" Background="#555555" Foreground="#EEEEEE" BorderThickness="0" Padding="8,4" FontSize="11" Cursor="Hand" Click="ResetTokensButton_Click" Margin="0,0,0,15">
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="3"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
 
-            <Grid Grid.Row="12" Margin="0,15,0,0">
-                <Button Content="Reset Token Count" HorizontalAlignment="Left" Background="#662222" Foreground="White" BorderThickness="0" Padding="10" Cursor="Hand" Click="ResetTokensButton_Click">
-                    <Button.Resources>
-                        <Style TargetType="Border">
-                            <Setter Property="CornerRadius" Value="5"/>
-                        </Style>
-                    </Button.Resources>
-                </Button>
-                <Button Content="Save Settings" HorizontalAlignment="Right" Click="SaveButton_Click"/>
-            </Grid>
+            <Button Grid.Row="12" Content="Save Settings" HorizontalAlignment="Right" Click="SaveButton_Click" Margin="0,15,0,0"/>
         </Grid>
     </ScrollViewer>
 </Window>

@@ -77,6 +77,7 @@ public partial class PostCaptureWindow : Window
     private void SettingsButton_Click(object sender, RoutedEventArgs e)
     {
         new SettingsWindow().ShowDialog();
+        UpdateUsageDisplay();
     }
 
     private void ChatInput_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
