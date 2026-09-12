@@ -59,4 +59,12 @@ public partial class SettingsWindow : Window
         DialogResult = true;
         Close();
     }
+
+    private void ResetTokensButton_Click(object sender, RoutedEventArgs e)
+    {
+        var settings = SettingsManager.LoadSettings();
+        settings.TotalTokensUsed = 0;
+        SettingsManager.SaveSettings(settings);
+        System.Windows.MessageBox.Show("Your token usage has been reset to 0.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+    }
 }

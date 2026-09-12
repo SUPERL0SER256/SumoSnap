@@ -132,7 +132,16 @@
             </StackPanel>
             <TextBox Grid.Row="10" x:Name="TxtTokenBudget" Margin="0,0,0,15"/>
 
-            <Button Grid.Row="12" Content="Save Settings" HorizontalAlignment="Right" Click="SaveButton_Click" Margin="0,15,0,0"/>
+            <Grid Grid.Row="12" Margin="0,15,0,0">
+                <Button Content="Reset Token Count" HorizontalAlignment="Left" Background="#662222" Foreground="White" BorderThickness="0" Padding="10" Cursor="Hand" Click="ResetTokensButton_Click">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="5"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+                <Button Content="Save Settings" HorizontalAlignment="Right" Click="SaveButton_Click"/>
+            </Grid>
         </Grid>
     </ScrollViewer>
 </Window>
