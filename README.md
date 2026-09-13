@@ -2,6 +2,8 @@
 
 SumoSnap is a lightning-fast, distraction-free AI screenshot companion for Windows. Built for power users who want instant answers about what's on their screen without juggling multiple browser tabs or bloated apps.
 
+**100% Open Source | Bring Your Own Key (BYOK) | No Subscriptions**
+
 ## Features
 
 - **Instant Capture:** Runs silently in your system tray and binds to your screenshot hotkey.
@@ -11,7 +13,7 @@ SumoSnap is a lightning-fast, distraction-free AI screenshot companion for Windo
   - Anthropic (Claude 3.5 Sonnet)
 - **Zero Distractions:** An ultra-minimal UI focused entirely on your screenshot and your conversation.
 - **Brief & Direct:** The AI is strictly prompted to avoid conversational filler and give you the exact information you need instantly.
-- **Local Keys:** Your API keys are saved locally on your machine and requests are sent directly to the AI providers. No subscriptions, no middlemen.
+- **BYOK (Bring Your Own Key):** SumoSnap is completely free and open source. There are no subscriptions, markups, or middlemen. You bring your own API keys, meaning you are in complete control of your usage and costs (including taking advantage of Google Gemini's massive free tier). Your keys are saved strictly locally on your own machine.
 
 ## Installation
 
