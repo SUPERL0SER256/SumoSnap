@@ -48,32 +48,6 @@
             </Setter>
         </Style>
 
-        <!-- Glass Button Style for Siri UI -->
-        <Style x:Key="GlassButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="#15FFFFFF"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderBrush" Value="#25FFFFFF"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="20">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#25FFFFFF"/>
-                </Trigger>
-                <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Opacity" Value="0.5"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
         <!-- Send Button Style -->
         <Style x:Key="SendButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="#111"/> <!-- Black background -->
@@ -156,65 +130,30 @@
         </ScrollViewer>
 
         <!-- Persistent Input Bar at Bottom -->
-        <Grid Grid.Row="2" Margin="20,10,20,30">
-            
-            <!-- Ambient Siri Glow Behind -->
-            <Border x:Name="GlowBorder" CornerRadius="25" Margin="-2" Opacity="0">
-                <Border.Background>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                        <GradientStop Color="#FF4A00E0" Offset="0.0" />
-                        <GradientStop Color="#FF8E2DE2" Offset="0.3" />
-                        <GradientStop Color="#FFF000FF" Offset="0.6" />
-                        <GradientStop Color="#FF00C9FF" Offset="1.0" />
-                    </LinearGradientBrush>
-                </Border.Background>
-                <Border.Effect>
-                    <BlurEffect Radius="35" />
-                </Border.Effect>
-            </Border>
-
-            <!-- Main Input Container -->
+        <Border Grid.Row="2" Background="#2A2A2A" BorderBrush="#333" BorderThickness="0,1,0,0" Padding="10">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-
-                <!-- Left Button (+) -->
-                <Button Grid.Column="0" Content="+" Width="40" Height="40" Style="{StaticResource GlassButtonStyle}" Click="SettingsButton_Click" FontSize="22" FontWeight="Light"/>
-
-                <!-- Middle Input (Pill) -->
-                <Border Grid.Column="1" Background="#12FFFFFF" BorderBrush="#25FFFFFF" BorderThickness="1" CornerRadius="20" Margin="10,0">
-                    <Grid>
-                        <!-- Siri Placeholder Text -->
-                        <TextBlock Text="Ask SumoSnap" Foreground="#888" VerticalAlignment="Center" Margin="15,0" FontSize="15" IsHitTestVisible="False">
-                            <TextBlock.Style>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Text.Length, ElementName=ChatInput}" Value="0">
-                                            <Setter Property="Visibility" Value="Visible"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
-                        
-                        <!-- Actual Text Box -->
-                        <TextBox x:Name="ChatInput" Background="Transparent" Foreground="White" CaretBrush="White" 
-                                 BorderThickness="0" Padding="15,10" FontSize="15" 
-                                 AcceptsReturn="False" KeyDown="ChatInput_KeyDown" 
-                                 VerticalContentAlignment="Center" VerticalAlignment="Stretch"/>
-                    </Grid>
-                </Border>
-
-                <!-- Right Button (Send / Up Arrow) -->
-                <Button x:Name="SendButton" Grid.Column="2" Content="↑" Width="40" Height="40" Style="{StaticResource GlassButtonStyle}" Click="SendButton_Click" FontSize="20" FontWeight="Bold"/>
                 
-                <!-- Loading Indicator Overlay -->
-                <TextBlock x:Name="LoadingIndicator" Grid.Column="2" Text="⋯" Foreground="White" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" IsHitTestVisible="False" Margin="0,-5,0,0"/>
+                <TextBox x:Name="ChatInput" Grid.Column="0" 
+                         Background="#333" Foreground="White" CaretBrush="White" 
+                         BorderThickness="0" Padding="10,6" FontSize="14" 
+                         AcceptsReturn="False" KeyDown="ChatInput_KeyDown" 
+                         VerticalContentAlignment="Center">
+                    <TextBox.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="18"/>
+                        </Style>
+                    </TextBox.Resources>
+                </TextBox>
+
+                <!-- Loading Spinner / Indicator -->
+                <TextBlock x:Name="LoadingIndicator" Grid.Column="1" Text="Thinking..." Foreground="Gray" VerticalAlignment="Center" Margin="10,0" Visibility="Collapsed" FontStyle="Italic"/>
+
+                <Button x:Name="SendButton" Grid.Column="1" Content="Ask" Style="{StaticResource SendButtonStyle}" Margin="10,0,0,0" Padding="20,6" Click="SendButton_Click"/>
             </Grid>
-        </Grid>
+        </Border>
     </Grid>
 </Window>

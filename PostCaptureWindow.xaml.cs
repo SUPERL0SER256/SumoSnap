@@ -107,19 +107,7 @@ public partial class PostCaptureWindow : Window
             thinkingBubble = AddChatBubble("Thinking...", isUser: false);
 
             var aiClient = AiProviderFactory.CreateClient();
-
-            // Turn on Glow
-            var glowIn = new System.Windows.Media.Animation.DoubleAnimation(0, 1, TimeSpan.FromSeconds(0.5));
-            glowIn.AutoReverse = true;
-            glowIn.RepeatBehavior = System.Windows.Media.Animation.RepeatBehavior.Forever;
-            GlowBorder.BeginAnimation(OpacityProperty, glowIn);
-
             AiResponse response = await aiClient.ChatWithImageAsync(_currentImage, userMessage);
-
-            // Turn off Glow
-            GlowBorder.BeginAnimation(OpacityProperty, null);
-            var glowOut = new System.Windows.Media.Animation.DoubleAnimation(GlowBorder.Opacity, 0, TimeSpan.FromSeconds(0.5));
-            GlowBorder.BeginAnimation(OpacityProperty, glowOut);
             
             if (thinkingBubble != null) ChatMessages.Children.Remove(thinkingBubble);
             AddChatBubble(response.Text, isUser: false);
@@ -150,11 +138,6 @@ public partial class PostCaptureWindow : Window
         }
         finally
         {
-            // Turn off Glow
-            GlowBorder.BeginAnimation(OpacityProperty, null);
-            var glowOut = new System.Windows.Media.Animation.DoubleAnimation(GlowBorder.Opacity, 0, TimeSpan.FromSeconds(0.5));
-            GlowBorder.BeginAnimation(OpacityProperty, glowOut);
-
             SendButton.Visibility = Visibility.Visible;
             LoadingIndicator.Visibility = Visibility.Collapsed;
             ChatInput.IsEnabled = true;
