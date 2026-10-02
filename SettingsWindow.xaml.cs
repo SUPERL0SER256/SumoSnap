@@ -6,6 +6,10 @@ namespace SumoSnap;
 
 public partial class SettingsWindow : Window
 {
+    
+    private void Minimize_Click(object sender, RoutedEventArgs e) { this.WindowState = WindowState.Minimized; }
+    private void Close_Click(object sender, RoutedEventArgs e) { this.Close(); }
+
     public SettingsWindow()
     {
         InitializeComponent();

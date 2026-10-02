@@ -12,6 +12,11 @@ public partial class PostCaptureWindow : Window
 {
     private BitmapSource _currentImage;
 
+    
+    private void Minimize_Click(object sender, RoutedEventArgs e) { this.WindowState = WindowState.Minimized; }
+    private void Maximize_Click(object sender, RoutedEventArgs e) { this.WindowState = this.WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized; }
+    private void Close_Click(object sender, RoutedEventArgs e) { this.Close(); }
+
     public PostCaptureWindow(BitmapSource capturedImage)
     {
         InitializeComponent();
@@ -163,8 +168,8 @@ public partial class PostCaptureWindow : Window
 
     private Border AddChatBubble(string text, bool isUser)
     {
-        var userColor = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#000000"); // Pure black
-        var aiColor = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#2A2A2A");
+        var userColor = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#050508"); // Pure black
+        var aiColor = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#1C1C1E");
 
         var bubble = new Border
         {
