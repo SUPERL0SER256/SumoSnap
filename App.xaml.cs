@@ -39,6 +39,16 @@ public partial class App : System.Windows.Application
         _hotkeyManager = new HotkeyManager();
         _hotkeyManager.OnPrintScreenPressed += HandleScreenshot;
 
+        
+        var settings = SettingsManager.LoadSettings();
+        if (!settings.HasSeenOnboarding)
+        {
+            var infoWindow = new InfoWindow();
+            infoWindow.ShowDialog();
+            settings.HasSeenOnboarding = true;
+            SettingsManager.SaveSettings(settings);
+        }
+        
         // Let the user know the app is ready
         _notifyIcon.ShowBalloonTip(3000, "SumoSnap", "Ready! Press Ctrl+Shift+Q to capture.", System.Windows.Forms.ToolTipIcon.Info);
     }

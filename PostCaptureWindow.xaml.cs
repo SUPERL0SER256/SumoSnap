@@ -15,6 +15,7 @@ public partial class PostCaptureWindow : Window
     
     private void Minimize_Click(object sender, RoutedEventArgs e) { this.WindowState = WindowState.Minimized; }
     private void Maximize_Click(object sender, RoutedEventArgs e) { this.WindowState = this.WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized; }
+    private void InfoButton_Click(object sender, RoutedEventArgs e) { new InfoWindow().ShowDialog(); }
     private void Close_Click(object sender, RoutedEventArgs e) { this.Close(); }
 
     public PostCaptureWindow(BitmapSource capturedImage)
@@ -85,6 +86,21 @@ public partial class PostCaptureWindow : Window
         UpdateUsageDisplay();
         ((App)System.Windows.Application.Current).SyncBuddyVisibility();
     }
+
+    
+    private void TriggerKeystrokePulse()
+    {
+        if (ChatChromeFocused != null)
+        {
+            var thicknessAnim = new System.Windows.Media.Animation.ThicknessAnimation();
+            thicknessAnim.From = new System.Windows.Thickness(1.4);
+            thicknessAnim.To = new System.Windows.Thickness(0);
+            thicknessAnim.Duration = new System.Windows.Duration(TimeSpan.FromMilliseconds(300));
+            thicknessAnim.EasingFunction = new System.Windows.Media.Animation.QuinticEase { EasingMode = System.Windows.Media.Animation.EasingMode.EaseOut };
+            
+            ChatChromeFocused.BeginAnimation(System.Windows.FrameworkElement.MarginProperty, thicknessAnim, System.Windows.Media.Animation.HandoffBehavior.Compose);
+        }
+    } 
 
     private void ChatInput_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
     {
