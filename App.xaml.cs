@@ -11,6 +11,7 @@ public partial class App : System.Windows.Application
 {
     private System.Windows.Forms.NotifyIcon? _notifyIcon;
     private HotkeyManager? _hotkeyManager;
+    private BuddyWindow? _buddyWindow;
 
     private void Application_Startup(object sender, StartupEventArgs e)
     {
@@ -25,11 +26,15 @@ public partial class App : System.Windows.Application
         var contextMenu = new System.Windows.Forms.ContextMenuStrip();
         contextMenu.Items.Add("Show Active Chat", null, OnShowChatClicked);
         contextMenu.Items.Add("New Screenshot", null, OnNewScreenshotClicked);
+        contextMenu.Items.Add("Toggle Floating Buddy", null, OnToggleBuddyClicked);
         contextMenu.Items.Add("Settings", null, OnSettingsClicked);
         contextMenu.Items.Add(new System.Windows.Forms.ToolStripSeparator());
         contextMenu.Items.Add("Quit", null, OnQuitClicked);
         
         _notifyIcon.ContextMenuStrip = contextMenu;
+
+        _buddyWindow = new BuddyWindow(HandleScreenshot);
+        _buddyWindow.Show();
 
         _hotkeyManager = new HotkeyManager();
         _hotkeyManager.OnPrintScreenPressed += HandleScreenshot;
@@ -42,6 +47,16 @@ public partial class App : System.Windows.Application
 
     private void HandleScreenshot()
     {
+        bool buddyWasVisible = false;
+        if (_buddyWindow != null && _buddyWindow.IsVisible)
+        {
+            buddyWasVisible = true;
+            _buddyWindow.Hide();
+            // Force UI update so it completely disappears before screen freeze
+            System.Windows.Application.Current.Dispatcher.Invoke(() => { }, System.Windows.Threading.DispatcherPriority.Render);
+            System.Threading.Thread.Sleep(50); 
+        }
+
         try
         {
             var window = new RegionCaptureWindow();
@@ -62,6 +77,13 @@ public partial class App : System.Windows.Application
         catch (Exception ex)
         {
             System.Windows.MessageBox.Show($"Error during capture: {ex.Message}\n{ex.StackTrace}", "Capture Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+        finally
+        {
+            if (buddyWasVisible && _buddyWindow != null)
+            {
+                _buddyWindow.Show();
+            }
         }
     }
 
@@ -98,9 +120,41 @@ public partial class App : System.Windows.Application
         HandleScreenshot();
     }
 
+    private void OnToggleBuddyClicked(object? sender, EventArgs e)
+    {
+        var settings = SettingsManager.LoadSettings();
+        settings.ShowFloatingBuddy = !settings.ShowFloatingBuddy;
+        SettingsManager.SaveSettings(settings);
+
+        if (_buddyWindow != null)
+        {
+            if (settings.ShowFloatingBuddy)
+                _buddyWindow.Show();
+            else
+                _buddyWindow.Hide();
+        }
+    }
+
     private void OnSettingsClicked(object? sender, EventArgs e)
     {
         new SettingsWindow().ShowDialog();
+        SyncBuddyVisibility();
+    }
+
+    public void SyncBuddyVisibility()
+    {
+        var settings = SettingsManager.LoadSettings();
+        if (_buddyWindow != null)
+        {
+            if (settings.ShowFloatingBuddy)
+            {
+                if (!_buddyWindow.IsVisible) _buddyWindow.Show();
+            }
+            else
+            {
+                if (_buddyWindow.IsVisible) _buddyWindow.Hide();
+            }
+        }
     }
 
     private void OnQuitClicked(object? sender, EventArgs e)

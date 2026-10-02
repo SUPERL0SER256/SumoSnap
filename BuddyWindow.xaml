@@ -1,0 +1,13 @@
+<Window x:Class="SumoSnap.BuddyWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="SumoSnap Buddy" Height="60" Width="60"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        Topmost="True" ShowInTaskbar="False" ResizeMode="NoResize"
+        Opacity="0.5" MouseEnter="Window_MouseEnter" MouseLeave="Window_MouseLeave"
+        MouseLeftButtonDown="Window_MouseLeftButtonDown" MouseMove="Window_MouseMove" MouseLeftButtonUp="Window_MouseLeftButtonUp"
+        Loaded="Window_Loaded">
+    <Grid Background="#01000000"> <!-- Near transparent background for hit testing -->
+        <Image Source="pack://siteoforigin:,,,/buddy_icon.png" Stretch="Uniform" Margin="0" RenderOptions.BitmapScalingMode="HighQuality"/>
+    </Grid>
+</Window>

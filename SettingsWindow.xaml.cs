@@ -25,6 +25,8 @@ public partial class SettingsWindow : Window
             RadioGeminiPro.IsChecked = true;
         else
             RadioGemini.IsChecked = true;
+
+        ChkShowBuddy.IsChecked = settings.ShowFloatingBuddy;
     }
 
     private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
@@ -46,13 +48,19 @@ public partial class SettingsWindow : Window
 
         int.TryParse(TxtTokenBudget.Text.Trim(), out int tokenBudget);
 
+        var existingSettings = SettingsManager.LoadSettings();
+
         var settings = new AppSettings
         {
             GeminiApiKey = TxtGemini.Password.Trim(),
             OpenAiApiKey = TxtOpenAI.Password.Trim(),
             AnthropicApiKey = TxtAnthropic.Password.Trim(),
             ActiveProvider = active,
-            MonthlyTokenBudget = tokenBudget
+            MonthlyTokenBudget = tokenBudget,
+            TotalTokensUsed = existingSettings.TotalTokensUsed,
+            DailyRequestsCount = existingSettings.DailyRequestsCount,
+            LastRequestDate = existingSettings.LastRequestDate,
+            ShowFloatingBuddy = ChkShowBuddy.IsChecked ?? true
         };
 
         SettingsManager.SaveSettings(settings);

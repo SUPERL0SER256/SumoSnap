@@ -78,6 +78,7 @@ public partial class PostCaptureWindow : Window
     {
         new SettingsWindow().ShowDialog();
         UpdateUsageDisplay();
+        ((App)System.Windows.Application.Current).SyncBuddyVisibility();
     }
 
     private void ChatInput_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
@@ -131,10 +132,10 @@ public partial class PostCaptureWindow : Window
                 new SettingsWindow().ShowDialog();
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             if (thinkingBubble != null) ChatMessages.Children.Remove(thinkingBubble);
-            AddChatBubble($"Error: {ex.Message}", isUser: false);
+            AddChatBubble("The AI server is currently busy or unresponsive. Please try sending your message again.", isUser: false);
         }
         finally
         {
