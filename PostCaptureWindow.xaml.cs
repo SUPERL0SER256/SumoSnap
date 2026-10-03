@@ -102,6 +102,38 @@ public partial class PostCaptureWindow : Window
         }
     } 
 
+    
+    private void UpdateSendButtonGlow(bool isHovering)
+    {
+        bool hasText = ChatInput.Text.Trim().Length > 0;
+        bool shouldGlow = hasText || isHovering;
+
+        var outerRing = SendButton.Template.FindName("OuterRingHover", SendButton) as System.Windows.Controls.Border;
+        var innerOverlay = SendButton.Template.FindName("InnerHoverOverlay", SendButton) as System.Windows.Controls.Border;
+
+        if (outerRing != null && innerOverlay != null)
+        {
+            var anim = new System.Windows.Media.Animation.DoubleAnimation(shouldGlow ? 1.0 : 0.0, new System.Windows.Duration(TimeSpan.FromMilliseconds(shouldGlow ? 200 : 300)));
+            outerRing.BeginAnimation(System.Windows.UIElement.OpacityProperty, anim);
+            innerOverlay.BeginAnimation(System.Windows.UIElement.OpacityProperty, anim);
+        }
+    }
+
+    private void ChatInput_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+    {
+        UpdateSendButtonGlow(SendButton.IsMouseOver);
+    }
+
+    private void SendButton_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+    {
+        UpdateSendButtonGlow(true);
+    }
+
+    private void SendButton_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+    {
+        UpdateSendButtonGlow(false);
+    }
+
     private void ChatInput_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
     {
         if (e.Key == Key.Enter)
@@ -119,14 +151,13 @@ public partial class PostCaptureWindow : Window
         AddChatBubble(userMessage, isUser: true);
         ChatInput.Text = "";
         
-        Border thinkingBubble = null;
+        FrameworkElement thinkingBubble = null;
         try
         {
             SendButton.Visibility = Visibility.Collapsed;
-            LoadingIndicator.Visibility = Visibility.Visible;
             ChatInput.IsEnabled = false;
 
-            thinkingBubble = AddChatBubble("Thinking...", isUser: false);
+            thinkingBubble = CreateMetallicLoader();
 
             var aiClient = AiProviderFactory.CreateClient();
             AiResponse response = await aiClient.ChatWithImageAsync(_currentImage, userMessage);
@@ -165,6 +196,66 @@ public partial class PostCaptureWindow : Window
             ChatInput.IsEnabled = true;
             ChatInput.Focus();
         }
+    }
+
+    private FrameworkElement CreateMetallicLoader()
+    {
+        const double d = 6;
+        var canvas = new System.Windows.Controls.Canvas
+        {
+            Width = 22,
+            Height = 20,
+            Margin = new Thickness(16, 8, 0, 12),
+            HorizontalAlignment = System.Windows.HorizontalAlignment.Left
+        };
+
+        var points = new[] { new System.Windows.Point(8, 0), new System.Windows.Point(1, 11), new System.Windows.Point(15, 11) };
+        var flatGrey = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xC8, 0xC8, 0xCC));
+        flatGrey.Freeze();
+
+        for (int i = 0; i < 3; i++)
+        {
+            var scale = new System.Windows.Media.ScaleTransform(0.7, 0.7);
+            var ball = new System.Windows.Shapes.Ellipse
+            {
+                Width = d,
+                Height = d,
+                Fill = flatGrey,
+                Opacity = 0.5,
+                RenderTransformOrigin = new System.Windows.Point(0.5, 0.5),
+                RenderTransform = scale
+            };
+            System.Windows.Controls.Canvas.SetLeft(ball, points[i].X);
+            System.Windows.Controls.Canvas.SetTop(ball, points[i].Y);
+            canvas.Children.Add(ball);
+
+            var begin = TimeSpan.FromMilliseconds(i * 250);
+            var total = TimeSpan.FromMilliseconds(1000);
+
+            System.Windows.Media.Animation.DoubleAnimationUsingKeyFrames Pulse(double idle, double peak)
+            {
+                var kf = new System.Windows.Media.Animation.DoubleAnimationUsingKeyFrames
+                {
+                    BeginTime = begin,
+                    Duration = new Duration(total),
+                    RepeatBehavior = System.Windows.Media.Animation.RepeatBehavior.Forever
+                };
+                kf.KeyFrames.Add(new System.Windows.Media.Animation.EasingDoubleKeyFrame(peak, System.Windows.Media.Animation.KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(250)),
+                    new System.Windows.Media.Animation.SineEase { EasingMode = System.Windows.Media.Animation.EasingMode.EaseOut }));
+                kf.KeyFrames.Add(new System.Windows.Media.Animation.EasingDoubleKeyFrame(idle, System.Windows.Media.Animation.KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(600)),
+                    new System.Windows.Media.Animation.SineEase { EasingMode = System.Windows.Media.Animation.EasingMode.EaseIn }));
+                kf.KeyFrames.Add(new System.Windows.Media.Animation.EasingDoubleKeyFrame(idle, System.Windows.Media.Animation.KeyTime.FromTimeSpan(total)));
+                return kf;
+            }
+
+            scale.BeginAnimation(System.Windows.Media.ScaleTransform.ScaleXProperty, Pulse(0.7, 1.3));
+            scale.BeginAnimation(System.Windows.Media.ScaleTransform.ScaleYProperty, Pulse(0.7, 1.3));
+            ball.BeginAnimation(System.Windows.UIElement.OpacityProperty, Pulse(0.5, 1.0));
+        }
+
+        ChatMessages.Children.Add(canvas);
+        MainScroll.ScrollToBottom();
+        return canvas;
     }
 
     private void UpdateUsageDisplay()

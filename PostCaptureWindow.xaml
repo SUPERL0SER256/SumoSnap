@@ -100,22 +100,7 @@
                             </Border>
                         </Grid>
                         <ControlTemplate.Triggers>
-                            <EventTrigger RoutedEvent="MouseEnter">
-                                <BeginStoryboard>
-                                    <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetName="OuterRingHover" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.2"/>
-                                        <DoubleAnimation Storyboard.TargetName="InnerHoverOverlay" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.2"/>
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </EventTrigger>
-                            <EventTrigger RoutedEvent="MouseLeave">
-                                <BeginStoryboard>
-                                    <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetName="OuterRingHover" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.3"/>
-                                        <DoubleAnimation Storyboard.TargetName="InnerHoverOverlay" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.3"/>
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </EventTrigger>
+                            
                             <Trigger Property="IsPressed" Value="True">
                                 <Setter TargetName="InnerButton" Property="Background" Value="#050505"/>
                             </Trigger>
@@ -281,7 +266,7 @@
     
     <TextBox x:Name="ChatInput" Background="#161618" Foreground="#E0E0E0" CaretBrush="White" 
              BorderThickness="0" Padding="12,8" FontSize="14" Margin="1.5"
-             AcceptsReturn="False" KeyDown="ChatInput_KeyDown" 
+             AcceptsReturn="False" KeyDown="ChatInput_KeyDown" TextChanged="ChatInput_TextChanged" 
              VerticalContentAlignment="Center">
         <TextBox.Resources>
             <Style TargetType="Border">
@@ -294,7 +279,7 @@
                 <!-- Loading Spinner / Indicator -->
                 <TextBlock x:Name="LoadingIndicator" Grid.Column="1" Text="Thinking..." Foreground="Gray" VerticalAlignment="Center" Margin="10,0" Visibility="Collapsed" FontStyle="Italic"/>
 
-                <Button x:Name="SendButton" Grid.Column="1" Content="Ask" Style="{StaticResource SendButtonStyle}" Margin="10,0,0,0" Padding="20,6" Click="SendButton_Click"/>
+                <Button x:Name="SendButton" Grid.Column="1" Content="Ask" Style="{StaticResource SendButtonStyle}" Margin="10,0,0,0" Padding="20,6" Click="SendButton_Click" MouseEnter="SendButton_MouseEnter" MouseLeave="SendButton_MouseLeave"/>
             </Grid>
         </Border>
     </Grid>

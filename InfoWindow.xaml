@@ -1,0 +1,137 @@
+<Window x:Class="SumoSnap.InfoWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="SumoSnap Guide" Height="500" Width="650"
+        WindowStartupLocation="CenterScreen" WindowStyle="None" FontFamily="Segoe UI Variable Display, Segoe UI, sans-serif">
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="40" ResizeBorderThickness="5" GlassFrameThickness="0" CornerRadius="0"/>
+    </WindowChrome.WindowChrome>
+    <Window.Resources>
+        <Style TargetType="ScrollBar">
+            <Setter Property="Background" Value="#1E1E1E"/>
+            <Setter Property="Foreground" Value="#444"/>
+            <Setter Property="Width" Value="8"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Grid Background="{TemplateBinding Background}">
+                            <Track x:Name="PART_Track" IsDirectionReversed="true">
+                                <Track.Thumb>
+                                    <Thumb>
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="Thumb">
+                                                <Border Background="{TemplateBinding Foreground}" CornerRadius="4" Margin="2,0"/>
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="WindowControlButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#888"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bgBorder" Background="{TemplateBinding Background}" CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bgBorder" Property="Background" Value="#1C1C1F"/>
+                                <Setter Property="Foreground" Value="#FFF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <Window.Background>
+        <RadialGradientBrush Center="0.5,0.0" RadiusX="1.2" RadiusY="1.2">
+            <GradientStop Color="#1A1A1D" Offset="0"/>
+            <GradientStop Color="#09090A" Offset="1"/>
+        </RadialGradientBrush>
+    </Window.Background>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Header -->
+        <Border Grid.Row="0" Background="#0A0A0C" BorderBrush="#1F1F22" BorderThickness="0,0,0,1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="15,10,0,10">
+                    <Image Source="pack://siteoforigin:,,,/icon.ico" Width="16" Height="16" Margin="0,0,8,0"/>
+                    <TextBlock Text="Quick Start Guide" Foreground="#666" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" WindowChrome.IsHitTestVisibleInChrome="True" Margin="0,10,10,10">
+                    <Button Content="✕" Style="{StaticResource WindowControlButtonStyle}" FontSize="12" Width="30" Click="Close_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+        
+        <!-- Content -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="40,40,40,40">
+                <TextBlock Text="Welcome to SumoSnap" FontSize="32" FontWeight="Light" Foreground="#FFF" HorizontalAlignment="Center" Margin="0,0,0,15"/>
+                <TextBlock Text="Your intelligent screen assistant. Use SumoSnap to instantly debug code, translate text, or extract tabular data from anywhere on your monitor." FontSize="15" FontWeight="Regular" Foreground="#AAA" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" Width="480" Margin="0,0,0,40"/>
+                
+                <Grid Margin="0,0,0,50">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <StackPanel Grid.Column="0" HorizontalAlignment="Center">
+                        <TextBlock Text="Capture Region" FontSize="20" FontWeight="Light" Foreground="#FFF" HorizontalAlignment="Center" Margin="0,0,0,12"/>
+                        <TextBlock Text="Hit Ctrl+Shift+Q to draw a box around any image, code, or text." FontSize="15" FontWeight="Regular" Foreground="#AAA" TextWrapping="Wrap" TextAlignment="Center" Width="150" LineHeight="20"/>
+                    </StackPanel>
+                    
+                    <StackPanel Grid.Column="1" HorizontalAlignment="Center">
+                        <TextBlock Text="Summon Buddy" FontSize="20" FontWeight="Light" Foreground="#FFF" HorizontalAlignment="Center" Margin="0,0,0,12"/>
+                        <TextBlock Text="Hover over the tiny floating buddy in the corner of your screen (you can drag it anywhere!)." FontSize="15" FontWeight="Regular" Foreground="#AAA" TextWrapping="Wrap" TextAlignment="Center" Width="150" LineHeight="20"/>
+                    </StackPanel>
+                    
+                    <StackPanel Grid.Column="2" HorizontalAlignment="Center">
+                        <TextBlock Text="Ask AI" FontSize="20" FontWeight="Light" Foreground="#FFF" HorizontalAlignment="Center" Margin="0,0,0,12"/>
+                        <TextBlock Text="Click the buddy and type your request. The AI will instantly process your screenshot." FontSize="15" FontWeight="Regular" Foreground="#AAA" TextWrapping="Wrap" TextAlignment="Center" Width="150" LineHeight="20"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- FAQ Section -->
+                <StackPanel Margin="0,10,0,0">
+                    <TextBlock Text="Frequently Asked Questions (FAQ)" FontSize="26" FontWeight="Light" Foreground="#FFF" HorizontalAlignment="Center" Margin="0,0,0,30"/>
+                    
+                    <StackPanel Margin="0,0,0,25">
+                        <TextBlock Text="Where do I get an API key?" FontSize="18" FontWeight="Light" Foreground="#FFF" Margin="0,0,0,5" HorizontalAlignment="Center"/>
+                        <TextBlock Text="You can get a free API key from Google AI Studio (for Gemini), or use your OpenAI/Anthropic accounts. Paste it into the Settings tab (⚙)." FontSize="13" Foreground="#888" TextWrapping="Wrap" TextAlignment="Center" LineHeight="20" HorizontalAlignment="Center" Width="480"/>
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,0,25">
+                        <TextBlock Text="Why isn't the floating buddy appearing?" FontSize="18" FontWeight="Light" Foreground="#FFF" Margin="0,0,0,5" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Make sure 'Show Floating Buddy' is enabled in Settings, and that you have a valid API key saved." FontSize="13" Foreground="#888" TextWrapping="Wrap" TextAlignment="Center" LineHeight="20" HorizontalAlignment="Center" Width="480"/>
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,0,10">
+                        <TextBlock Text="Can I capture multiple monitors?" FontSize="18" FontWeight="Light" Foreground="#FFF" Margin="0,0,0,5" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Yes! When you press Ctrl+Shift+Q, the capture overlay spans across all connected monitors automatically." FontSize="13" Foreground="#888" TextWrapping="Wrap" TextAlignment="Center" LineHeight="20" HorizontalAlignment="Center" Width="480"/>
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Window>
