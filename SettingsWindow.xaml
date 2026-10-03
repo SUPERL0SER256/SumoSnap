@@ -263,8 +263,9 @@
                 </Button.Resources>
             </Button>
 
-            <StackPanel Grid.Row="12" Margin="0,0,0,15">
-                <CheckBox x:Name="ChkShowBuddy" Content="Show Floating Buddy" Foreground="White" ToolTip="Display the floating SumoSnap buddy in the bottom right corner" IsChecked="True"/>
+            <StackPanel Grid.Row="12" Margin="0,0,0,15" Orientation="Horizontal">
+                <CheckBox x:Name="ChkShowBuddy" Content="Show Floating Buddy" Foreground="White" ToolTip="Display the floating SumoSnap buddy in the bottom right corner" IsChecked="True" Margin="0,0,30,0"/>
+                <CheckBox x:Name="ChkRunOnStartup" Content="Run on Startup" Foreground="White" ToolTip="Launch SumoSnap silently in the system tray when Windows starts" IsChecked="True"/>
             </StackPanel>
 
             <Button Grid.Row="13" Content="Save Settings" HorizontalAlignment="Right" Click="SaveButton_Click" Margin="0,15,0,0" Style="{StaticResource SaveButtonStyle}"/>

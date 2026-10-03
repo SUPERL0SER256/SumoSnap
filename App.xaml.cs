@@ -13,8 +13,21 @@ public partial class App : System.Windows.Application
     private HotkeyManager? _hotkeyManager;
     private BuddyWindow? _buddyWindow;
 
+    private static System.Threading.Mutex? _singleInstanceMutex;
+
     private void Application_Startup(object sender, StartupEventArgs e)
     {
+        // Only one SumoSnap may run; otherwise a manual launch would fight the boot instance for the hotkey
+        _singleInstanceMutex = new System.Threading.Mutex(true, "SumoSnap_SingleInstance_Mutex", out bool isFirstInstance);
+        if (!isFirstInstance)
+        {
+            Shutdown();
+            return;
+        }
+
+        bool launchedAtBoot = Array.IndexOf(e.Args, "--startup") >= 0;
+        StartupManager.Apply(SettingsManager.LoadSettings().RunOnStartup);
+
         CreateStartMenuShortcut();
         string iconPath = Path.Combine(AppContext.BaseDirectory, "icon.ico");
         _notifyIcon = new System.Windows.Forms.NotifyIcon
@@ -49,8 +62,9 @@ public partial class App : System.Windows.Application
             SettingsManager.SaveSettings(settings);
         }
         
-        // Let the user know the app is ready
-        _notifyIcon.ShowBalloonTip(3000, "SumoSnap", "Ready! Press Ctrl+Shift+Q to capture.", System.Windows.Forms.ToolTipIcon.Info);
+        // Let the user know the app is ready (stay silent when auto-launched at boot)
+        if (!launchedAtBoot)
+            _notifyIcon.ShowBalloonTip(3000, "SumoSnap", "Ready! Press Ctrl+Shift+Q to capture.", System.Windows.Forms.ToolTipIcon.Info);
     }
 
     private PostCaptureWindow? _currentSessionWindow;

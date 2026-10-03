@@ -15,6 +15,7 @@ public class AppSettings
     public DateTime LastRequestDate { get; set; } = DateTime.MinValue;
     public int MonthlyTokenBudget { get; set; } = 500000;
     public bool ShowFloatingBuddy { get; set; } = true;
+    public bool RunOnStartup { get; set; } = true;
     public bool HasSeenOnboarding { get; set; } = false;
 }
 

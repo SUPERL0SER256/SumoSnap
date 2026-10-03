@@ -184,10 +184,27 @@ public partial class PostCaptureWindow : Window
                 new SettingsWindow().ShowDialog();
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             if (thinkingBubble != null) ChatMessages.Children.Remove(thinkingBubble);
-            AddChatBubble("The AI server is currently busy or unresponsive. Please try sending your message again.", isUser: false);
+            
+            string errorMsg = ex.Message;
+            if (errorMsg.Contains("TooManyRequests") || errorMsg.Contains("429"))
+            {
+                AddChatBubble("Rate limit exceeded. You've sent too many requests to the AI provider. Please wait a moment and try again.", isUser: false);
+            }
+            else if (errorMsg.Contains("Unauthorized") || errorMsg.Contains("401") || errorMsg.Contains("Forbidden") || errorMsg.Contains("403"))
+            {
+                AddChatBubble("Authentication failed. Your API key might be invalid, expired, or lacking permissions. Please check your settings.", isUser: false);
+            }
+            else if (errorMsg.Contains("InternalServerError") || errorMsg.Contains("500") || errorMsg.Contains("502") || errorMsg.Contains("503"))
+            {
+                AddChatBubble("The AI provider's servers are currently down or returning errors. Please try again later.", isUser: false);
+            }
+            else
+            {
+                AddChatBubble($"An unexpected error occurred communicating with the AI. Details: {ex.Message}", isUser: false);
+            }
         }
         finally
         {
@@ -287,9 +304,9 @@ public partial class PostCaptureWindow : Window
             HorizontalAlignment = isUser ? System.Windows.HorizontalAlignment.Right : System.Windows.HorizontalAlignment.Left
         };
 
-        var textBox = new System.Windows.Controls.TextBox
+        System.Windows.Controls.TextBox MakeTextBox(string t) => new System.Windows.Controls.TextBox
         {
-            Text = text,
+            Text = t,
             Foreground = System.Windows.Media.Brushes.White,
             Background = System.Windows.Media.Brushes.Transparent,
             BorderThickness = new Thickness(0),
@@ -299,7 +316,24 @@ public partial class PostCaptureWindow : Window
             Cursor = System.Windows.Input.Cursors.IBeam
         };
 
-        bubble.Child = textBox;
+        var segments = isUser ? null : CodeBlockRenderer.Parse(text);
+        if (segments == null || !segments.Exists(s => s is CodeBlockRenderer.CodeSegment))
+        {
+            bubble.Child = MakeTextBox(text);
+        }
+        else
+        {
+            var stack = new StackPanel();
+            foreach (var seg in segments)
+            {
+                if (seg is CodeBlockRenderer.CodeSegment code)
+                    stack.Children.Add(CodeBlockRenderer.BuildCodeBlock(code.Language, code.Code, MainScroll));
+                else if (seg is CodeBlockRenderer.TextSegment txt)
+                    stack.Children.Add(MakeTextBox(txt.Text));
+            }
+            bubble.Child = stack;
+        }
+
         ChatMessages.Children.Add(bubble);
         MainScroll.ScrollToEnd();
         return bubble;

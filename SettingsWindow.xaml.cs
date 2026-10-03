@@ -31,6 +31,7 @@ public partial class SettingsWindow : Window
             RadioGemini.IsChecked = true;
 
         ChkShowBuddy.IsChecked = settings.ShowFloatingBuddy;
+        ChkRunOnStartup.IsChecked = settings.RunOnStartup;
     }
 
     private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
@@ -52,22 +53,18 @@ public partial class SettingsWindow : Window
 
         int.TryParse(TxtTokenBudget.Text.Trim(), out int tokenBudget);
 
-        var existingSettings = SettingsManager.LoadSettings();
-
-        var settings = new AppSettings
-        {
-            GeminiApiKey = TxtGemini.Password.Trim(),
-            OpenAiApiKey = TxtOpenAI.Password.Trim(),
-            AnthropicApiKey = TxtAnthropic.Password.Trim(),
-            ActiveProvider = active,
-            MonthlyTokenBudget = tokenBudget,
-            TotalTokensUsed = existingSettings.TotalTokensUsed,
-            DailyRequestsCount = existingSettings.DailyRequestsCount,
-            LastRequestDate = existingSettings.LastRequestDate,
-            ShowFloatingBuddy = ChkShowBuddy.IsChecked ?? true
-        };
+        // Update the existing settings so fields not shown here (e.g. HasSeenOnboarding) are preserved
+        var settings = SettingsManager.LoadSettings();
+        settings.GeminiApiKey = TxtGemini.Password.Trim();
+        settings.OpenAiApiKey = TxtOpenAI.Password.Trim();
+        settings.AnthropicApiKey = TxtAnthropic.Password.Trim();
+        settings.ActiveProvider = active;
+        settings.MonthlyTokenBudget = tokenBudget;
+        settings.ShowFloatingBuddy = ChkShowBuddy.IsChecked ?? true;
+        settings.RunOnStartup = ChkRunOnStartup.IsChecked ?? true;
 
         SettingsManager.SaveSettings(settings);
+        StartupManager.Apply(settings.RunOnStartup);
         DialogResult = true;
         Close();
     }
