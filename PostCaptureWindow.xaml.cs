@@ -12,13 +12,12 @@ public partial class PostCaptureWindow : Window
 {
     private BitmapSource _currentImage;
 
-    private void Minimize_Click(object sender, RoutedEventArgs e) { this.Hide(); }
+    private void Minimize_Click(object sender, RoutedEventArgs e) { this.WindowState = WindowState.Minimized; }
     private void Maximize_Click(object sender, RoutedEventArgs e) { this.WindowState = this.WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized; }
     private void InfoButton_Click(object sender, RoutedEventArgs e) { new InfoWindow().ShowDialog(); }
     
-    // Instead of completely destroying the session on close, we hide it to the system tray
-    // so the user can bring it back if they need to check the AI's answer again.
-    private void Close_Click(object sender, RoutedEventArgs e) { this.Hide(); }
+    // Completely destroy the session on close
+    private void Close_Click(object sender, RoutedEventArgs e) { this.Close(); }
 
     public PostCaptureWindow(BitmapSource capturedImage)
     {
@@ -34,7 +33,7 @@ public partial class PostCaptureWindow : Window
         {
             if (e.Key == Key.Escape) 
             {
-                this.Hide();
+                this.WindowState = WindowState.Minimized;
                 e.Handled = true;
             }
         };
