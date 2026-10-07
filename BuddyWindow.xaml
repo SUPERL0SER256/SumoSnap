@@ -11,6 +11,6 @@
         <Grid.RenderTransform>
             <ScaleTransform x:Name="BuddyScale" ScaleX="0.4" ScaleY="0.4"/>
         </Grid.RenderTransform>
-        <Image Source="pack://siteoforigin:,,,/buddy_icon.png" Stretch="Uniform" Margin="0" RenderOptions.BitmapScalingMode="HighQuality"/>
+        <Image Source="pack://application:,,,/buddy_icon.png" Stretch="Uniform" Margin="0" RenderOptions.BitmapScalingMode="HighQuality"/>
     </Grid>
 </Window>

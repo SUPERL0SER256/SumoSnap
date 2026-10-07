@@ -70,6 +70,31 @@ public class OpenAiClient : IAiClient
         return ExtractTextFromResponse(responseJson);
     }
 
+    public async Task<string> TranscribeAudioAsync(byte[] wavData)
+    {
+        using var content = new MultipartFormDataContent();
+        using var audioContent = new ByteArrayContent(wavData);
+        audioContent.Headers.ContentType = MediaTypeHeaderValue.Parse("audio/wav");
+        content.Add(audioContent, "file", "audio.wav");
+        content.Add(new StringContent("whisper-1"), "model");
+        
+        var request = new HttpRequestMessage(HttpMethod.Post, "https://api.openai.com/v1/audio/transcriptions");
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
+        request.Content = content;
+
+        var response = await _httpClient.SendAsync(request);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorBody = await response.Content.ReadAsStringAsync();
+            throw new Exception($"OpenAI Whisper failed: {response.StatusCode} - {errorBody}");
+        }
+
+        var responseJson = await response.Content.ReadAsStringAsync();
+        using var doc = JsonDocument.Parse(responseJson);
+        return doc.RootElement.GetProperty("text").GetString() ?? "";
+    }
+
     private string ImageToBase64(BitmapSource image)
     {
         using var ms = new MemoryStream();

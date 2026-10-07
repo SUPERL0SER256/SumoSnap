@@ -180,7 +180,7 @@
                 </Grid.ColumnDefinitions>
                 <!-- Custom Title -->
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="15,10,0,10">
-                    <Image Source="pack://siteoforigin:,,,/icon.ico" Width="16" Height="16" Margin="0,0,8,0"/>
+                    <Image Source="pack://application:,,,/icon.ico" Width="16" Height="16" Margin="0,0,8,0"/>
                     <TextBlock Text="SumoSnap Editor" Foreground="#666" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"/>
                 </StackPanel>
                 <!-- Controls -->
@@ -250,7 +250,7 @@
             </LinearGradientBrush>
         </Border.Background>
     </Border>
-    
+
     <Border x:Name="ChatChromeFocused" CornerRadius="18" Padding="0.5" Opacity="0" Margin="0">
                             <Border.Background>
                                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">

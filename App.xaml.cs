@@ -47,7 +47,10 @@ public partial class App : System.Windows.Application
         _notifyIcon.ContextMenuStrip = contextMenu;
 
         _buddyWindow = new BuddyWindow(HandleScreenshot);
-        _buddyWindow.Show();
+        if (SettingsManager.LoadSettings().ShowFloatingBuddy)
+        {
+            _buddyWindow.Show();
+        }
 
         _hotkeyManager = new HotkeyManager();
         _hotkeyManager.OnPrintScreenPressed += HandleScreenshot;
@@ -56,7 +59,7 @@ public partial class App : System.Windows.Application
         var settings = SettingsManager.LoadSettings();
         if (!settings.HasSeenOnboarding)
         {
-            var infoWindow = new InfoWindow();
+            var infoWindow = new InfoWindow(isOnboarding: true);
             infoWindow.ShowDialog();
             settings.HasSeenOnboarding = true;
             SettingsManager.SaveSettings(settings);
