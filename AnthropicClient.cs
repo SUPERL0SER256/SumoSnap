@@ -23,6 +23,29 @@ public class AnthropicClient : IAiClient
         _apiKey = settings.AnthropicApiKey;
     }
 
+        public async Task<AiResponse> ChatAsync(string userMessage, string systemPrompt)
+    {
+        var requestBody = new
+        {
+            model = "claude-3-5-sonnet-20240620",
+            max_tokens = 4096,
+            system = systemPrompt,
+            messages = new object[]
+            {
+                new { role = "user", content = userMessage }
+            }
+        };
+        var json = JsonSerializer.Serialize(requestBody);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+        var request = new HttpRequestMessage(HttpMethod.Post, "https://api.anthropic.com/v1/messages") { Content = content };
+        request.Headers.Add("x-api-key", _apiKey);
+        request.Headers.Add("anthropic-version", "2023-06-01");
+        using var response = await _httpClient.SendAsync(request);
+        var responseJson = await response.Content.ReadAsStringAsync();
+        if (!response.IsSuccessStatusCode) throw new Exception($"Anthropic API Error: {responseJson}");
+        return ExtractTextFromResponse(responseJson);
+    }
+
     public async Task<AiResponse> ChatWithImageAsync(BitmapSource image, string userMessage)
     {
         string base64Image = ImageToBase64(image);
@@ -99,3 +122,7 @@ public class AnthropicClient : IAiClient
         return response;
     }
 }
+
+
+
+

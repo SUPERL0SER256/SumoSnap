@@ -26,6 +26,30 @@
         </Style.Triggers>
     </Style>
 
+    <!-- Mode Toggle Button Style -->
+    <Style x:Key="ModeRadioButtonStyle" TargetType="RadioButton">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RadioButton">
+                    <Border x:Name="border" Background="Transparent" CornerRadius="10" Padding="15,6">
+                        <TextBlock Text="{TemplateBinding Content}" Foreground="#666" FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#222"/>
+                            <Setter TargetName="border" Property="BorderBrush" Value="#444"/>
+                            <Setter TargetName="border" Property="BorderThickness" Value="1"/>
+                            <Setter Property="Foreground" Value="#FFF"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#1A1A1A"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- Send Button Style -->
     <Style x:Key="SendButtonStyle" TargetType="Button">
         <Setter Property="Background" Value="#111111"/> 

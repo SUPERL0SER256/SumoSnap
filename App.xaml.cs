@@ -103,6 +103,7 @@ public partial class App : System.Windows.Application
         }
         catch (Exception ex)
         {
+            File.WriteAllText("capture_error.log", $"Error during capture: {ex.Message}\n{ex.StackTrace}");
             System.Windows.MessageBox.Show($"Error during capture: {ex.Message}\n{ex.StackTrace}", "Capture Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
         finally
@@ -176,6 +177,7 @@ public partial class App : System.Windows.Application
             if (settings.ShowFloatingBuddy)
             {
                 if (!_buddyWindow.IsVisible) _buddyWindow.Show();
+                _buddyWindow.RefreshPulse();
             }
             else
             {

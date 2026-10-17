@@ -24,6 +24,27 @@ public class OpenAiClient : IAiClient
         _apiKey = settings.OpenAiApiKey;
     }
 
+        public async Task<AiResponse> ChatAsync(string userMessage, string systemPrompt)
+    {
+        var requestBody = new
+        {
+            model = "gpt-4o",
+            messages = new object[]
+            {
+                new { role = "system", content = systemPrompt },
+                new { role = "user", content = userMessage }
+            }
+        };
+        var json = JsonSerializer.Serialize(requestBody);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+        var request = new HttpRequestMessage(HttpMethod.Post, "https://api.openai.com/v1/chat/completions") { Content = content };
+        request.Headers.Add("Authorization", $"Bearer {_apiKey}");
+        using var response = await _httpClient.SendAsync(request);
+        var responseJson = await response.Content.ReadAsStringAsync();
+        if (!response.IsSuccessStatusCode) throw new Exception($"OpenAI API Error: {responseJson}");
+        return ExtractTextFromResponse(responseJson);
+    }
+
     public async Task<AiResponse> ChatWithImageAsync(BitmapSource image, string userMessage)
     {
         string base64Image = ImageToBase64(image);
@@ -126,3 +147,7 @@ public class OpenAiClient : IAiClient
         return response;
     }
 }
+
+
+
+

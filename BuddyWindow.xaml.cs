@@ -36,7 +36,18 @@ public partial class BuddyWindow : Window
         this.Left = desktopWorkingArea.Right - this.Width + 10;
         this.Top = desktopWorkingArea.Bottom - this.Height + 5;
         
+        RefreshPulse();
+        
         _proximityTimer.Start();
+    }
+
+    public void RefreshPulse()
+    {
+        // Feature temporarily disabled. We will add the reminder function back later.
+        BuddyGlow.BeginAnimation(System.Windows.Media.Effects.DropShadowEffect.BlurRadiusProperty, null);
+        BuddyGlow.BeginAnimation(System.Windows.Media.Effects.DropShadowEffect.OpacityProperty, null);
+        BuddyGlow.Opacity = 0;
+        BuddyGlow.BlurRadius = 0;
     }
 
     private void Window_Closed(object sender, EventArgs e)

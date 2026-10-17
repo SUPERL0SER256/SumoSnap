@@ -13,6 +13,7 @@ public class AiResponse
 public interface IAiClient
 {
     Task<AiResponse> ChatWithImageAsync(BitmapSource image, string userMessage);
+    Task<AiResponse> ChatAsync(string userMessage, string systemPrompt);
 }
 
 public class MissingKeyException : Exception
@@ -22,3 +23,4 @@ public class MissingKeyException : Exception
     {
     }
 }
+

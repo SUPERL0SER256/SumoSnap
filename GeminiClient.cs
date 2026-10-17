@@ -25,6 +25,28 @@ public class GeminiClient : IAiClient
         _modelName = isPro ? "gemini-3.1-pro" : "gemini-3.6-flash";
     }
 
+        public async Task<AiResponse> ChatAsync(string userMessage, string systemPrompt)
+    {
+        var requestBody = new
+        {
+            system_instruction = new
+            {
+                parts = new[] { new { text = systemPrompt } }
+            },
+            contents = new[]
+            {
+                new { parts = new object[] { new { text = userMessage } } }
+            }
+        };
+        var json = JsonSerializer.Serialize(requestBody);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"https://generativelanguage.googleapis.com/v1beta/models/{_modelName}:generateContent?key={_apiKey}") { Content = content };
+        using var response = await _httpClient.SendAsync(request);
+        var responseJson = await response.Content.ReadAsStringAsync();
+        if (!response.IsSuccessStatusCode) throw new Exception($"Gemini API Error: {responseJson}");
+        return ExtractTextFromResponse(responseJson);
+    }
+
     public async Task<AiResponse> ChatWithImageAsync(BitmapSource image, string userMessage)
     {
         string base64Image = ImageToBase64(image);
@@ -102,3 +124,4 @@ public class GeminiClient : IAiClient
         return response;
     }
 }
+

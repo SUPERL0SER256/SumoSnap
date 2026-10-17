@@ -10,13 +10,18 @@ public class AppSettings
     public string OpenAiApiKey { get; set; } = "";
     public string AnthropicApiKey { get; set; } = "";
     public string ActiveProvider { get; set; } = "Gemini"; // "Gemini", "OpenAI", or "Anthropic"
-    public int TotalTokensUsed { get; set; } = 0;
-    public int DailyRequestsCount { get; set; } = 0;
-    public DateTime LastRequestDate { get; set; } = DateTime.MinValue;
-    public int MonthlyTokenBudget { get; set; } = 500000;
     public bool ShowFloatingBuddy { get; set; } = true;
     public bool RunOnStartup { get; set; } = true;
     public bool HasSeenOnboarding { get; set; } = false;
+    
+    // Logic Puzzle Tracking
+    public int DailyLogicStreak { get; set; } = 0;
+    public int HighestLogicStreak { get; set; } = 0;
+    public DateTime LastPuzzleSolvedDate { get; set; } = DateTime.MinValue;
+    public string DailyPuzzleText { get; set; } = "";
+    public string DailyPuzzleAnswer { get; set; } = "";
+    public DateTime DailyPuzzleDate { get; set; } = DateTime.MinValue;
+    public int DailyPuzzleAttemptsLeft { get; set; } = 3;
 }
 
 public static class SettingsManager
@@ -53,3 +58,4 @@ public static class SettingsManager
         File.WriteAllText(SettingsFilePath, json);
     }
 }
+

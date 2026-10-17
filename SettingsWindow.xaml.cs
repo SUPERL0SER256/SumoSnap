@@ -19,7 +19,7 @@ public partial class SettingsWindow : Window
         TxtGemini.Password = settings.GeminiApiKey;
         TxtOpenAI.Password = settings.OpenAiApiKey;
         TxtAnthropic.Password = settings.AnthropicApiKey;
-        TxtTokenBudget.Text = settings.MonthlyTokenBudget.ToString();
+        
 
         if (settings.ActiveProvider == "OpenAI")
             RadioOpenAI.IsChecked = true;
@@ -51,7 +51,7 @@ public partial class SettingsWindow : Window
         if (RadioOpenAI.IsChecked == true) active = "OpenAI";
         if (RadioAnthropic.IsChecked == true) active = "Anthropic";
 
-        int.TryParse(TxtTokenBudget.Text.Trim(), out int tokenBudget);
+        
 
         // Update the existing settings so fields not shown here (e.g. HasSeenOnboarding) are preserved
         var settings = SettingsManager.LoadSettings();
@@ -59,7 +59,7 @@ public partial class SettingsWindow : Window
         settings.OpenAiApiKey = TxtOpenAI.Password.Trim();
         settings.AnthropicApiKey = TxtAnthropic.Password.Trim();
         settings.ActiveProvider = active;
-        settings.MonthlyTokenBudget = tokenBudget;
+        
         settings.ShowFloatingBuddy = ChkShowBuddy.IsChecked ?? true;
         settings.RunOnStartup = ChkRunOnStartup.IsChecked ?? true;
 
@@ -69,11 +69,8 @@ public partial class SettingsWindow : Window
         Close();
     }
 
-    private void ResetTokensButton_Click(object sender, RoutedEventArgs e)
-    {
-        var settings = SettingsManager.LoadSettings();
-        settings.TotalTokensUsed = 0;
-        SettingsManager.SaveSettings(settings);
-        System.Windows.MessageBox.Show("Your token usage has been reset to 0.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-    }
+    
 }
+
+
+

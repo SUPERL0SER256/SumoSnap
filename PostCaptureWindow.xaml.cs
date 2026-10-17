@@ -1,4 +1,6 @@
 using System;
+using System.Threading.Tasks;
+using System.Text.Json;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -10,6 +12,197 @@ namespace SumoSnap;
 
 public partial class PostCaptureWindow : Window
 {
+    private bool _isGameMode = false;
+    private string _gameSystemPrompt = @"You are a diverse logic puzzle generator. Generate a short logic puzzle. Mix it up randomly between: number patterns, spatial reasoning described in text, letter sequences, and classic logic riddles. Output ONLY a valid JSON object without markdown. Schema: { ""puzzle"": ""the puzzle text"", ""answer"": ""the exact brief answer"" }. Make it very concise to save tokens.";
+
+    private async void GameToggle_Click(object sender, RoutedEventArgs e)
+    {
+        _isGameMode = !_isGameMode;
+        if (_isGameMode)
+        {
+            GameToggleButton.Content = "\uE8BD"; // Chat icon
+            GameToggleButton.ToolTip = "Chat Mode";
+            
+            MainScroll.Visibility = Visibility.Collapsed;
+            ChatInputBar.Visibility = Visibility.Collapsed;
+            
+            GamePanel.Visibility = Visibility.Visible;
+            GameInputBar.Visibility = Visibility.Visible;
+            
+            var settings = SettingsManager.LoadSettings();
+            StreakText.Text = $"Streak: {settings.DailyLogicStreak}";
+            BestStreakText.Text = $"Best: {settings.HighestLogicStreak}";
+
+            if (settings.LastPuzzleSolvedDate.Date == DateTime.Today)
+            {
+                GameText.Text = "You've already played today's puzzle! Come back tomorrow for a new challenge.";
+                GameInput.Visibility = Visibility.Collapsed;
+                GameSubmitButton.Visibility = Visibility.Collapsed;
+                TriesIndicator.Visibility = Visibility.Collapsed;
+            }
+            else if (settings.DailyPuzzleDate.Date == DateTime.Today)
+            {
+                // Resume today's puzzle
+                GameText.Text = settings.DailyPuzzleText;
+                TriesIndicator.Text = $"{settings.DailyPuzzleAttemptsLeft} Tries Left";
+                GameInput.Visibility = Visibility.Visible;
+                GameSubmitButton.Visibility = Visibility.Visible;
+                TriesIndicator.Visibility = Visibility.Visible;
+                GameInput.IsEnabled = true;
+                GameInput.Focus();
+            }
+            else
+            {
+                // Generate new puzzle
+                await StartNewGameAsync();
+            }
+        }
+        else
+        {
+            GameToggleButton.Content = "\uE7FC"; // Gamepad icon
+            GameToggleButton.ToolTip = "Game Mode";
+            
+            GamePanel.Visibility = Visibility.Collapsed;
+            GameInputBar.Visibility = Visibility.Collapsed;
+            
+            MainScroll.Visibility = Visibility.Visible;
+            ChatInputBar.Visibility = Visibility.Visible;
+        }
+    }
+
+    private async Task StartNewGameAsync()
+    {
+        GameText.Text = "Generating today's logic puzzle...";
+        GameButtonsPanel.Visibility = Visibility.Collapsed;
+        GameSubmitButton.Visibility = Visibility.Visible;
+        TriesIndicator.Visibility = Visibility.Visible;
+        GameLoadingIndicator.Visibility = Visibility.Visible;
+        GameInput.Visibility = Visibility.Visible;
+        GameInput.IsEnabled = false;
+
+        try
+        {
+            var aiClient = AiProviderFactory.CreateClient();
+            AiResponse response = await aiClient.ChatAsync("Generate a new logic puzzle.", _gameSystemPrompt);
+            
+            string json = response.Text.Replace("```json", "").Replace("```", "").Trim();
+            using var doc = System.Text.Json.JsonDocument.Parse(json);
+            var root = doc.RootElement;
+            
+            var settings = SettingsManager.LoadSettings();
+            if (root.TryGetProperty("puzzle", out var puzzleProp))
+                settings.DailyPuzzleText = puzzleProp.GetString();
+            if (root.TryGetProperty("answer", out var ansProp))
+                settings.DailyPuzzleAnswer = ansProp.GetString();
+                
+            settings.DailyPuzzleDate = DateTime.Today;
+            settings.DailyPuzzleAttemptsLeft = 3;
+            SettingsManager.SaveSettings(settings);
+
+            GameText.Text = settings.DailyPuzzleText;
+            TriesIndicator.Text = "3 Tries Left";
+        }
+        catch (Exception ex)
+        {
+            GameText.Text = "Failed to generate puzzle. " + ex.Message;
+        }
+        finally
+        {
+            GameButtonsPanel.Visibility = Visibility.Visible;
+            GameLoadingIndicator.Visibility = Visibility.Collapsed;
+            GameInput.IsEnabled = true;
+            GameInput.Focus();
+        }
+    }
+
+    private void GameNextButton_Click(object sender, RoutedEventArgs e)
+    {
+        GameToggle_Click(this, new RoutedEventArgs());
+    }
+
+    private async void GameSubmitButton_Click(object sender, RoutedEventArgs e)
+    {
+        string answer = GameInput.Text.Trim();
+        if (string.IsNullOrEmpty(answer)) return;
+
+        var settings = SettingsManager.LoadSettings();
+
+        GameInput.Text = "";
+        GameButtonsPanel.Visibility = Visibility.Collapsed;
+        GameLoadingIndicator.Visibility = Visibility.Visible;
+        GameInput.IsEnabled = false;
+
+        try
+        {
+            var aiClient = AiProviderFactory.CreateClient();
+            string prompt = $"The puzzle was:\n{settings.DailyPuzzleText}\n\nThe correct answer is: {settings.DailyPuzzleAnswer}\n\nThe user guessed: '{answer}'. Evaluate their guess. If they are completely correct or conceptually correct, reply EXACTLY with 'CORRECT'. If they are wrong, reply EXACTLY with 'WRONG'. Do not include markdown.";
+            AiResponse response = await aiClient.ChatAsync(prompt, "You are a puzzle master evaluating a user's guess.");
+            
+            string reply = response.Text.Trim().ToUpper();
+            if (reply.StartsWith("CORRECT"))
+            {
+                settings.DailyLogicStreak++;
+                if (settings.DailyLogicStreak > settings.HighestLogicStreak) 
+                    settings.HighestLogicStreak = settings.DailyLogicStreak;
+                settings.LastPuzzleSolvedDate = DateTime.Today;
+                SettingsManager.SaveSettings(settings);
+
+                StreakText.Text = $"Streak: {settings.DailyLogicStreak}";
+                BestStreakText.Text = $"Best: {settings.HighestLogicStreak}";
+                GameText.Text = "Correct! Come back tomorrow for the next puzzle.\n\n" + settings.DailyPuzzleText;
+                
+                GameInput.Visibility = Visibility.Collapsed;
+                GameSubmitButton.Visibility = Visibility.Collapsed;
+                TriesIndicator.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                settings.DailyPuzzleAttemptsLeft--;
+                if (settings.DailyPuzzleAttemptsLeft <= 0)
+                {
+                    settings.DailyLogicStreak = 0;
+                    settings.LastPuzzleSolvedDate = DateTime.Today;
+                    SettingsManager.SaveSettings(settings);
+
+                    StreakText.Text = "Streak: 0";
+                    GameText.Text = $"Out of tries! The correct answer was: {settings.DailyPuzzleAnswer}\n\nCome back tomorrow for the next puzzle.\n\n{settings.DailyPuzzleText}";
+                    
+                    GameInput.Visibility = Visibility.Collapsed;
+                    GameSubmitButton.Visibility = Visibility.Collapsed;
+                    TriesIndicator.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    SettingsManager.SaveSettings(settings);
+                    TriesIndicator.Text = $"{settings.DailyPuzzleAttemptsLeft} Tries Left";
+                    GameText.Text = $"Wrong guess!\n\n" + settings.DailyPuzzleText;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            GameText.Text = "Error checking answer: " + ex.Message + "\n\n" + settings.DailyPuzzleText;
+        }
+        finally
+        {
+            GameButtonsPanel.Visibility = Visibility.Visible;
+            GameLoadingIndicator.Visibility = Visibility.Collapsed;
+            GameInput.IsEnabled = true;
+            GameInput.Focus();
+        }
+    }
+
+    private void GameInput_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        if (e.Key == System.Windows.Input.Key.Enter)
+        {
+            if (GameSubmitButton.Visibility == Visibility.Visible)
+                GameSubmitButton_Click(sender, e);
+            else if (GameNextButton.Visibility == Visibility.Visible)
+                GameNextButton_Click(sender, e);
+            e.Handled = true;
+        }
+    }
     private BitmapSource _currentImage;
 
     private void Minimize_Click(object sender, RoutedEventArgs e) { this.WindowState = WindowState.Minimized; }
@@ -26,7 +219,7 @@ public partial class PostCaptureWindow : Window
         _currentImage = capturedImage;
         PreviewImage.Source = _currentImage;
         
-        UpdateUsageDisplay();
+        
         
         ChatInput.Focus();
         this.PreviewKeyDown += (s, e) => 
@@ -88,7 +281,7 @@ public partial class PostCaptureWindow : Window
     private void SettingsButton_Click(object sender, RoutedEventArgs e)
     {
         new SettingsWindow().ShowDialog();
-        UpdateUsageDisplay();
+        
         ((App)System.Windows.Application.Current).SyncBuddyVisibility();
     }
 
@@ -108,13 +301,13 @@ public partial class PostCaptureWindow : Window
     } 
 
     
-    private void UpdateSendButtonGlow(bool isHovering)
+        private void UpdateLiquidGlow(System.Windows.Controls.Button btn, System.Windows.Controls.TextBox input, bool isHovering)
     {
-        bool hasText = ChatInput.Text.Trim().Length > 0;
+        bool hasText = input.Text.Trim().Length > 0;
         bool shouldGlow = hasText || isHovering;
 
-        var outerRing = SendButton.Template.FindName("OuterRingHover", SendButton) as System.Windows.Controls.Border;
-        var innerOverlay = SendButton.Template.FindName("InnerHoverOverlay", SendButton) as System.Windows.Controls.Border;
+        var outerRing = btn.Template.FindName("OuterRingHover", btn) as System.Windows.Controls.Border;
+        var innerOverlay = btn.Template.FindName("InnerHoverOverlay", btn) as System.Windows.Controls.Border;
 
         if (outerRing != null && innerOverlay != null)
         {
@@ -126,17 +319,32 @@ public partial class PostCaptureWindow : Window
 
     private void ChatInput_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
     {
-        UpdateSendButtonGlow(SendButton.IsMouseOver);
+        UpdateLiquidGlow(SendButton, ChatInput, SendButton.IsMouseOver);
     }
 
     private void SendButton_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
     {
-        UpdateSendButtonGlow(true);
+        UpdateLiquidGlow(SendButton, ChatInput, true);
     }
 
     private void SendButton_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
     {
-        UpdateSendButtonGlow(false);
+        UpdateLiquidGlow(SendButton, ChatInput, false);
+    }
+
+    private void GameInput_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+    {
+        UpdateLiquidGlow(GameSubmitButton, GameInput, GameSubmitButton.IsMouseOver);
+    }
+
+    private void GameSubmitButton_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+    {
+        UpdateLiquidGlow(GameSubmitButton, GameInput, true);
+    }
+
+    private void GameSubmitButton_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+    {
+        UpdateLiquidGlow(GameSubmitButton, GameInput, false);
     }
 
     private void ChatInput_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
@@ -170,17 +378,8 @@ public partial class PostCaptureWindow : Window
             if (thinkingBubble != null) ChatMessages.Children.Remove(thinkingBubble);
             AddChatBubble(response.Text, isUser: false);
 
-            if (response.TokensUsed > 0 || aiClient is GeminiClient)
-            {
-                var settings = SettingsManager.LoadSettings();
-                settings.TotalTokensUsed += response.TokensUsed;
-                settings.DailyRequestsCount += 1;
-                settings.LastRequestDate = DateTime.Now;
-                SettingsManager.SaveSettings(settings);
-                UpdateUsageDisplay();
-            }
-        }
-        catch (MissingKeyException ex)
+            
+                } catch (MissingKeyException ex)
         {
             if (thinkingBubble != null) ChatMessages.Children.Remove(thinkingBubble);
             var result = System.Windows.MessageBox.Show($"Please enter your {ex.Message} API key in Settings.", "Missing API Key", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
@@ -280,21 +479,6 @@ public partial class PostCaptureWindow : Window
         return canvas;
     }
 
-    private void UpdateUsageDisplay()
-    {
-        var settings = SettingsManager.LoadSettings();
-
-        int maxTokens = settings.MonthlyTokenBudget > 0 ? settings.MonthlyTokenBudget : 100000;
-        int remaining = Math.Max(0, maxTokens - settings.TotalTokensUsed);
-        
-        UsageText.Text = $"Tokens: {settings.TotalTokensUsed:N0} / {maxTokens:N0}";
-        
-        // Highlight in red if they exceed the budget
-        UsageText.Foreground = settings.TotalTokensUsed >= maxTokens 
-            ? System.Windows.Media.Brushes.Red 
-            : new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#888888"));
-    }
-
     private Border AddChatBubble(string text, bool isUser)
     {
         var userColor = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#050508"); // Pure black
@@ -344,3 +528,11 @@ public partial class PostCaptureWindow : Window
         return bubble;
     }
 }
+
+
+
+
+
+
+
+

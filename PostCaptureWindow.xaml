@@ -185,8 +185,7 @@
                 </StackPanel>
                 <!-- Controls -->
                 <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10,10,10,10" WindowChrome.IsHitTestVisibleInChrome="True">
-                    <TextBlock x:Name="UsageText" Text="Quota: 100% Left" Foreground="#888" FontSize="12" VerticalAlignment="Center" Margin="0,0,15,0"/>
-                    
+                    <Button x:Name="GameToggleButton" Content="&#xE7FC;" ToolTip="Game Mode" Style="{StaticResource IconButtonStyle}" Click="GameToggle_Click" Margin="0,0,15,0" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"/>
                     <Border Background="#111" CornerRadius="8" BorderBrush="#222" BorderThickness="1" Padding="2" Margin="0,0,15,0">
                         <StackPanel Orientation="Horizontal">
                             <Button Content="📋" ToolTip="Copy to Clipboard" Style="{StaticResource IconButtonStyle}" Click="CopyButton_Click"/>
@@ -216,8 +215,17 @@
             </StackPanel>
         </ScrollViewer>
 
-        <!-- Persistent Input Bar at Bottom -->
-        <Border Grid.Row="2" Background="#0A0A0C" BorderBrush="#1F1F22" BorderThickness="0,1,0,0" Padding="15">
+        <!-- Game Content -->
+        <ScrollViewer Grid.Row="1" x:Name="GamePanel" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="20,0,20,20">
+                <Border Background="#1C1C1E" CornerRadius="12" Padding="15,10,15,10" Margin="0,0,50,15" HorizontalAlignment="Left">
+                    <TextBlock x:Name="GameText" Foreground="White" FontSize="14" TextWrapping="Wrap" TextAlignment="Left" />
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Persistent Chat Input Bar at Bottom -->
+        <Border x:Name="ChatInputBar" Grid.Row="2" Background="#0A0A0C" BorderBrush="#1F1F22" BorderThickness="0,1,0,0" Padding="15">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -282,5 +290,37 @@
                 <Button x:Name="SendButton" Grid.Column="1" Content="Ask" Style="{StaticResource SendButtonStyle}" Margin="10,0,0,0" Padding="20,6" Click="SendButton_Click" MouseEnter="SendButton_MouseEnter" MouseLeave="SendButton_MouseLeave"/>
             </Grid>
         </Border>
+                    <!-- Persistent Game Input Bar at Bottom -->
+        <Border x:Name="GameInputBar" Grid.Row="2" Visibility="Collapsed" Background="#0A0A0C" BorderBrush="#1F1F22" BorderThickness="0,1,0,0" Padding="15">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Orientation="Vertical" VerticalAlignment="Center" Margin="0,0,15,0">
+                    <TextBlock x:Name="StreakText" Text="Streak: 0" Foreground="#E0E0E0" FontSize="13"/>
+                    <TextBlock x:Name="BestStreakText" Text="Best: 0" Foreground="#888" FontSize="13"/>
+                </StackPanel>
+                
+                <TextBox x:Name="GameInput" Grid.Column="1" Background="#161618" Foreground="#E0E0E0" CaretBrush="White" BorderThickness="0" Padding="12,8" FontSize="13" AcceptsReturn="False" VerticalContentAlignment="Center" KeyDown="GameInput_KeyDown" TextChanged="GameInput_TextChanged">
+                    <TextBox.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="16.5"/>
+                        </Style>
+                    </TextBox.Resources>
+                </TextBox>
+                
+                <TextBlock x:Name="GameLoadingIndicator" Grid.Column="2" Text="Thinking..." Foreground="Gray" FontSize="13" VerticalAlignment="Center" Margin="10,0" Visibility="Collapsed"/>
+                
+                <StackPanel x:Name="GameButtonsPanel" Grid.Column="2" Orientation="Horizontal" Margin="10,0,0,0">
+                    
+                    <TextBlock x:Name="TriesIndicator" Text="3 Tries Left" Foreground="#888" VerticalAlignment="Center" Margin="0,0,15,0" FontSize="13"/><Button x:Name="GameSubmitButton" Content="Submit" Style="{StaticResource SendButtonStyle}" Padding="20,6" Click="GameSubmitButton_Click" MouseEnter="GameSubmitButton_MouseEnter" MouseLeave="GameSubmitButton_MouseLeave"/>
+                    <Button x:Name="GameNextButton" Content="Next" Visibility="Collapsed" Style="{StaticResource SendButtonStyle}" Padding="20,6" Click="GameNextButton_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
     </Grid>
 </Window>
+
+
