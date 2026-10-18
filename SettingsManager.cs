@@ -1,8 +1,17 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 
 namespace SumoSnap;
+
+public class ReminderItem
+{
+    public string Id { get; set; } = Guid.NewGuid().ToString();
+    public DateTime DueDateTime { get; set; }
+    public string Title { get; set; } = "";
+    public bool Notified { get; set; } = false;
+}
 
 public class AppSettings
 {
@@ -22,6 +31,18 @@ public class AppSettings
     public string DailyPuzzleAnswer { get; set; } = "";
     public DateTime DailyPuzzleDate { get; set; } = DateTime.MinValue;
     public int DailyPuzzleAttemptsLeft { get; set; } = 3;
+    public List<string> PastPuzzles { get; set; } = new();
+
+    // Mini Sudoku 6x6 Daily Tracking
+    public int SudokuSolvedCount { get; set; } = 0;
+    public int BestSudokuStreak { get; set; } = 0;
+    public DateTime DailySudokuDate { get; set; } = DateTime.MinValue;
+    public DateTime LastSudokuSolvedDate { get; set; } = DateTime.MinValue;
+    public int[] DailySudokuInitial { get; set; } = Array.Empty<int>();
+    public int[] DailySudokuCurrent { get; set; } = Array.Empty<int>();
+
+    // Calendar Reminders
+    public List<ReminderItem> Reminders { get; set; } = new();
 }
 
 public static class SettingsManager
@@ -58,4 +79,3 @@ public static class SettingsManager
         File.WriteAllText(SettingsFilePath, json);
     }
 }
-

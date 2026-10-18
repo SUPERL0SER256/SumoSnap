@@ -185,7 +185,11 @@
                 </StackPanel>
                 <!-- Controls -->
                 <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10,10,10,10" WindowChrome.IsHitTestVisibleInChrome="True">
-                    <Button x:Name="GameToggleButton" Content="&#xE7FC;" ToolTip="Game Mode" Style="{StaticResource IconButtonStyle}" Click="GameToggle_Click" Margin="0,0,15,0" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"/>
+                    <Button x:Name="ChatModeButton" Content="&#xE8BD;" ToolTip="Chat Mode" Style="{StaticResource IconButtonStyle}" Click="ChatMode_Click" Margin="0,0,4,0" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"/>
+                    <Button x:Name="GameToggleButton" Content="&#xE7FC;" ToolTip="Daily Logic Puzzle" Style="{StaticResource IconButtonStyle}" Click="GameToggle_Click" Margin="0,0,4,0" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"/>
+                    <Button x:Name="SudokuModeButton" Content="&#xE80A;" ToolTip="6x6 Mini Sudoku" Style="{StaticResource IconButtonStyle}" Click="SudokuMode_Click" Margin="0,0,4,0" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"/>
+                    <Button x:Name="PomodoroModeButton" Content="&#xE916;" ToolTip="Pomodoro Timer" Style="{StaticResource IconButtonStyle}" Click="PomodoroMode_Click" Margin="0,0,4,0" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"/>
+                    <Button x:Name="CalendarModeButton" Content="&#xE787;" ToolTip="Calendar &amp; Reminders" Style="{StaticResource IconButtonStyle}" Click="CalendarMode_Click" Margin="0,0,15,0" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"/>
                     <Border Background="#111" CornerRadius="8" BorderBrush="#222" BorderThickness="1" Padding="2" Margin="0,0,15,0">
                         <StackPanel Orientation="Horizontal">
                             <Button Content="📋" ToolTip="Copy to Clipboard" Style="{StaticResource IconButtonStyle}" Click="CopyButton_Click"/>
@@ -223,6 +227,78 @@
                 </Border>
             </StackPanel>
         </ScrollViewer>
+
+        <!-- 6x6 Mini Sudoku Content -->
+        <Grid Grid.Row="1" x:Name="SudokuPanel" Visibility="Collapsed" Margin="20,10,20,10">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock x:Name="SudokuStatusText" Text="Fill each row, column, and 2x3 box with 1-6. Click a cell to cycle." Foreground="#999" FontSize="13" HorizontalAlignment="Center" Margin="0,0,0,15"/>
+                <Border Background="#141417" BorderBrush="#333" BorderThickness="1.5" CornerRadius="8" Padding="6" HorizontalAlignment="Center">
+                    <UniformGrid x:Name="SudokuGrid" Rows="6" Columns="6" Width="288" Height="288"/>
+                </Border>
+            </StackPanel>
+        </Grid>
+
+        <!-- Pomodoro Timer Content -->
+        <Grid Grid.Row="1" x:Name="PomodoroPanel" Visibility="Collapsed" Margin="20">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Border Width="220" Height="220" CornerRadius="110" BorderBrush="#2A2A2E" BorderThickness="2" Background="#0F0F12" Margin="0,0,0,20">
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <TextBlock x:Name="PomodoroTimeText" Text="25:00" Foreground="#E0E0E0" FontSize="42" HorizontalAlignment="Center"/>
+                        <TextBlock x:Name="PomodoroStatusLabel" Text="Focus Session" Foreground="#777" FontSize="13" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
+                    <Button Content="- 5m" Style="{StaticResource IconButtonStyle}" Padding="10,4" Margin="4,0" Click="PomodoroMinus_Click"/>
+                    <Button Content="15m" Style="{StaticResource IconButtonStyle}" Padding="10,4" Margin="4,0" Click="PomodoroPreset15_Click"/>
+                    <Button Content="25m" Style="{StaticResource IconButtonStyle}" Padding="10,4" Margin="4,0" Click="PomodoroPreset25_Click"/>
+                    <Button Content="45m" Style="{StaticResource IconButtonStyle}" Padding="10,4" Margin="4,0" Click="PomodoroPreset45_Click"/>
+                    <Button Content="+ 5m" Style="{StaticResource IconButtonStyle}" Padding="10,4" Margin="4,0" Click="PomodoroPlus_Click"/>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+
+        <!-- Calendar & Reminders Content -->
+        <Grid Grid.Row="1" x:Name="CalendarPanel" Visibility="Collapsed" Margin="20,5,20,10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" Margin="0,0,0,8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Content="‹" Style="{StaticResource IconButtonStyle}" Padding="10,2" Click="CalendarPrevMonth_Click"/>
+                <TextBlock x:Name="CalendarMonthLabel" Grid.Column="1" Text="October 2026" Foreground="#E0E0E0" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <Button Grid.Column="2" Content="›" Style="{StaticResource IconButtonStyle}" Padding="10,2" Click="CalendarNextMonth_Click"/>
+            </Grid>
+            <StackPanel Grid.Row="1" Margin="0,0,0,10">
+                <UniformGrid Columns="7" Margin="0,0,0,4">
+                    <TextBlock Text="Su" Foreground="#666" FontSize="12" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Mo" Foreground="#666" FontSize="12" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Tu" Foreground="#666" FontSize="12" HorizontalAlignment="Center"/>
+                    <TextBlock Text="We" Foreground="#666" FontSize="12" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Th" Foreground="#666" FontSize="12" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Fr" Foreground="#666" FontSize="12" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Sa" Foreground="#666" FontSize="12" HorizontalAlignment="Center"/>
+                </UniformGrid>
+                <UniformGrid x:Name="CalendarDaysGrid" Columns="7" Rows="6" Height="168"/>
+            </StackPanel>
+            <Border Grid.Row="2" Background="#0D0D10" BorderBrush="#1F1F22" BorderThickness="1" CornerRadius="8" Padding="10">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock x:Name="SelectedDateLabel" Grid.Row="0" Text="Reminders" Foreground="#888" FontSize="12" Margin="0,0,0,6"/>
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                        <StackPanel x:Name="RemindersListPanel"/>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+        </Grid>
 
         <!-- Persistent Chat Input Bar at Bottom -->
         <Border x:Name="ChatInputBar" Grid.Row="2" Background="#0A0A0C" BorderBrush="#1F1F22" BorderThickness="0,1,0,0" Padding="15">
@@ -318,6 +394,65 @@
                     <TextBlock x:Name="TriesIndicator" Text="3 Tries Left" Foreground="#888" VerticalAlignment="Center" Margin="0,0,15,0" FontSize="13"/><Button x:Name="GameSubmitButton" Content="Submit" Style="{StaticResource SendButtonStyle}" Padding="20,6" Click="GameSubmitButton_Click" MouseEnter="GameSubmitButton_MouseEnter" MouseLeave="GameSubmitButton_MouseLeave"/>
                     <Button x:Name="GameNextButton" Content="Next" Visibility="Collapsed" Style="{StaticResource SendButtonStyle}" Padding="20,6" Click="GameNextButton_Click"/>
                 </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Persistent 6x6 Mini Sudoku Bottom Bar -->
+        <Border x:Name="SudokuInputBar" Grid.Row="2" Visibility="Collapsed" Background="#0A0A0C" BorderBrush="#1F1F22" BorderThickness="0,1,0,0" Padding="15">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Orientation="Vertical" VerticalAlignment="Center" Margin="0,0,15,0">
+                    <TextBlock x:Name="SudokuSolvedText" Text="Streak: 0" Foreground="#E0E0E0" FontSize="13"/>
+                    <TextBlock x:Name="SudokuBestText" Text="Best: 0" Foreground="#888" FontSize="13"/>
+                </StackPanel>
+                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                    <Button x:Name="SudokuClearButton" Content="Reset Board" Style="{StaticResource SendButtonStyle}" Padding="16,6" Click="SudokuClear_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Persistent Pomodoro Bottom Bar -->
+        <Border x:Name="PomodoroInputBar" Grid.Row="2" Visibility="Collapsed" Background="#0A0A0C" BorderBrush="#1F1F22" BorderThickness="0,1,0,0" Padding="15">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Runs in background when window is minimized or closed" Foreground="#666" FontSize="12" VerticalAlignment="Center"/>
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button x:Name="PomodoroResetButton" Content="Reset" Style="{StaticResource SendButtonStyle}" Padding="16,6" Margin="0,0,8,0" Click="PomodoroReset_Click"/>
+                    <Button x:Name="PomodoroStartPauseButton" Content="Start" Style="{StaticResource SendButtonStyle}" Padding="20,6" Click="PomodoroStartPause_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Persistent Calendar Reminder Bottom Bar -->
+        <Border x:Name="CalendarInputBar" Grid.Row="2" Visibility="Collapsed" Background="#0A0A0C" BorderBrush="#1F1F22" BorderThickness="0,1,0,0" Padding="15">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="75"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBox x:Name="ReminderTimeInput" Grid.Column="0" Text="18:00" ToolTip="24h Time (HH:mm)" Background="#161618" Foreground="#E0E0E0" CaretBrush="White" BorderThickness="0" Padding="10,8" FontSize="13" VerticalContentAlignment="Center" Margin="0,0,8,0">
+                    <TextBox.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="16.5"/>
+                        </Style>
+                    </TextBox.Resources>
+                </TextBox>
+                <TextBox x:Name="ReminderTitleInput" Grid.Column="1" Background="#161618" Foreground="#E0E0E0" CaretBrush="White" BorderThickness="0" Padding="12,8" FontSize="13" VerticalContentAlignment="Center" KeyDown="ReminderTitleInput_KeyDown" TextChanged="ReminderTitleInput_TextChanged">
+                    <TextBox.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="16.5"/>
+                        </Style>
+                    </TextBox.Resources>
+                </TextBox>
+                <Button x:Name="AddReminderButton" Grid.Column="2" Content="Add" Style="{StaticResource SendButtonStyle}" Margin="10,0,0,0" Padding="20,6" Click="AddReminder_Click" MouseEnter="AddReminderButton_MouseEnter" MouseLeave="AddReminderButton_MouseLeave"/>
             </Grid>
         </Border>
     </Grid>

@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Text.Json;
 using System.IO;
@@ -12,62 +14,649 @@ namespace SumoSnap;
 
 public partial class PostCaptureWindow : Window
 {
-    private bool _isGameMode = false;
+    private string _activeMode = "Chat"; // "Chat", "Logic", "Sudoku", "Pomodoro", "Calendar"
     private string _gameSystemPrompt = @"You are a diverse logic puzzle generator. Generate a short logic puzzle. Mix it up randomly between: number patterns, spatial reasoning described in text, letter sequences, and classic logic riddles. Output ONLY a valid JSON object without markdown. Schema: { ""puzzle"": ""the puzzle text"", ""answer"": ""the exact brief answer"" }. Make it very concise to save tokens.";
+
+    private void HideAllPanels()
+    {
+        MainScroll.Visibility = Visibility.Collapsed;
+        ChatInputBar.Visibility = Visibility.Collapsed;
+        GamePanel.Visibility = Visibility.Collapsed;
+        GameInputBar.Visibility = Visibility.Collapsed;
+        SudokuPanel.Visibility = Visibility.Collapsed;
+        SudokuInputBar.Visibility = Visibility.Collapsed;
+        PomodoroPanel.Visibility = Visibility.Collapsed;
+        PomodoroInputBar.Visibility = Visibility.Collapsed;
+        CalendarPanel.Visibility = Visibility.Collapsed;
+        CalendarInputBar.Visibility = Visibility.Collapsed;
+    }
+
+    private void ChatMode_Click(object sender, RoutedEventArgs e)
+    {
+        _activeMode = "Chat";
+        HideAllPanels();
+        MainScroll.Visibility = Visibility.Visible;
+        ChatInputBar.Visibility = Visibility.Visible;
+        ChatInput.Focus();
+    }
 
     private async void GameToggle_Click(object sender, RoutedEventArgs e)
     {
-        _isGameMode = !_isGameMode;
-        if (_isGameMode)
+        if (_activeMode == "Logic")
         {
-            GameToggleButton.Content = "\uE8BD"; // Chat icon
-            GameToggleButton.ToolTip = "Chat Mode";
-            
-            MainScroll.Visibility = Visibility.Collapsed;
-            ChatInputBar.Visibility = Visibility.Collapsed;
-            
-            GamePanel.Visibility = Visibility.Visible;
-            GameInputBar.Visibility = Visibility.Visible;
-            
-            var settings = SettingsManager.LoadSettings();
-            StreakText.Text = $"Streak: {settings.DailyLogicStreak}";
-            BestStreakText.Text = $"Best: {settings.HighestLogicStreak}";
+            ChatMode_Click(sender, e);
+            return;
+        }
 
-            if (settings.LastPuzzleSolvedDate.Date == DateTime.Today)
+        _activeMode = "Logic";
+        HideAllPanels();
+        GamePanel.Visibility = Visibility.Visible;
+        GameInputBar.Visibility = Visibility.Visible;
+
+        var settings = SettingsManager.LoadSettings();
+        StreakText.Text = $"Streak: {settings.DailyLogicStreak}";
+        BestStreakText.Text = $"Best: {settings.HighestLogicStreak}";
+
+        if (settings.LastPuzzleSolvedDate.Date == DateTime.Today)
+        {
+            GameText.Text = "You've already played today's puzzle! Come back tomorrow for a new challenge.";
+            GameInput.Visibility = Visibility.Collapsed;
+            GameSubmitButton.Visibility = Visibility.Collapsed;
+            TriesIndicator.Visibility = Visibility.Collapsed;
+        }
+        else if (settings.DailyPuzzleDate.Date == DateTime.Today)
+        {
+            GameText.Text = settings.DailyPuzzleText;
+            TriesIndicator.Text = $"{settings.DailyPuzzleAttemptsLeft} Tries Left";
+            GameInput.Visibility = Visibility.Visible;
+            GameSubmitButton.Visibility = Visibility.Visible;
+            TriesIndicator.Visibility = Visibility.Visible;
+            GameInput.IsEnabled = true;
+            GameInput.Focus();
+        }
+        else
+        {
+            await StartNewGameAsync();
+        }
+    }
+
+    // ==================== 6x6 MINI SUDOKU (DAILY ALGORITHMIC / 0 TOKENS) ====================
+    private int[,] _sudokuInitial = new int[6, 6];
+    private int[,] _sudokuCurrent = new int[6, 6];
+    private System.Windows.Controls.Button[,] _sudokuButtons = new System.Windows.Controls.Button[6, 6];
+    private bool _sudokuWon = false;
+
+    private void SudokuMode_Click(object sender, RoutedEventArgs e)
+    {
+        if (_activeMode == "Sudoku")
+        {
+            ChatMode_Click(sender, e);
+            return;
+        }
+
+        _activeMode = "Sudoku";
+        HideAllPanels();
+        SudokuPanel.Visibility = Visibility.Visible;
+        SudokuInputBar.Visibility = Visibility.Visible;
+
+        LoadOrGenerateDailySudoku();
+    }
+
+    private void LoadOrGenerateDailySudoku()
+    {
+        var settings = SettingsManager.LoadSettings();
+
+        // Reset streak if the user missed yesterday
+        if (settings.LastSudokuSolvedDate != DateTime.MinValue &&
+            settings.LastSudokuSolvedDate.Date < DateTime.Today.AddDays(-1))
+        {
+            settings.SudokuSolvedCount = 0;
+            SettingsManager.SaveSettings(settings);
+        }
+
+        SudokuSolvedText.Text = $"Streak: {settings.SudokuSolvedCount}";
+        SudokuBestText.Text = $"Best: {settings.BestSudokuStreak}";
+
+        if (settings.DailySudokuDate.Date == DateTime.Today &&
+            settings.DailySudokuInitial != null && settings.DailySudokuInitial.Length == 36 &&
+            settings.DailySudokuCurrent != null && settings.DailySudokuCurrent.Length == 36)
+        {
+            for (int i = 0; i < 36; i++)
             {
-                GameText.Text = "You've already played today's puzzle! Come back tomorrow for a new challenge.";
-                GameInput.Visibility = Visibility.Collapsed;
-                GameSubmitButton.Visibility = Visibility.Collapsed;
-                TriesIndicator.Visibility = Visibility.Collapsed;
+                _sudokuInitial[i / 6, i % 6] = settings.DailySudokuInitial[i];
+                _sudokuCurrent[i / 6, i % 6] = settings.DailySudokuCurrent[i];
             }
-            else if (settings.DailyPuzzleDate.Date == DateTime.Today)
+
+            _sudokuWon = settings.LastSudokuSolvedDate.Date == DateTime.Today;
+            RenderSudokuBoard();
+
+            if (_sudokuWon)
             {
-                // Resume today's puzzle
-                GameText.Text = settings.DailyPuzzleText;
-                TriesIndicator.Text = $"{settings.DailyPuzzleAttemptsLeft} Tries Left";
-                GameInput.Visibility = Visibility.Visible;
-                GameSubmitButton.Visibility = Visibility.Visible;
-                TriesIndicator.Visibility = Visibility.Visible;
-                GameInput.IsEnabled = true;
-                GameInput.Focus();
+                SudokuStatusText.Text = "You've solved today's Mini Sudoku! Come back tomorrow for a new grid.";
+                SudokuClearButton.Visibility = Visibility.Collapsed;
             }
             else
             {
-                // Generate new puzzle
-                await StartNewGameAsync();
+                SudokuStatusText.Text = "Fill each row, column, and 2x3 box with 1-6. Click a cell to cycle.";
+                SudokuClearButton.Visibility = Visibility.Visible;
             }
         }
         else
         {
-            GameToggleButton.Content = "\uE7FC"; // Gamepad icon
-            GameToggleButton.ToolTip = "Game Mode";
-            
-            GamePanel.Visibility = Visibility.Collapsed;
-            GameInputBar.Visibility = Visibility.Collapsed;
-            
-            MainScroll.Visibility = Visibility.Visible;
-            ChatInputBar.Visibility = Visibility.Visible;
+            GenerateNewDailySudoku6x6(settings);
         }
+    }
+
+    private void SaveSudokuProgress(AppSettings settings)
+    {
+        settings.DailySudokuInitial = new int[36];
+        settings.DailySudokuCurrent = new int[36];
+        for (int i = 0; i < 36; i++)
+        {
+            settings.DailySudokuInitial[i] = _sudokuInitial[i / 6, i % 6];
+            settings.DailySudokuCurrent[i] = _sudokuCurrent[i / 6, i % 6];
+        }
+        SettingsManager.SaveSettings(settings);
+    }
+
+    private void GenerateNewDailySudoku6x6(AppSettings settings)
+    {
+        _sudokuWon = false;
+        SudokuClearButton.Visibility = Visibility.Visible;
+        SudokuStatusText.Text = "Fill each row, column, and 2x3 box with 1-6. Click a cell to cycle.";
+
+        int[,] baseGrid = new int[6, 6]
+        {
+            { 1, 2, 3, 4, 5, 6 },
+            { 4, 5, 6, 1, 2, 3 },
+            { 2, 3, 1, 5, 6, 4 },
+            { 5, 6, 4, 2, 3, 1 },
+            { 3, 1, 2, 6, 4, 5 },
+            { 6, 4, 5, 3, 1, 2 }
+        };
+
+        // Deterministic daily seed so the board is uniquely tied to today's date
+        int dateSeed = DateTime.Today.Year * 10000 + DateTime.Today.Month * 100 + DateTime.Today.Day;
+        var rng = new Random(dateSeed);
+
+        // Permute digits 1..6
+        int[] map = Enumerable.Range(1, 6).OrderBy(_ => rng.Next()).ToArray();
+        for (int r = 0; r < 6; r++)
+            for (int c = 0; c < 6; c++)
+                baseGrid[r, c] = map[baseGrid[r, c] - 1];
+
+        // Shuffle rows within each 2-row band (bands: 0..1, 2..3, 4..5)
+        for (int band = 0; band < 3; band++)
+        {
+            if (rng.Next(2) == 1)
+            {
+                int r1 = band * 2, r2 = band * 2 + 1;
+                for (int c = 0; c < 6; c++)
+                    (baseGrid[r1, c], baseGrid[r2, c]) = (baseGrid[r2, c], baseGrid[r1, c]);
+            }
+        }
+
+        // Shuffle the 3 row bands
+        int[] bandOrder = new[] { 0, 1, 2 }.OrderBy(_ => rng.Next()).ToArray();
+        int[,] tempBandGrid = new int[6, 6];
+        for (int b = 0; b < 3; b++)
+        {
+            for (int r = 0; r < 2; r++)
+                for (int c = 0; c < 6; c++)
+                    tempBandGrid[b * 2 + r, c] = baseGrid[bandOrder[b] * 2 + r, c];
+        }
+        baseGrid = tempBandGrid;
+
+        // Shuffle columns within each 3-col stack (stacks: 0..2, 3..5)
+        for (int stack = 0; stack < 2; stack++)
+        {
+            int[] colOrder = new[] { 0, 1, 2 }.OrderBy(_ => rng.Next()).ToArray();
+            int[,] tempColGrid = (int[,])baseGrid.Clone();
+            for (int c = 0; c < 3; c++)
+                for (int r = 0; r < 6; r++)
+                    baseGrid[r, stack * 3 + c] = tempColGrid[r, stack * 3 + colOrder[c]];
+        }
+
+        _sudokuInitial = (int[,])baseGrid.Clone();
+
+        var allCells = Enumerable.Range(0, 36).OrderBy(_ => rng.Next()).Take(18).ToList();
+        foreach (int idx in allCells)
+        {
+            _sudokuInitial[idx / 6, idx % 6] = 0;
+        }
+
+        _sudokuCurrent = (int[,])_sudokuInitial.Clone();
+        settings.DailySudokuDate = DateTime.Today;
+        SaveSudokuProgress(settings);
+        RenderSudokuBoard();
+    }
+
+    private void RenderSudokuBoard()
+    {
+        SudokuGrid.Children.Clear();
+        for (int r = 0; r < 6; r++)
+        {
+            for (int c = 0; c < 6; c++)
+            {
+                int row = r, col = c;
+                bool isFixed = _sudokuInitial[r, c] != 0;
+                int val = _sudokuCurrent[r, c];
+
+                // Thicker borders between 2x3 sub-boxes
+                double rightThick = (c == 2) ? 2.5 : 0.5;
+                double bottomThick = (r == 1 || r == 3) ? 2.5 : 0.5;
+
+                var cellBorder = new Border
+                {
+                    BorderBrush = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#333338")),
+                    BorderThickness = new Thickness(0.5, 0.5, rightThick, bottomThick),
+                    Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(isFixed ? "#1A1A1F" : "#0E0E11"))
+                };
+
+                var btn = new System.Windows.Controls.Button
+                {
+                    Content = val == 0 ? "" : val.ToString(),
+                    FontSize = 15,
+                    Foreground = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(isFixed ? "#888888" : "#FFFFFF")),
+                    Background = System.Windows.Media.Brushes.Transparent,
+                    BorderThickness = new Thickness(0),
+                    Cursor = (isFixed || _sudokuWon) ? System.Windows.Input.Cursors.Arrow : System.Windows.Input.Cursors.Hand
+                };
+
+                if (!isFixed && !_sudokuWon)
+                {
+                    btn.Click += (s, e) => OnSudokuCellClicked(row, col);
+                }
+
+                _sudokuButtons[r, c] = btn;
+                cellBorder.Child = btn;
+                SudokuGrid.Children.Add(cellBorder);
+            }
+        }
+    }
+
+    private void OnSudokuCellClicked(int r, int c)
+    {
+        if (_sudokuWon || _sudokuInitial[r, c] != 0) return;
+
+        _sudokuCurrent[r, c] = (_sudokuCurrent[r, c] + 1) % 7;
+        _sudokuButtons[r, c].Content = _sudokuCurrent[r, c] == 0 ? "" : _sudokuCurrent[r, c].ToString();
+
+        var settings = SettingsManager.LoadSettings();
+        SaveSudokuProgress(settings);
+
+        CheckSudokuBoardState(settings);
+    }
+
+    private void CheckSudokuBoardState(AppSettings settings)
+    {
+        bool allFilled = true;
+        bool hasConflict = false;
+
+        for (int r = 0; r < 6; r++)
+        {
+            for (int c = 0; c < 6; c++)
+            {
+                int v = _sudokuCurrent[r, c];
+                if (v == 0)
+                {
+                    allFilled = false;
+                    continue;
+                }
+
+                // Check row & col conflicts
+                for (int k = 0; k < 6; k++)
+                {
+                    if (k != c && _sudokuCurrent[r, k] == v) hasConflict = true;
+                    if (k != r && _sudokuCurrent[k, c] == v) hasConflict = true;
+                }
+
+                // Check 2x3 box conflict
+                int br = (r / 2) * 2;
+                int bc = (c / 3) * 3;
+                for (int dr = 0; dr < 2; dr++)
+                {
+                    for (int dc = 0; dc < 3; dc++)
+                    {
+                        int nr = br + dr, nc = bc + dc;
+                        if ((nr != r || nc != c) && _sudokuCurrent[nr, nc] == v)
+                            hasConflict = true;
+                    }
+                }
+            }
+        }
+
+        if (allFilled && !hasConflict)
+        {
+            _sudokuWon = true;
+            settings.SudokuSolvedCount++;
+            if (settings.SudokuSolvedCount > settings.BestSudokuStreak)
+                settings.BestSudokuStreak = settings.SudokuSolvedCount;
+            settings.LastSudokuSolvedDate = DateTime.Today;
+            SaveSudokuProgress(settings);
+
+            SudokuSolvedText.Text = $"Streak: {settings.SudokuSolvedCount}";
+            SudokuBestText.Text = $"Best: {settings.BestSudokuStreak}";
+            SudokuStatusText.Text = "You've solved today's Mini Sudoku! Come back tomorrow for a new grid.";
+            SudokuClearButton.Visibility = Visibility.Collapsed;
+            RenderSudokuBoard();
+        }
+        else if (allFilled && hasConflict)
+        {
+            SudokuStatusText.Text = "Some numbers conflict in a row, column, or 2x3 box.";
+        }
+        else
+        {
+            SudokuStatusText.Text = "Fill each row, column, and 2x3 box with 1-6. Click a cell to cycle.";
+        }
+    }
+
+    private void SudokuClear_Click(object sender, RoutedEventArgs e)
+    {
+        if (_sudokuWon) return;
+        _sudokuCurrent = (int[,])_sudokuInitial.Clone();
+        var settings = SettingsManager.LoadSettings();
+        SaveSudokuProgress(settings);
+        RenderSudokuBoard();
+        SudokuStatusText.Text = "Board reset. Fill each row, column, and 2x3 box with 1-6.";
+    }
+
+    // ==================== POMODORO TIMER MODE ====================
+    private void PomodoroMode_Click(object sender, RoutedEventArgs e)
+    {
+        if (_activeMode == "Pomodoro")
+        {
+            ChatMode_Click(sender, e);
+            return;
+        }
+
+        _activeMode = "Pomodoro";
+        HideAllPanels();
+        PomodoroPanel.Visibility = Visibility.Visible;
+        PomodoroInputBar.Visibility = Visibility.Visible;
+        SyncPomodoroUI();
+    }
+
+    public void SyncPomodoroUI()
+    {
+        if (PomodoroTimeText == null) return;
+
+        if (App.IsPomodoroRunning && App.PomodoroEndTime.HasValue)
+        {
+            var remaining = App.PomodoroEndTime.Value - DateTime.Now;
+            if (remaining.TotalSeconds < 0) remaining = TimeSpan.Zero;
+            int mins = (int)remaining.TotalMinutes;
+            int secs = remaining.Seconds;
+            PomodoroTimeText.Text = $"{mins:D2}:{secs:D2}";
+            PomodoroStatusLabel.Text = "Focusing...";
+            PomodoroStartPauseButton.Content = "Pause";
+        }
+        else
+        {
+            int mins = App.PomodoroRemainingPausedSeconds / 60;
+            int secs = App.PomodoroRemainingPausedSeconds % 60;
+            PomodoroTimeText.Text = $"{mins:D2}:{secs:D2}";
+            PomodoroStatusLabel.Text = "Ready";
+            PomodoroStartPauseButton.Content = "Start";
+        }
+    }
+
+    private void SetPomodoroMinutes(int minutes)
+    {
+        if (minutes < 5) minutes = 5;
+        if (minutes > 120) minutes = 120;
+        App.PomodoroEndTime = null;
+        App.PomodoroDurationMinutes = minutes;
+        App.PomodoroRemainingPausedSeconds = minutes * 60;
+        SyncPomodoroUI();
+    }
+
+    private void PomodoroMinus_Click(object sender, RoutedEventArgs e) => SetPomodoroMinutes(App.PomodoroDurationMinutes - 5);
+    private void PomodoroPlus_Click(object sender, RoutedEventArgs e) => SetPomodoroMinutes(App.PomodoroDurationMinutes + 5);
+    private void PomodoroPreset15_Click(object sender, RoutedEventArgs e) => SetPomodoroMinutes(15);
+    private void PomodoroPreset25_Click(object sender, RoutedEventArgs e) => SetPomodoroMinutes(25);
+    private void PomodoroPreset45_Click(object sender, RoutedEventArgs e) => SetPomodoroMinutes(45);
+
+    private void PomodoroStartPause_Click(object sender, RoutedEventArgs e)
+    {
+        if (App.IsPomodoroRunning && App.PomodoroEndTime.HasValue)
+        {
+            var remaining = App.PomodoroEndTime.Value - DateTime.Now;
+            App.PomodoroRemainingPausedSeconds = Math.Max(1, (int)remaining.TotalSeconds);
+            App.PomodoroEndTime = null;
+        }
+        else
+        {
+            if (App.PomodoroRemainingPausedSeconds <= 0)
+                App.PomodoroRemainingPausedSeconds = App.PomodoroDurationMinutes * 60;
+            App.PomodoroEndTime = DateTime.Now.AddSeconds(App.PomodoroRemainingPausedSeconds);
+        }
+        SyncPomodoroUI();
+    }
+
+    private void PomodoroReset_Click(object sender, RoutedEventArgs e)
+    {
+        App.PomodoroEndTime = null;
+        App.PomodoroRemainingPausedSeconds = App.PomodoroDurationMinutes * 60;
+        SyncPomodoroUI();
+    }
+
+    // ==================== CALENDAR & REMINDERS MODE ====================
+    private DateTime _displayedMonth = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+    private DateTime _selectedCalendarDate = DateTime.Today;
+
+    private void CalendarMode_Click(object sender, RoutedEventArgs e)
+    {
+        if (_activeMode == "Calendar")
+        {
+            ChatMode_Click(sender, e);
+            return;
+        }
+
+        _activeMode = "Calendar";
+        HideAllPanels();
+        CalendarPanel.Visibility = Visibility.Visible;
+        CalendarInputBar.Visibility = Visibility.Visible;
+
+        if (ReminderTimeInput.Text == "18:00")
+        {
+            ReminderTimeInput.Text = DateTime.Now.AddMinutes(5).ToString("HH:mm");
+        }
+
+        RenderCalendarMonth();
+        RefreshCalendarRemindersList();
+    }
+
+    private void CalendarPrevMonth_Click(object sender, RoutedEventArgs e)
+    {
+        _displayedMonth = _displayedMonth.AddMonths(-1);
+        RenderCalendarMonth();
+    }
+
+    private void CalendarNextMonth_Click(object sender, RoutedEventArgs e)
+    {
+        _displayedMonth = _displayedMonth.AddMonths(1);
+        RenderCalendarMonth();
+    }
+
+    private void RenderCalendarMonth()
+    {
+        CalendarMonthLabel.Text = _displayedMonth.ToString("MMMM yyyy");
+        CalendarDaysGrid.Children.Clear();
+
+        var settings = SettingsManager.LoadSettings();
+        var reminders = settings.Reminders ?? new List<ReminderItem>();
+
+        int startDayOfWeek = (int)_displayedMonth.DayOfWeek;
+        int daysInMonth = DateTime.DaysInMonth(_displayedMonth.Year, _displayedMonth.Month);
+
+        for (int i = 0; i < 42; i++)
+        {
+            int dayNum = i - startDayOfWeek + 1;
+            if (dayNum < 1 || dayNum > daysInMonth)
+            {
+                CalendarDaysGrid.Children.Add(new Border());
+                continue;
+            }
+
+            DateTime cellDate = new DateTime(_displayedMonth.Year, _displayedMonth.Month, dayNum);
+            bool isSelected = cellDate.Date == _selectedCalendarDate.Date;
+            bool isToday = cellDate.Date == DateTime.Today;
+            bool hasReminders = reminders.Any(r => r.DueDateTime.Date == cellDate.Date);
+
+            string bgHex = isSelected ? "#2A2A30" : (isToday ? "#18181C" : "Transparent");
+            string borderHex = isSelected ? "#666670" : (hasReminders ? "#44444A" : "#1A1A1E");
+
+            var border = new Border
+            {
+                Background = bgHex == "Transparent" ? System.Windows.Media.Brushes.Transparent : new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(bgHex)),
+                BorderBrush = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(borderHex)),
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(5),
+                Margin = new Thickness(2)
+            };
+
+            string labelText = hasReminders ? $"{dayNum} •" : dayNum.ToString();
+            var btn = new System.Windows.Controls.Button
+            {
+                Content = labelText,
+                FontSize = 12,
+                Foreground = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(isSelected ? "#FFFFFF" : "#CCCCCC")),
+                Background = System.Windows.Media.Brushes.Transparent,
+                BorderThickness = new Thickness(0),
+                Cursor = System.Windows.Input.Cursors.Hand
+            };
+
+            btn.Click += (s, e) =>
+            {
+                _selectedCalendarDate = cellDate;
+                RenderCalendarMonth();
+                RefreshCalendarRemindersList();
+            };
+
+            border.Child = btn;
+            CalendarDaysGrid.Children.Add(border);
+        }
+    }
+
+    public void RefreshCalendarRemindersList()
+    {
+        if (RemindersListPanel == null) return;
+
+        SelectedDateLabel.Text = $"Reminders for {_selectedCalendarDate:MMM dd, yyyy}";
+        RemindersListPanel.Children.Clear();
+
+        var settings = SettingsManager.LoadSettings();
+        var dayReminders = (settings.Reminders ?? new List<ReminderItem>())
+            .Where(r => r.DueDateTime.Date == _selectedCalendarDate.Date)
+            .OrderBy(r => r.DueDateTime)
+            .ToList();
+
+        if (dayReminders.Count == 0)
+        {
+            RemindersListPanel.Children.Add(new TextBlock
+            {
+                Text = "No reminders scheduled for this day.",
+                Foreground = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#555555")),
+                FontSize = 12,
+                Margin = new Thickness(0, 4, 0, 0)
+            });
+            return;
+        }
+
+        foreach (var rem in dayReminders)
+        {
+            var row = new Grid { Margin = new Thickness(0, 2, 0, 4) };
+            row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+            string statusSuffix = rem.Notified ? " (Done)" : "";
+            var txt = new TextBlock
+            {
+                Text = $"{rem.DueDateTime:HH:mm}  —  {rem.Title}{statusSuffix}",
+                Foreground = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(rem.Notified ? "#666666" : "#E0E0E0")),
+                FontSize = 12,
+                VerticalAlignment = VerticalAlignment.Center,
+                TextWrapping = TextWrapping.Wrap
+            };
+            Grid.SetColumn(txt, 0);
+
+            var delBtn = new System.Windows.Controls.Button
+            {
+                Content = "✕",
+                Background = System.Windows.Media.Brushes.Transparent,
+                Foreground = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#777777")),
+                BorderThickness = new Thickness(0),
+                Cursor = System.Windows.Input.Cursors.Hand,
+                FontSize = 11,
+                Padding = new Thickness(6, 2, 6, 2)
+            };
+            string remId = rem.Id;
+            delBtn.Click += (s, e) =>
+            {
+                var st = SettingsManager.LoadSettings();
+                st.Reminders.RemoveAll(x => x.Id == remId);
+                SettingsManager.SaveSettings(st);
+                RenderCalendarMonth();
+                RefreshCalendarRemindersList();
+            };
+            Grid.SetColumn(delBtn, 1);
+
+            row.Children.Add(txt);
+            row.Children.Add(delBtn);
+            RemindersListPanel.Children.Add(row);
+        }
+    }
+
+    private void AddReminder_Click(object sender, RoutedEventArgs e)
+    {
+        string title = ReminderTitleInput.Text.Trim();
+        if (string.IsNullOrEmpty(title)) return;
+
+        if (!TimeSpan.TryParse(ReminderTimeInput.Text.Trim(), out TimeSpan timeOfDay))
+        {
+            timeOfDay = DateTime.Now.TimeOfDay.Add(TimeSpan.FromMinutes(1));
+        }
+
+        DateTime due = _selectedCalendarDate.Date.Add(timeOfDay);
+
+        var settings = SettingsManager.LoadSettings();
+        settings.Reminders ??= new List<ReminderItem>();
+        settings.Reminders.Add(new ReminderItem
+        {
+            DueDateTime = due,
+            Title = title,
+            Notified = false
+        });
+        SettingsManager.SaveSettings(settings);
+
+        ReminderTitleInput.Text = "";
+        RenderCalendarMonth();
+        RefreshCalendarRemindersList();
+    }
+
+    private void ReminderTitleInput_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter)
+        {
+            AddReminder_Click(sender, e);
+            e.Handled = true;
+        }
+    }
+
+    private void ReminderTitleInput_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+    {
+        UpdateLiquidGlow(AddReminderButton, ReminderTitleInput, AddReminderButton.IsMouseOver);
+    }
+
+    private void AddReminderButton_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+    {
+        UpdateLiquidGlow(AddReminderButton, ReminderTitleInput, true);
+    }
+
+    private void AddReminderButton_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+    {
+        UpdateLiquidGlow(AddReminderButton, ReminderTitleInput, false);
     }
 
     private async Task StartNewGameAsync()
@@ -82,19 +671,46 @@ public partial class PostCaptureWindow : Window
 
         try
         {
+            var settings = SettingsManager.LoadSettings();
+            settings.PastPuzzles ??= new();
+
+            string[] categories = new[]
+            {
+                "a numerical sequence or mathematical deduction puzzle",
+                "a spatial or geometric reasoning puzzle described in plain text",
+                "a lateral thinking or deductive logic riddle",
+                "a wordplay, cipher, or letter-pattern puzzle",
+                "a truth-teller / liar or Knights-and-Knaves deduction puzzle",
+                "a scheduling, ordering, or constraint-satisfaction logic puzzle",
+                "an algorithmic or probability brain-teaser"
+            };
+            string todayCategory = categories[DateTime.Today.DayOfYear % categories.Length];
+
+            string historyContext = settings.PastPuzzles.Count > 0
+                ? "\n\nCRITICAL: NEVER repeat or closely resemble any of these previously used puzzles or answers:\n- " + string.Join("\n- ", settings.PastPuzzles)
+                : "";
+
+            string userPrompt = $"Generate a brand new, unique daily logic puzzle for {DateTime.Today:yyyy-MM-dd}. Today's required theme is: {todayCategory}. Avoid cliché riddles (like footsteps, echo, shadow, clock, etc.).{historyContext}";
+
             var aiClient = AiProviderFactory.CreateClient();
-            AiResponse response = await aiClient.ChatAsync("Generate a new logic puzzle.", _gameSystemPrompt);
+            AiResponse response = await aiClient.ChatAsync(userPrompt, _gameSystemPrompt);
             
             string json = response.Text.Replace("```json", "").Replace("```", "").Trim();
             using var doc = System.Text.Json.JsonDocument.Parse(json);
             var root = doc.RootElement;
             
-            var settings = SettingsManager.LoadSettings();
             if (root.TryGetProperty("puzzle", out var puzzleProp))
-                settings.DailyPuzzleText = puzzleProp.GetString();
+                settings.DailyPuzzleText = puzzleProp.GetString() ?? "";
             if (root.TryGetProperty("answer", out var ansProp))
-                settings.DailyPuzzleAnswer = ansProp.GetString();
+                settings.DailyPuzzleAnswer = ansProp.GetString() ?? "";
                 
+            if (!string.IsNullOrWhiteSpace(settings.DailyPuzzleText))
+            {
+                string summary = $"{settings.DailyPuzzleText} (Answer: {settings.DailyPuzzleAnswer})";
+                if (!settings.PastPuzzles.Contains(summary))
+                    settings.PastPuzzles.Add(summary);
+            }
+
             settings.DailyPuzzleDate = DateTime.Today;
             settings.DailyPuzzleAttemptsLeft = 3;
             SettingsManager.SaveSettings(settings);

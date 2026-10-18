@@ -13,6 +13,12 @@ public partial class App : System.Windows.Application
     private HotkeyManager? _hotkeyManager;
     private BuddyWindow? _buddyWindow;
 
+    private System.Windows.Threading.DispatcherTimer? _backgroundScheduler;
+    public static DateTime? PomodoroEndTime { get; set; }
+    public static int PomodoroDurationMinutes { get; set; } = 25;
+    public static int PomodoroRemainingPausedSeconds { get; set; } = 25 * 60;
+    public static bool IsPomodoroRunning => PomodoroEndTime.HasValue;
+
     private static System.Threading.Mutex? _singleInstanceMutex;
 
     private void Application_Startup(object sender, StartupEventArgs e)
@@ -55,6 +61,12 @@ public partial class App : System.Windows.Application
         _hotkeyManager = new HotkeyManager();
         _hotkeyManager.OnPrintScreenPressed += HandleScreenshot;
 
+        _backgroundScheduler = new System.Windows.Threading.DispatcherTimer
+        {
+            Interval = TimeSpan.FromSeconds(1)
+        };
+        _backgroundScheduler.Tick += BackgroundScheduler_Tick;
+        _backgroundScheduler.Start();
         
         var settings = SettingsManager.LoadSettings();
         if (!settings.HasSeenOnboarding)
@@ -68,6 +80,47 @@ public partial class App : System.Windows.Application
         // Let the user know the app is ready (stay silent when auto-launched at boot)
         if (!launchedAtBoot)
             _notifyIcon.ShowBalloonTip(3000, "SumoSnap", "Ready! Press Ctrl+Shift+Q to capture.", System.Windows.Forms.ToolTipIcon.Info);
+    }
+
+    private void BackgroundScheduler_Tick(object? sender, EventArgs e)
+    {
+        // 1. Check Pomodoro Timer
+        if (PomodoroEndTime.HasValue && DateTime.Now >= PomodoroEndTime.Value)
+        {
+            PomodoroEndTime = null;
+            PomodoroRemainingPausedSeconds = PomodoroDurationMinutes * 60;
+            NotificationWindow.ShowDarkCard("Pomodoro Timer", $"Your {PomodoroDurationMinutes}-minute focus session is complete.");
+            _currentSessionWindow?.SyncPomodoroUI();
+        }
+        else if (PomodoroEndTime.HasValue)
+        {
+            _currentSessionWindow?.SyncPomodoroUI();
+        }
+
+        // 2. Check Calendar Reminders (every 5 seconds to minimize disk reads)
+        if (DateTime.Now.Second % 5 == 0)
+        {
+            var settings = SettingsManager.LoadSettings();
+            if (settings.Reminders != null && settings.Reminders.Count > 0)
+            {
+                bool changed = false;
+                var now = DateTime.Now;
+                foreach (var rem in settings.Reminders)
+                {
+                    if (!rem.Notified && now >= rem.DueDateTime)
+                    {
+                        rem.Notified = true;
+                        changed = true;
+                        NotificationWindow.ShowDarkCard("Reminder", rem.Title);
+                    }
+                }
+                if (changed)
+                {
+                    SettingsManager.SaveSettings(settings);
+                    _currentSessionWindow?.RefreshCalendarRemindersList();
+                }
+            }
+        }
     }
 
     private PostCaptureWindow? _currentSessionWindow;
