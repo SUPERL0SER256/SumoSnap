@@ -709,6 +709,11 @@ public partial class PostCaptureWindow : Window
                 string summary = $"{settings.DailyPuzzleText} (Answer: {settings.DailyPuzzleAnswer})";
                 if (!settings.PastPuzzles.Contains(summary))
                     settings.PastPuzzles.Add(summary);
+
+                while (settings.PastPuzzles.Count > 7)
+                {
+                    settings.PastPuzzles.RemoveAt(0);
+                }
             }
 
             settings.DailyPuzzleDate = DateTime.Today;
