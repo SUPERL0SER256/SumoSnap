@@ -185,11 +185,11 @@
                 </StackPanel>
                 <!-- Controls -->
                 <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10,10,10,10" WindowChrome.IsHitTestVisibleInChrome="True">
-                    <Button x:Name="ChatModeButton" Content="&#xE8BD;" ToolTip="Chat Mode" Style="{StaticResource IconButtonStyle}" Click="ChatMode_Click" Margin="0,0,4,0" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"/>
-                    <Button x:Name="GameToggleButton" Content="&#xE7FC;" ToolTip="Daily Logic Puzzle" Style="{StaticResource IconButtonStyle}" Click="GameToggle_Click" Margin="0,0,4,0" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"/>
-                    <Button x:Name="SudokuModeButton" Content="&#xE80A;" ToolTip="6x6 Mini Sudoku" Style="{StaticResource IconButtonStyle}" Click="SudokuMode_Click" Margin="0,0,4,0" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"/>
+                    <Button x:Name="CalendarModeButton" Content="&#xE787;" ToolTip="Calendar &amp; Reminders" Style="{StaticResource IconButtonStyle}" Click="CalendarMode_Click" Margin="0,0,4,0" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"/>
                     <Button x:Name="PomodoroModeButton" Content="&#xE916;" ToolTip="Pomodoro Timer" Style="{StaticResource IconButtonStyle}" Click="PomodoroMode_Click" Margin="0,0,4,0" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"/>
-                    <Button x:Name="CalendarModeButton" Content="&#xE787;" ToolTip="Calendar &amp; Reminders" Style="{StaticResource IconButtonStyle}" Click="CalendarMode_Click" Margin="0,0,15,0" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"/>
+                    <Button x:Name="SudokuModeButton" Content="&#xE80A;" ToolTip="6x6 Mini Sudoku" Style="{StaticResource IconButtonStyle}" Click="SudokuMode_Click" Margin="0,0,4,0" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"/>
+                    <Button x:Name="GameToggleButton" Content="&#xE7FC;" ToolTip="Daily Logic Puzzle" Style="{StaticResource IconButtonStyle}" Click="GameToggle_Click" Margin="0,0,4,0" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"/>
+                    <Button x:Name="ChatModeButton" Content="&#xE8BD;" ToolTip="Chat Mode" Style="{StaticResource IconButtonStyle}" Click="ChatMode_Click" Margin="0,0,15,0" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"/>
                     <Border Background="#111" CornerRadius="8" BorderBrush="#222" BorderThickness="1" Padding="2" Margin="0,0,15,0">
                         <StackPanel Orientation="Horizontal">
                             <Button Content="📋" ToolTip="Copy to Clipboard" Style="{StaticResource IconButtonStyle}" Click="CopyButton_Click"/>
