@@ -242,17 +242,31 @@
                             </Rectangle>
                         </StackPanel>
                         <!-- Physical Mode & Utility Keycaps -->
-                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="8,6,8,6" WindowChrome.IsHitTestVisibleInChrome="True">
-                            <Border Background="#0D0D0F" CornerRadius="6" BorderBrush="#26262B" BorderThickness="1" Padding="3" Margin="0,0,10,0">
-                                <StackPanel Orientation="Horizontal">
-                                    <Button x:Name="CalendarModeButton" Content="&#xE787;" ToolTip="Calendar &amp; Reminders" Style="{StaticResource IconButtonStyle}" Click="CalendarMode_Click" Margin="0,0,3,0" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"/>
-                                    <Button x:Name="PomodoroModeButton" Content="&#xE916;" ToolTip="Pomodoro Timer" Style="{StaticResource IconButtonStyle}" Click="PomodoroMode_Click" Margin="0,0,3,0" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"/>
-                                    <Button x:Name="SudokuModeButton" Content="&#xE80A;" ToolTip="6x6 Mini Sudoku" Style="{StaticResource IconButtonStyle}" Click="SudokuMode_Click" Margin="0,0,3,0" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"/>
-                                    <Button x:Name="GameToggleButton" Content="&#xE7FC;" ToolTip="Daily Logic Puzzle" Style="{StaticResource IconButtonStyle}" Click="GameToggle_Click" Margin="0,0,3,0" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"/>
-                                    <Button x:Name="ChatModeButton" Content="&#xE8BD;" ToolTip="Chat Mode" Style="{StaticResource IconButtonStyle}" Click="ChatMode_Click" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"/>
-                                </StackPanel>
-                            </Border>
-                            <Border Background="#0D0D0F" CornerRadius="6" BorderBrush="#26262B" BorderThickness="1" Padding="3" Margin="0,0,10,0">
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="8,4,8,6" WindowChrome.IsHitTestVisibleInChrome="True">
+                            <StackPanel Orientation="Vertical" Margin="0,0,10,0" VerticalAlignment="Bottom">
+                                <!-- Drilled Chassis LED Pinholes (Outside & Above the Button Box) -->
+                                <UniformGrid Columns="5" Margin="4,0,4,3">
+                                    <Ellipse x:Name="CalendarLed" Width="4" Height="4" Fill="#222228" HorizontalAlignment="Center"/>
+                                    <Ellipse x:Name="PomodoroLed" Width="4" Height="4" Fill="#222228" HorizontalAlignment="Center"/>
+                                    <Ellipse x:Name="SudokuLed" Width="4" Height="4" Fill="#222228" HorizontalAlignment="Center"/>
+                                    <Ellipse x:Name="LogicLed" Width="4" Height="4" Fill="#222228" HorizontalAlignment="Center"/>
+                                    <Ellipse x:Name="ChatLed" Width="4" Height="4" Fill="#FFFFFF" HorizontalAlignment="Center">
+                                        <Ellipse.Effect>
+                                            <DropShadowEffect Color="White" BlurRadius="5" ShadowDepth="0" Opacity="0.9"/>
+                                        </Ellipse.Effect>
+                                    </Ellipse>
+                                </UniformGrid>
+                                <Border Background="#0D0D0F" CornerRadius="6" BorderBrush="#26262B" BorderThickness="1" Padding="3">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button x:Name="CalendarModeButton" Content="&#xE787;" ToolTip="Calendar &amp; Reminders" Style="{StaticResource IconButtonStyle}" Click="CalendarMode_Click" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Margin="0,0,3,0"/>
+                                        <Button x:Name="PomodoroModeButton" Content="&#xE916;" ToolTip="Pomodoro Timer" Style="{StaticResource IconButtonStyle}" Click="PomodoroMode_Click" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Margin="0,0,3,0"/>
+                                        <Button x:Name="SudokuModeButton" Content="&#xE80A;" ToolTip="6x6 Mini Sudoku" Style="{StaticResource IconButtonStyle}" Click="SudokuMode_Click" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Margin="0,0,3,0"/>
+                                        <Button x:Name="GameToggleButton" Content="&#xE7FC;" ToolTip="Daily Logic Puzzle" Style="{StaticResource IconButtonStyle}" Click="GameToggle_Click" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Margin="0,0,3,0"/>
+                                        <Button x:Name="ChatModeButton" Content="&#xE8BD;" ToolTip="Chat Mode" Style="{StaticResource IconButtonStyle}" Click="ChatMode_Click" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"/>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                            <Border Background="#0D0D0F" CornerRadius="6" BorderBrush="#26262B" BorderThickness="1" Padding="3" Margin="0,7,10,0" VerticalAlignment="Bottom">
                                 <StackPanel Orientation="Horizontal">
                                     <Button Content="📋" ToolTip="Copy to Clipboard" Style="{StaticResource IconButtonStyle}" Click="CopyButton_Click"/>
                                     <Button Content="💾" ToolTip="Save to Disk" Style="{StaticResource IconButtonStyle}" Click="SaveButton_Click" Margin="3,0"/>
@@ -261,9 +275,9 @@
                                 </StackPanel>
                             </Border>
 
-                            <Button Content="—" Style="{StaticResource WindowControlButtonStyle}" FontSize="10" Width="28" Height="26" Click="Minimize_Click"/>
-                            <Button Content="◻" Style="{StaticResource WindowControlButtonStyle}" FontSize="13" Width="28" Height="26" Click="Maximize_Click"/>
-                            <Button Content="✕" Style="{StaticResource WindowControlButtonStyle}" FontSize="11" Width="28" Height="26" Click="Close_Click"/>
+                            <Button Content="—" Style="{StaticResource WindowControlButtonStyle}" FontSize="10" Width="28" Height="26" Margin="0,7,0,0" VerticalAlignment="Center" Click="Minimize_Click"/>
+                            <Button Content="◻" Style="{StaticResource WindowControlButtonStyle}" FontSize="13" Width="28" Height="26" Margin="0,7,0,0" VerticalAlignment="Center" Click="Maximize_Click"/>
+                            <Button Content="✕" Style="{StaticResource WindowControlButtonStyle}" FontSize="11" Width="28" Height="26" Margin="0,7,0,0" VerticalAlignment="Center" Click="Close_Click"/>
                         </StackPanel>
                     </Grid>
                 </Border>

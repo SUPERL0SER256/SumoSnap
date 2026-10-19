@@ -89,6 +89,7 @@ public partial class App : System.Windows.Application
         {
             PomodoroEndTime = null;
             PomodoroRemainingPausedSeconds = PomodoroDurationMinutes * 60;
+            HardwareAudio.PlayChime();
             NotificationWindow.ShowDarkCard("Pomodoro Timer", $"Your {PomodoroDurationMinutes}-minute focus session is complete.");
             _currentSessionWindow?.SyncPomodoroUI();
         }
@@ -111,6 +112,7 @@ public partial class App : System.Windows.Application
                     {
                         rem.Notified = true;
                         changed = true;
+                        HardwareAudio.PlayChime();
                         NotificationWindow.ShowDarkCard("Reminder", rem.Title);
                     }
                 }

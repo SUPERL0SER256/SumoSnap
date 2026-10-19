@@ -17,6 +17,57 @@ public partial class PostCaptureWindow : Window
     private string _activeMode = "Chat"; // "Chat", "Logic", "Sudoku", "Pomodoro", "Calendar"
     private string _gameSystemPrompt = @"You are a diverse logic puzzle generator. Generate a short logic puzzle. Mix it up randomly between: number patterns, spatial reasoning described in text, letter sequences, and classic logic riddles. Output ONLY a valid JSON object without markdown. Schema: { ""puzzle"": ""the puzzle text"", ""answer"": ""the exact brief answer"" }. Make it very concise to save tokens.";
 
+    private bool _suppressKeyClick = false;
+    private static readonly SolidColorBrush _ledLitBrush = CreateFrozenBrush(0xFF, 0xFF, 0xFF);
+    private static readonly SolidColorBrush _ledUnlitBrush = CreateFrozenBrush(0x22, 0x22, 0x28);
+
+    private void UpdateActiveModeLights()
+    {
+        if (ChatLed == null) return;
+
+        void SetLed(System.Windows.Shapes.Ellipse led, bool active)
+        {
+            led.Fill = active ? _ledLitBrush : _ledUnlitBrush;
+            led.Effect = active
+                ? new System.Windows.Media.Effects.DropShadowEffect
+                {
+                    Color = System.Windows.Media.Colors.White,
+                    BlurRadius = 5,
+                    ShadowDepth = 0,
+                    Opacity = 0.9
+                }
+                : null;
+        }
+
+        SetLed(CalendarLed, _activeMode == "Calendar");
+        SetLed(PomodoroLed, _activeMode == "Pomodoro");
+        SetLed(SudokuLed, _activeMode == "Sudoku");
+        SetLed(LogicLed, _activeMode == "Logic");
+        SetLed(ChatLed, _activeMode == "Chat");
+    }
+
+    private static void PlayPanelTransition(FrameworkElement panel)
+    {
+        panel.RenderTransformOrigin = new System.Windows.Point(0.5, 0.5);
+        var scale = new ScaleTransform(1.0, 0.965);
+        panel.RenderTransform = scale;
+
+        var dur = new Duration(TimeSpan.FromMilliseconds(85));
+        var ease = new System.Windows.Media.Animation.QuadraticEase { EasingMode = System.Windows.Media.Animation.EasingMode.EaseOut };
+
+        var opAnim = new System.Windows.Media.Animation.DoubleAnimation(0.18, 1.0, dur) { EasingFunction = ease };
+        var syAnim = new System.Windows.Media.Animation.DoubleAnimation(0.965, 1.0, dur) { EasingFunction = ease };
+
+        panel.BeginAnimation(UIElement.OpacityProperty, opAnim);
+        scale.BeginAnimation(ScaleTransform.ScaleYProperty, syAnim);
+    }
+
+    private void PlayModeSound()
+    {
+        if (_suppressKeyClick) return;
+        HardwareAudio.PlayKeyClick();
+    }
+
     private void HideAllPanels()
     {
         MainScroll.Visibility = Visibility.Collapsed;
@@ -33,32 +84,44 @@ public partial class PostCaptureWindow : Window
 
     private void SideSwitch_Click(object sender, RoutedEventArgs e)
     {
-        switch (_activeMode)
+        HardwareAudio.PlaySideSwitch();
+        _suppressKeyClick = true;
+        try
         {
-            case "Chat":
-                GameToggle_Click(sender, e);
-                break;
-            case "Logic":
-                SudokuMode_Click(sender, e);
-                break;
-            case "Sudoku":
-                PomodoroMode_Click(sender, e);
-                break;
-            case "Pomodoro":
-                CalendarMode_Click(sender, e);
-                break;
-            default:
-                ChatMode_Click(sender, e);
-                break;
+            switch (_activeMode)
+            {
+                case "Chat":
+                    GameToggle_Click(sender, e);
+                    break;
+                case "Logic":
+                    SudokuMode_Click(sender, e);
+                    break;
+                case "Sudoku":
+                    PomodoroMode_Click(sender, e);
+                    break;
+                case "Pomodoro":
+                    CalendarMode_Click(sender, e);
+                    break;
+                default:
+                    ChatMode_Click(sender, e);
+                    break;
+            }
+        }
+        finally
+        {
+            _suppressKeyClick = false;
         }
     }
 
     private void ChatMode_Click(object sender, RoutedEventArgs e)
     {
+        PlayModeSound();
         _activeMode = "Chat";
+        UpdateActiveModeLights();
         HideAllPanels();
         MainScroll.Visibility = Visibility.Visible;
         ChatInputBar.Visibility = Visibility.Visible;
+        PlayPanelTransition(MainScroll);
         ChatInput.Focus();
     }
 
@@ -78,10 +141,13 @@ public partial class PostCaptureWindow : Window
             return;
         }
 
+        PlayModeSound();
         _activeMode = "Logic";
+        UpdateActiveModeLights();
         HideAllPanels();
         GamePanel.Visibility = Visibility.Visible;
         GameInputBar.Visibility = Visibility.Visible;
+        PlayPanelTransition(GamePanel);
 
         var settings = SettingsManager.LoadSettings();
         StreakText.Text = $"Streak: {settings.DailyLogicStreak}";
@@ -124,10 +190,13 @@ public partial class PostCaptureWindow : Window
             return;
         }
 
+        PlayModeSound();
         _activeMode = "Sudoku";
+        UpdateActiveModeLights();
         HideAllPanels();
         SudokuPanel.Visibility = Visibility.Visible;
         SudokuInputBar.Visibility = Visibility.Visible;
+        PlayPanelTransition(SudokuPanel);
 
         LoadOrGenerateDailySudoku();
     }
@@ -309,6 +378,7 @@ public partial class PostCaptureWindow : Window
     {
         if (_sudokuWon || _sudokuInitial[r, c] != 0) return;
 
+        HardwareAudio.PlayKeyClick();
         _sudokuCurrent[r, c] = (_sudokuCurrent[r, c] + 1) % 7;
         _sudokuButtons[r, c].Content = _sudokuCurrent[r, c] == 0 ? "" : _sudokuCurrent[r, c].ToString();
 
@@ -359,6 +429,7 @@ public partial class PostCaptureWindow : Window
         if (allFilled && !hasConflict)
         {
             _sudokuWon = true;
+            HardwareAudio.PlayChime();
             settings.SudokuSolvedCount++;
             if (settings.SudokuSolvedCount > settings.BestSudokuStreak)
                 settings.BestSudokuStreak = settings.SudokuSolvedCount;
@@ -384,6 +455,7 @@ public partial class PostCaptureWindow : Window
     private void SudokuClear_Click(object sender, RoutedEventArgs e)
     {
         if (_sudokuWon) return;
+        HardwareAudio.PlayKeyClick();
         _sudokuCurrent = (int[,])_sudokuInitial.Clone();
         var settings = SettingsManager.LoadSettings();
         SaveSudokuProgress(settings);
@@ -482,10 +554,13 @@ public partial class PostCaptureWindow : Window
             return;
         }
 
+        PlayModeSound();
         _activeMode = "Pomodoro";
+        UpdateActiveModeLights();
         HideAllPanels();
         PomodoroPanel.Visibility = Visibility.Visible;
         PomodoroInputBar.Visibility = Visibility.Visible;
+        PlayPanelTransition(PomodoroPanel);
         SyncPomodoroUI();
     }
 
@@ -519,6 +594,7 @@ public partial class PostCaptureWindow : Window
 
     private void SetPomodoroMinutes(int minutes)
     {
+        HardwareAudio.PlayKeyClick();
         if (minutes < 5) minutes = 5;
         if (minutes > 120) minutes = 120;
         App.PomodoroEndTime = null;
@@ -535,6 +611,7 @@ public partial class PostCaptureWindow : Window
 
     private void PomodoroStartPause_Click(object sender, RoutedEventArgs e)
     {
+        HardwareAudio.PlayKeyClick();
         if (App.IsPomodoroRunning && App.PomodoroEndTime.HasValue)
         {
             var remaining = App.PomodoroEndTime.Value - DateTime.Now;
@@ -552,6 +629,7 @@ public partial class PostCaptureWindow : Window
 
     private void PomodoroReset_Click(object sender, RoutedEventArgs e)
     {
+        HardwareAudio.PlayKeyClick();
         App.PomodoroEndTime = null;
         App.PomodoroRemainingPausedSeconds = App.PomodoroDurationMinutes * 60;
         SyncPomodoroUI();
@@ -569,10 +647,13 @@ public partial class PostCaptureWindow : Window
             return;
         }
 
+        PlayModeSound();
         _activeMode = "Calendar";
+        UpdateActiveModeLights();
         HideAllPanels();
         CalendarPanel.Visibility = Visibility.Visible;
         CalendarInputBar.Visibility = Visibility.Visible;
+        PlayPanelTransition(CalendarPanel);
 
         if (ReminderTimeInput.Text == "18:00")
         {
@@ -585,12 +666,14 @@ public partial class PostCaptureWindow : Window
 
     private void CalendarPrevMonth_Click(object sender, RoutedEventArgs e)
     {
+        HardwareAudio.PlayKeyClick();
         _displayedMonth = _displayedMonth.AddMonths(-1);
         RenderCalendarMonth();
     }
 
     private void CalendarNextMonth_Click(object sender, RoutedEventArgs e)
     {
+        HardwareAudio.PlayKeyClick();
         _displayedMonth = _displayedMonth.AddMonths(1);
         RenderCalendarMonth();
     }
@@ -862,6 +945,7 @@ public partial class PostCaptureWindow : Window
         string answer = GameInput.Text.Trim();
         if (string.IsNullOrEmpty(answer)) return;
 
+        HardwareAudio.PlayKeyClick();
         var settings = SettingsManager.LoadSettings();
 
         GameInput.Text = "";
@@ -878,6 +962,7 @@ public partial class PostCaptureWindow : Window
             string reply = response.Text.Trim().ToUpper();
             if (reply.StartsWith("CORRECT"))
             {
+                HardwareAudio.PlayChime();
                 settings.DailyLogicStreak++;
                 if (settings.DailyLogicStreak > settings.HighestLogicStreak) 
                     settings.HighestLogicStreak = settings.DailyLogicStreak;
@@ -1098,6 +1183,7 @@ public partial class PostCaptureWindow : Window
         string userMessage = ChatInput.Text.Trim();
         if (string.IsNullOrEmpty(userMessage)) return;
 
+        HardwareAudio.PlayKeyClick();
         AddChatBubble(userMessage, isUser: true);
         ChatInput.Text = "";
         
