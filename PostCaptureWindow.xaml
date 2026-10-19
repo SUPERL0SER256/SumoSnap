@@ -1,44 +1,53 @@
 <Window x:Class="SumoSnap.PostCaptureWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="SumoSnap Editor" Height="600" Width="600"
+        Title="SumoSnap Editor" Height="600" Width="610"
         WindowStartupLocation="CenterScreen"
-        WindowStyle="SingleBorderWindow"
-        >
-    
+        WindowStyle="None"
+        AllowsTransparency="True"
+        FontFamily="Consolas, Segoe UI"
+        Background="Transparent">
+
     <WindowChrome.WindowChrome>
-        <WindowChrome CaptionHeight="40" ResizeBorderThickness="5" GlassFrameThickness="0" CornerRadius="0"/>
+        <WindowChrome CaptionHeight="44" ResizeBorderThickness="6" GlassFrameThickness="0" CornerRadius="0"/>
     </WindowChrome.WindowChrome>
-    <Window.Background>
-        <RadialGradientBrush Center="0.5,0.0" RadiusX="1.2" RadiusY="1.2">
-            <GradientStop Color="#1A1A1D" Offset="0"/>
-            <GradientStop Color="#09090A" Offset="1"/>
-        </RadialGradientBrush>
-    </Window.Background>
+
     <Window.Resources>
-        <!-- Transparent Icon Buttons for Top Right -->
+        <!-- Tactile Mechanical Keycap Icon Button (Monochrome Braun / Casio / OP-1 Style) -->
         <Style x:Key="IconButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Foreground" Value="Gray"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="5"/>
-            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Background" Value="#202024"/>
+            <Setter Property="Foreground" Value="#A0A0A6"/>
+            <Setter Property="BorderBrush" Value="#0A0A0C"/>
+            <Setter Property="BorderThickness" Value="1,1,1,3"/>
+            <Setter Property="Padding" Value="7,5"/>
+            <Setter Property="FontSize" Value="14"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}" CornerRadius="5">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
+                        <Border x:Name="KeycapBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4">
+                            <Border x:Name="KeycapTopEdge" BorderBrush="#2E2E34" BorderThickness="0,1,0,0" CornerRadius="3">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
+                            </Border>
                         </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="KeycapBorder" Property="Background" Value="#2A2A30"/>
+                                <Setter TargetName="KeycapTopEdge" Property="BorderBrush" Value="#55555E"/>
+                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="KeycapBorder" Property="BorderThickness" Value="1,2,1,1"/>
+                                <Setter TargetName="KeycapBorder" Property="Background" Value="#18181C"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Foreground" Value="White"/>
-                    <Setter Property="Background" Value="#333333"/>
-                </Trigger>
-            </Style.Triggers>
         </Style>
 
         <!-- No Hover Button Style for Chat Copy -->
@@ -58,64 +67,60 @@
             </Setter>
         </Style>
 
-        <!-- Send Button Style -->
-                        <Style x:Key="SendButtonStyle" TargetType="Button">
-            <Setter Property="Foreground" Value="#E0E0E0"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
+        <!-- Tactile Primary Action Keycap (Monochrome Hardware Accent) -->
+        <Style x:Key="SendButtonStyle" TargetType="Button">
+            <Setter Property="Foreground" Value="#E8E8EC"/>
+            <Setter Property="FontFamily" Value="Consolas, Segoe UI"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Grid>
-                            <!-- Idle Dull Ring -->
-                            <Border CornerRadius="18" Padding="1.5">
+                            <!-- Hardware Keycap Base Bevel -->
+                            <Border CornerRadius="6" Background="#0A0A0C" BorderBrush="#2D2D32" BorderThickness="1,1,1,3" Padding="1">
+                                <Border.Effect>
+                                    <DropShadowEffect Color="Black" BlurRadius="4" ShadowDepth="1" Opacity="0.6"/>
+                                </Border.Effect>
+                            </Border>
+
+                            <!-- Hover/Active Monochrome Indicator Rim (Compatible with UpdateLiquidGlow) -->
+                            <Border x:Name="OuterRingHover" CornerRadius="6" Padding="1.5" Opacity="0" BorderBrush="#D0D0D8" BorderThickness="1.5">
                                 <Border.Background>
                                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                        <GradientStop Color="#444" Offset="0.0"/>
-                                        <GradientStop Color="#111" Offset="1.0"/>
+                                        <GradientStop Color="#44444A" Offset="0.0"/>
+                                        <GradientStop Color="#FFFFFF" Offset="0.5"/>
+                                        <GradientStop Color="#44444A" Offset="1.0"/>
                                     </LinearGradientBrush>
                                 </Border.Background>
                             </Border>
 
-                            <!-- Hover Iridescent Ring (Fades in) -->
-                            <Border x:Name="OuterRingHover" CornerRadius="18" Padding="1.5" Opacity="0">
-                                <Border.Background>
-                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                        <GradientStop Color="#111" Offset="0.0"/>
-                                        <GradientStop Color="#FFF" Offset="0.3"/>
-                                        <GradientStop Color="#00E5FF" Offset="0.33"/>
-                                        <GradientStop Color="#FFAA00" Offset="0.38"/>
-                                        <GradientStop Color="#FFF" Offset="0.42"/>
-                                        <GradientStop Color="#111" Offset="1.0"/>
-                                    </LinearGradientBrush>
-                                </Border.Background>
-                            </Border>
-
-                            <!-- Inner Button -->
-                            <Border x:Name="InnerButton" Background="#111" CornerRadius="16.5" Margin="1.5">
+                            <!-- Inner Keycap Cap -->
+                            <Border x:Name="InnerButton" Background="#222227" CornerRadius="4.5" Margin="1.5,1.5,1.5,3">
                                 <Grid>
-                                    <Border x:Name="InnerHoverOverlay" Background="#1A1A1D" Opacity="0" CornerRadius="16.5"/>
+                                    <Border x:Name="InnerHoverOverlay" Background="#2C2C32" Opacity="0" CornerRadius="4.5"/>
+                                    <Border BorderBrush="#383840" BorderThickness="0,1,0,0" CornerRadius="4.5"/>
                                     <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="16,6"/>
                                 </Grid>
                             </Border>
                         </Grid>
                         <ControlTemplate.Triggers>
-                            
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="InnerButton" Property="Background" Value="#050505"/>
+                                <Setter TargetName="InnerButton" Property="Margin" Value="1.5,3,1.5,1.5"/>
+                                <Setter TargetName="InnerButton" Property="Background" Value="#16161A"/>
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Opacity" Value="0.5"/>
+                                <Setter Property="Opacity" Value="0.45"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
-        <!-- ScrollBar Styles -->
+
+        <!-- Industrial ScrollBar -->
         <Style TargetType="ScrollBar">
-            <Setter Property="Background" Value="#1E1E1E"/>
-            <Setter Property="Foreground" Value="#444"/>
+            <Setter Property="Background" Value="#101012"/>
+            <Setter Property="Foreground" Value="#38383E"/>
             <Setter Property="Width" Value="8"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -126,7 +131,7 @@
                                     <Thumb>
                                         <Thumb.Template>
                                             <ControlTemplate TargetType="Thumb">
-                                                <Border Background="{TemplateBinding Foreground}" CornerRadius="4" Margin="2,0"/>
+                                                <Border Background="{TemplateBinding Foreground}" CornerRadius="2" Margin="1,0"/>
                                             </ControlTemplate>
                                         </Thumb.Template>
                                     </Thumb>
@@ -137,25 +142,56 @@
                 </Setter.Value>
             </Setter>
         </Style>
-    
+
+        <!-- Hardware Window Control Buttons -->
         <Style x:Key="WindowControlButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Foreground" Value="#888"/>
-            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="#1C1C20"/>
+            <Setter Property="Foreground" Value="#888890"/>
+            <Setter Property="BorderBrush" Value="#0A0A0C"/>
+            <Setter Property="BorderThickness" Value="1,1,1,2"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="bgBorder" Background="{TemplateBinding Background}" CornerRadius="4">
+                        <Border x:Name="bgBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="3" Margin="2,0">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="bgBorder" Property="Background" Value="#1C1C1F"/>
-                                <Setter Property="Foreground" Value="#FFF"/>
+                                <Setter TargetName="bgBorder" Property="Background" Value="#2A2A30"/>
+                                <Setter Property="Foreground" Value="#FFFFFF"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="bgBorder" Property="Background" Value="#111111"/>
+                                <Setter TargetName="bgBorder" Property="Background" Value="#121215"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!-- Protruding Flat-Orange Hardware Side Push-Button Switch -->
+        <Style x:Key="SideSwitchButtonStyle" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid Width="10" Height="115" Background="Transparent">
+                            <Border x:Name="SwitchBody"
+                                    Width="9"
+                                    Height="115"
+                                    HorizontalAlignment="Left"
+                                    CornerRadius="0,4,4,0"
+                                    Background="#E05A24"
+                                    BorderThickness="0"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="SwitchBody" Property="Background" Value="#EC6630"/>
+                            </Trigger>
+                            <!-- Depresses inward 2px when clicked -->
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="SwitchBody" Property="Width" Value="7"/>
+                                <Setter TargetName="SwitchBody" Property="Background" Value="#C94E1C"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -163,299 +199,337 @@
             </Setter>
         </Style>
     </Window.Resources>
-    
+
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/> <!-- Top Bar -->
-            <RowDefinition Height="*"/>    <!-- Scrollable Image & Chat -->
-            <RowDefinition Height="Auto"/> <!-- Input Bar -->
-        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
 
-        <!-- Top Right Actions -->
-        <Border Grid.Row="0" Background="#0A0A0C" BorderBrush="#1F1F22" BorderThickness="0,0,0,1" Margin="0,0,0,10">
+        <!-- Outer Matte Hardware Chassis Frame -->
+        <Border Grid.Column="0" BorderBrush="#2A2A30" BorderThickness="2" Background="#161619" CornerRadius="6">
             <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <!-- Custom Title -->
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="15,10,0,10">
-                    <Image Source="pack://application:,,,/icon.ico" Width="16" Height="16" Margin="0,0,8,0"/>
-                    <TextBlock Text="SumoSnap Editor" Foreground="#666" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                </StackPanel>
-                <!-- Controls -->
-                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10,10,10,10" WindowChrome.IsHitTestVisibleInChrome="True">
-                    <Button x:Name="CalendarModeButton" Content="&#xE787;" ToolTip="Calendar &amp; Reminders" Style="{StaticResource IconButtonStyle}" Click="CalendarMode_Click" Margin="0,0,4,0" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"/>
-                    <Button x:Name="PomodoroModeButton" Content="&#xE916;" ToolTip="Pomodoro Timer" Style="{StaticResource IconButtonStyle}" Click="PomodoroMode_Click" Margin="0,0,4,0" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"/>
-                    <Button x:Name="SudokuModeButton" Content="&#xE80A;" ToolTip="6x6 Mini Sudoku" Style="{StaticResource IconButtonStyle}" Click="SudokuMode_Click" Margin="0,0,4,0" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"/>
-                    <Button x:Name="GameToggleButton" Content="&#xE7FC;" ToolTip="Daily Logic Puzzle" Style="{StaticResource IconButtonStyle}" Click="GameToggle_Click" Margin="0,0,4,0" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"/>
-                    <Button x:Name="ChatModeButton" Content="&#xE8BD;" ToolTip="Chat Mode" Style="{StaticResource IconButtonStyle}" Click="ChatMode_Click" Margin="0,0,15,0" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"/>
-                    <Border Background="#111" CornerRadius="8" BorderBrush="#222" BorderThickness="1" Padding="2" Margin="0,0,15,0">
-                        <StackPanel Orientation="Horizontal">
-                            <Button Content="📋" ToolTip="Copy to Clipboard" Style="{StaticResource IconButtonStyle}" Click="CopyButton_Click"/>
-                            <Button Content="💾" ToolTip="Save to Disk" Style="{StaticResource IconButtonStyle}" Click="SaveButton_Click" Margin="2,0"/>
-                            <Button Content="⚙" ToolTip="Settings" Style="{StaticResource IconButtonStyle}" Click="SettingsButton_Click" Margin="0,0,2,0"/>
-                            <Button Content="?" ToolTip="Quick Start Guide" Style="{StaticResource IconButtonStyle}" Click="InfoButton_Click"/>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/> <!-- Top Deck -->
+                    <RowDefinition Height="*"/>    <!-- Recessed LCD Display Area -->
+                    <RowDefinition Height="Auto"/> <!-- Bottom Keycap Input Deck -->
+                </Grid.RowDefinitions>
+
+                <!-- Top Hardware Control Deck -->
+                <Border Grid.Row="0" Background="#141417" BorderBrush="#09090B" BorderThickness="0,0,0,2" CornerRadius="5,5,0,0" Padding="4,2">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <!-- Industrial Badging with Custom Monochrome Logo + Perforated Speaker Grille -->
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="12,8,0,8">
+                            <Image Source="pack://application:,,,/header_logo.png" Width="18" Height="18" Margin="0,0,8,0" RenderOptions.BitmapScalingMode="HighQuality" VerticalAlignment="Center"/>
+                            <TextBlock Text="SUMOSNAP // VO-01" Foreground="#9999A2" FontSize="12" VerticalAlignment="Center"/>
+                            <!-- Perforated Hardware Speaker Grille (3x10 Recessed Dots) -->
+                            <Rectangle Width="50" Height="14" Margin="14,0,0,0" VerticalAlignment="Center" Opacity="0.75">
+                                <Rectangle.Fill>
+                                    <DrawingBrush Viewport="0,0,5,5" ViewportUnits="Absolute" TileMode="Tile">
+                                        <DrawingBrush.Drawing>
+                                            <GeometryDrawing Brush="#070709">
+                                                <GeometryDrawing.Geometry>
+                                                    <EllipseGeometry Center="2.5,2.5" RadiusX="1.3" RadiusY="1.3"/>
+                                                </GeometryDrawing.Geometry>
+                                            </GeometryDrawing>
+                                        </DrawingBrush.Drawing>
+                                    </DrawingBrush>
+                                </Rectangle.Fill>
+                            </Rectangle>
                         </StackPanel>
-                    </Border>
-                    
-                    <Button Content="—" Style="{StaticResource WindowControlButtonStyle}" FontSize="10" Width="30" Click="Minimize_Click"/>
-                    <Button Content="◻" Style="{StaticResource WindowControlButtonStyle}" FontSize="14" Width="30" Click="Maximize_Click"/>
-                    <Button Content="✕" Style="{StaticResource WindowControlButtonStyle}" FontSize="12" Width="30" Click="Close_Click"/>
-                </StackPanel>
-            </Grid>
-        </Border>
+                        <!-- Physical Mode & Utility Keycaps -->
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="8,6,8,6" WindowChrome.IsHitTestVisibleInChrome="True">
+                            <Border Background="#0D0D0F" CornerRadius="6" BorderBrush="#26262B" BorderThickness="1" Padding="3" Margin="0,0,10,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <Button x:Name="CalendarModeButton" Content="&#xE787;" ToolTip="Calendar &amp; Reminders" Style="{StaticResource IconButtonStyle}" Click="CalendarMode_Click" Margin="0,0,3,0" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"/>
+                                    <Button x:Name="PomodoroModeButton" Content="&#xE916;" ToolTip="Pomodoro Timer" Style="{StaticResource IconButtonStyle}" Click="PomodoroMode_Click" Margin="0,0,3,0" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"/>
+                                    <Button x:Name="SudokuModeButton" Content="&#xE80A;" ToolTip="6x6 Mini Sudoku" Style="{StaticResource IconButtonStyle}" Click="SudokuMode_Click" Margin="0,0,3,0" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"/>
+                                    <Button x:Name="GameToggleButton" Content="&#xE7FC;" ToolTip="Daily Logic Puzzle" Style="{StaticResource IconButtonStyle}" Click="GameToggle_Click" Margin="0,0,3,0" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"/>
+                                    <Button x:Name="ChatModeButton" Content="&#xE8BD;" ToolTip="Chat Mode" Style="{StaticResource IconButtonStyle}" Click="ChatMode_Click" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Background="#0D0D0F" CornerRadius="6" BorderBrush="#26262B" BorderThickness="1" Padding="3" Margin="0,0,10,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Content="📋" ToolTip="Copy to Clipboard" Style="{StaticResource IconButtonStyle}" Click="CopyButton_Click"/>
+                                    <Button Content="💾" ToolTip="Save to Disk" Style="{StaticResource IconButtonStyle}" Click="SaveButton_Click" Margin="3,0"/>
+                                    <Button Content="⚙" ToolTip="Settings" Style="{StaticResource IconButtonStyle}" Click="SettingsButton_Click" Margin="0,0,3,0"/>
+                                    <Button Content="?" ToolTip="Quick Start Guide" Style="{StaticResource IconButtonStyle}" Click="InfoButton_Click"/>
+                                </StackPanel>
+                            </Border>
 
-        <!-- Scrollable Content -->
-        <ScrollViewer Grid.Row="1" x:Name="MainScroll" VerticalScrollBarVisibility="Auto">
-            <StackPanel Margin="20,0,20,20">
-                <!-- Image Preview -->
-                <Border BorderBrush="#333" BorderThickness="1" CornerRadius="8" Background="#111" Margin="0,0,0,20">
-                    <Image x:Name="PreviewImage" Stretch="Uniform" Margin="10" MaxHeight="400" HorizontalAlignment="Center"/>
+                            <Button Content="—" Style="{StaticResource WindowControlButtonStyle}" FontSize="10" Width="28" Height="26" Click="Minimize_Click"/>
+                            <Button Content="◻" Style="{StaticResource WindowControlButtonStyle}" FontSize="13" Width="28" Height="26" Click="Maximize_Click"/>
+                            <Button Content="✕" Style="{StaticResource WindowControlButtonStyle}" FontSize="11" Width="28" Height="26" Click="Close_Click"/>
+                        </StackPanel>
+                    </Grid>
                 </Border>
-                
-                <!-- Chat Messages Flow Below Image -->
-                <StackPanel x:Name="ChatMessages"/>
-            </StackPanel>
-        </ScrollViewer>
 
-        <!-- Game Content -->
-        <ScrollViewer Grid.Row="1" x:Name="GamePanel" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
-            <StackPanel Margin="20,0,20,20">
-                <Border Background="#1C1C1E" CornerRadius="12" Padding="15,10,15,10" Margin="0,0,50,15" HorizontalAlignment="Left">
-                    <TextBlock x:Name="GameText" Foreground="White" FontSize="14" TextWrapping="Wrap" TextAlignment="Left" />
+                <!-- Recessed Dot-Matrix LCD Bezel Housing (Grid.Row=1) -->
+                <Border Grid.Row="1" Margin="14,10,14,10" Background="#000000" BorderBrush="#28282E" BorderThickness="2" CornerRadius="6">
+                    <Grid>
+                        <!-- Scrollable Chat Content -->
+                        <ScrollViewer x:Name="MainScroll" VerticalScrollBarVisibility="Auto">
+                            <StackPanel Margin="16,14,16,16">
+                                <!-- Framed Image Preview Well -->
+                                <Border BorderBrush="#242429" BorderThickness="1.5" CornerRadius="4" Background="#000000" Margin="0,0,0,16" Padding="8">
+                                    <StackPanel>
+                                        <TextBlock Text="[ SNAPSHOT_BUFFER ]" Foreground="#666670" FontSize="10" Margin="2,0,0,6"/>
+                                        <Image x:Name="PreviewImage" Stretch="Uniform" MaxHeight="360" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Chat Messages Flow Below Image -->
+                                <StackPanel x:Name="ChatMessages"/>
+                            </StackPanel>
+                        </ScrollViewer>
+
+                        <!-- Daily Logic Puzzle Content -->
+                        <ScrollViewer x:Name="GamePanel" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                            <StackPanel Margin="16,14,16,16">
+                                <TextBlock Text="[ MODULE // DAILY_LOGIC ]" Foreground="#666670" FontSize="11" Margin="2,0,0,8"/>
+                                <Border Background="#141418" BorderBrush="#2E2E36" BorderThickness="1.5" CornerRadius="5" Padding="15,12,15,12" Margin="0,0,40,15" HorizontalAlignment="Left">
+                                    <TextBlock x:Name="GameText" Foreground="#E8E8EC" FontSize="13" TextWrapping="Wrap" TextAlignment="Left" />
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+
+                        <!-- 6x6 Mini Sudoku Content -->
+                        <Grid x:Name="SudokuPanel" Visibility="Collapsed" Margin="16,10,16,10">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock Text="[ MODULE // SUDOKU_6X6 ]" Foreground="#666670" FontSize="11" HorizontalAlignment="Center" Margin="0,0,0,4"/>
+                                <TextBlock x:Name="SudokuStatusText" Text="Fill each row, column, and 2x3 box with 1-6. Click a cell to cycle." Foreground="#9999A0" FontSize="12" HorizontalAlignment="Center" Margin="0,0,0,12"/>
+                                <Border Background="Transparent" BorderThickness="0" Padding="6" HorizontalAlignment="Center">
+                                    <UniformGrid x:Name="SudokuGrid" Rows="6" Columns="6" Width="288" Height="288"/>
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Pomodoro Timer Content (True 5x7 Dot-Matrix LED Readout) -->
+                        <Grid x:Name="PomodoroPanel" Visibility="Collapsed" Margin="16">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock Text="[ CHRONO // FOCUS_TIMER ]" Foreground="#666670" FontSize="11" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                                <Border Width="280" Height="150" BorderThickness="0" Background="#000000" Margin="0,0,0,18" Padding="16">
+                                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                        <!-- 5x7 Dot-Matrix Display Grid (7 rows x 27 columns) -->
+                                        <UniformGrid x:Name="PomodoroMatrixGrid" Rows="7" Columns="27" Width="216" Height="56" HorizontalAlignment="Center" Margin="0,4,0,8"/>
+                                        <TextBlock x:Name="PomodoroTimeText" Text="25:00" Visibility="Collapsed"/>
+                                        <TextBlock x:Name="PomodoroStatusLabel" Text="READY" Foreground="#888890" FontSize="11" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                                    </StackPanel>
+                                </Border>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,6">
+                                    <Button Content="-5M" Style="{StaticResource IconButtonStyle}" Padding="10,5" Margin="3,0" Click="PomodoroMinus_Click"/>
+                                    <Button Content="15M" Style="{StaticResource IconButtonStyle}" Padding="10,5" Margin="3,0" Click="PomodoroPreset15_Click"/>
+                                    <Button Content="25M" Style="{StaticResource IconButtonStyle}" Padding="10,5" Margin="3,0" Click="PomodoroPreset25_Click"/>
+                                    <Button Content="45M" Style="{StaticResource IconButtonStyle}" Padding="10,5" Margin="3,0" Click="PomodoroPreset45_Click"/>
+                                    <Button Content="+5M" Style="{StaticResource IconButtonStyle}" Padding="10,5" Margin="3,0" Click="PomodoroPlus_Click"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Calendar & Reminders Content -->
+                        <Grid x:Name="CalendarPanel" Visibility="Collapsed" Margin="16,10,16,10">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0" Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Button Grid.Column="0" Content="‹" Style="{StaticResource IconButtonStyle}" Padding="10,2" Click="CalendarPrevMonth_Click"/>
+                                <TextBlock x:Name="CalendarMonthLabel" Grid.Column="1" Text="OCTOBER 2026" Foreground="#E0E0E0" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <Button Grid.Column="2" Content="›" Style="{StaticResource IconButtonStyle}" Padding="10,2" Click="CalendarNextMonth_Click"/>
+                            </Grid>
+                            <StackPanel Grid.Row="1" Margin="0,0,0,10">
+                                <UniformGrid Columns="7" Margin="0,0,0,4">
+                                    <TextBlock Text="SU" Foreground="#66666E" FontSize="11" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="MO" Foreground="#66666E" FontSize="11" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="TU" Foreground="#66666E" FontSize="11" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="WE" Foreground="#66666E" FontSize="11" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="TH" Foreground="#66666E" FontSize="11" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="FR" Foreground="#66666E" FontSize="11" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="SA" Foreground="#66666E" FontSize="11" HorizontalAlignment="Center"/>
+                                </UniformGrid>
+                                <UniformGrid x:Name="CalendarDaysGrid" Columns="7" Rows="6" Height="162"/>
+                            </StackPanel>
+                            <Border Grid.Row="2" Background="#070709" BorderBrush="#26262E" BorderThickness="1.5" CornerRadius="4" Padding="10">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock x:Name="SelectedDateLabel" Grid.Row="0" Text="REMINDERS" Foreground="#888890" FontSize="11" Margin="0,0,0,6"/>
+                                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                        <StackPanel x:Name="RemindersListPanel"/>
+                                    </ScrollViewer>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </Grid>
                 </Border>
-            </StackPanel>
-        </ScrollViewer>
 
-        <!-- 6x6 Mini Sudoku Content -->
-        <Grid Grid.Row="1" x:Name="SudokuPanel" Visibility="Collapsed" Margin="20,10,20,10">
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                <TextBlock x:Name="SudokuStatusText" Text="Fill each row, column, and 2x3 box with 1-6. Click a cell to cycle." Foreground="#999" FontSize="13" HorizontalAlignment="Center" Margin="0,0,0,15"/>
-                <Border Background="#141417" BorderBrush="#333" BorderThickness="1.5" CornerRadius="8" Padding="6" HorizontalAlignment="Center">
-                    <UniformGrid x:Name="SudokuGrid" Rows="6" Columns="6" Width="288" Height="288"/>
+                <!-- Persistent Chat Input Deck at Bottom -->
+                <Border x:Name="ChatInputBar" Grid.Row="2" Background="#141417" BorderBrush="#09090B" BorderThickness="0,2,0,0" CornerRadius="0,0,5,5" Padding="14,12">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid Grid.Column="0">
+                            <Grid.Triggers>
+                                <EventTrigger RoutedEvent="TextBox.GotKeyboardFocus">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="ChatChromeFocused" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.2"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                                <EventTrigger RoutedEvent="TextBox.LostKeyboardFocus">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="ChatChromeFocused" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.3"/>
+                                            <ThicknessAnimation Storyboard.TargetName="ChatChromeFocused" Storyboard.TargetProperty="Margin" To="0" Duration="0:0:0.3"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Grid.Triggers>
+
+                            <Border CornerRadius="5" Background="#09090B" BorderBrush="#28282E" BorderThickness="1.5"/>
+                            <Border x:Name="ChatChromeFocused" CornerRadius="5" Opacity="0" Margin="0" BorderBrush="#888890" BorderThickness="1.5"/>
+
+                            <TextBox x:Name="ChatInput" Background="#0B0B0D" Foreground="#E8E8EC" CaretBrush="White"
+                                     BorderThickness="0" Padding="12,8" FontSize="13" Margin="2"
+                                     AcceptsReturn="False" KeyDown="ChatInput_KeyDown" TextChanged="ChatInput_TextChanged"
+                                     VerticalContentAlignment="Center">
+                                <TextBox.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius" Value="4"/>
+                                    </Style>
+                                </TextBox.Resources>
+                            </TextBox>
+                        </Grid>
+
+                        <TextBlock x:Name="LoadingIndicator" Grid.Column="1" Text="PROCESSING..." Foreground="#888890" VerticalAlignment="Center" Margin="10,0" Visibility="Collapsed"/>
+                        <Button x:Name="SendButton" Grid.Column="1" Content="ASK" Style="{StaticResource SendButtonStyle}" Margin="10,0,0,0" Padding="20,6" Click="SendButton_Click" MouseEnter="SendButton_MouseEnter" MouseLeave="SendButton_MouseLeave"/>
+                    </Grid>
                 </Border>
-            </StackPanel>
-        </Grid>
 
-        <!-- Pomodoro Timer Content -->
-        <Grid Grid.Row="1" x:Name="PomodoroPanel" Visibility="Collapsed" Margin="20">
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Border Width="220" Height="220" CornerRadius="110" BorderBrush="#2A2A2E" BorderThickness="2" Background="#0F0F12" Margin="0,0,0,20">
-                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <TextBlock x:Name="PomodoroTimeText" Text="25:00" Foreground="#E0E0E0" FontSize="42" HorizontalAlignment="Center"/>
-                        <TextBlock x:Name="PomodoroStatusLabel" Text="Focus Session" Foreground="#777" FontSize="13" HorizontalAlignment="Center" Margin="0,4,0,0"/>
-                    </StackPanel>
-                </Border>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
-                    <Button Content="- 5m" Style="{StaticResource IconButtonStyle}" Padding="10,4" Margin="4,0" Click="PomodoroMinus_Click"/>
-                    <Button Content="15m" Style="{StaticResource IconButtonStyle}" Padding="10,4" Margin="4,0" Click="PomodoroPreset15_Click"/>
-                    <Button Content="25m" Style="{StaticResource IconButtonStyle}" Padding="10,4" Margin="4,0" Click="PomodoroPreset25_Click"/>
-                    <Button Content="45m" Style="{StaticResource IconButtonStyle}" Padding="10,4" Margin="4,0" Click="PomodoroPreset45_Click"/>
-                    <Button Content="+ 5m" Style="{StaticResource IconButtonStyle}" Padding="10,4" Margin="4,0" Click="PomodoroPlus_Click"/>
-                </StackPanel>
-            </StackPanel>
-        </Grid>
-
-        <!-- Calendar & Reminders Content -->
-        <Grid Grid.Row="1" x:Name="CalendarPanel" Visibility="Collapsed" Margin="20,5,20,10">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <Grid Grid.Row="0" Margin="0,0,0,8">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" Content="‹" Style="{StaticResource IconButtonStyle}" Padding="10,2" Click="CalendarPrevMonth_Click"/>
-                <TextBlock x:Name="CalendarMonthLabel" Grid.Column="1" Text="October 2026" Foreground="#E0E0E0" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <Button Grid.Column="2" Content="›" Style="{StaticResource IconButtonStyle}" Padding="10,2" Click="CalendarNextMonth_Click"/>
-            </Grid>
-            <StackPanel Grid.Row="1" Margin="0,0,0,10">
-                <UniformGrid Columns="7" Margin="0,0,0,4">
-                    <TextBlock Text="Su" Foreground="#666" FontSize="12" HorizontalAlignment="Center"/>
-                    <TextBlock Text="Mo" Foreground="#666" FontSize="12" HorizontalAlignment="Center"/>
-                    <TextBlock Text="Tu" Foreground="#666" FontSize="12" HorizontalAlignment="Center"/>
-                    <TextBlock Text="We" Foreground="#666" FontSize="12" HorizontalAlignment="Center"/>
-                    <TextBlock Text="Th" Foreground="#666" FontSize="12" HorizontalAlignment="Center"/>
-                    <TextBlock Text="Fr" Foreground="#666" FontSize="12" HorizontalAlignment="Center"/>
-                    <TextBlock Text="Sa" Foreground="#666" FontSize="12" HorizontalAlignment="Center"/>
-                </UniformGrid>
-                <UniformGrid x:Name="CalendarDaysGrid" Columns="7" Rows="6" Height="168"/>
-            </StackPanel>
-            <Border Grid.Row="2" Background="#0D0D10" BorderBrush="#1F1F22" BorderThickness="1" CornerRadius="8" Padding="10">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    <TextBlock x:Name="SelectedDateLabel" Grid.Row="0" Text="Reminders" Foreground="#888" FontSize="12" Margin="0,0,0,6"/>
-                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                        <StackPanel x:Name="RemindersListPanel"/>
-                    </ScrollViewer>
-                </Grid>
-            </Border>
-        </Grid>
-
-        <!-- Persistent Chat Input Bar at Bottom -->
-        <Border x:Name="ChatInputBar" Grid.Row="2" Background="#0A0A0C" BorderBrush="#1F1F22" BorderThickness="0,1,0,0" Padding="15">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                
-                <Grid Grid.Column="0">
-    <Grid.Triggers>
-        <EventTrigger RoutedEvent="TextBox.GotKeyboardFocus">
-                <BeginStoryboard>
-                    <Storyboard>
-                       <DoubleAnimation Storyboard.TargetName="ChatChromeFocused" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.2"/>
-                    </Storyboard>
-                </BeginStoryboard>
-            </EventTrigger>
-        <EventTrigger RoutedEvent="TextBox.LostKeyboardFocus">
-              <BeginStoryboard>
-                  <Storyboard>
-                      <DoubleAnimation Storyboard.TargetName="ChatChromeFocused" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.3"/>
-                      <ThicknessAnimation Storyboard.TargetName="ChatChromeFocused" Storyboard.TargetProperty="Margin" To="0" Duration="0:0:0.3"/>
-                  </Storyboard>
-              </BeginStoryboard>
-          </EventTrigger>
-    </Grid.Triggers>
-    <Border CornerRadius="18" Padding="0.5">
-        <Border.Background>
-            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                <GradientStop Color="#333" Offset="0.0"/>
-                <GradientStop Color="#111" Offset="1.0"/>
-            </LinearGradientBrush>
-        </Border.Background>
-    </Border>
-
-    <Border x:Name="ChatChromeFocused" CornerRadius="18" Padding="0.5" Opacity="0" Margin="0">
-                            <Border.Background>
-                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                    <GradientStop Color="#111" Offset="0.0"/>
-                                    <GradientStop Color="#FFF" Offset="0.3"/>
-                                    <GradientStop Color="#00E5FF" Offset="0.33"/>
-                                    <GradientStop Color="#FFAA00" Offset="0.38"/>
-                                    <GradientStop Color="#FFF" Offset="0.42"/>
-                                    <GradientStop Color="#111" Offset="1.0"/>
-                                </LinearGradientBrush>
-                            </Border.Background>
+                <!-- Persistent Game Input Deck at Bottom -->
+                <Border x:Name="GameInputBar" Grid.Row="2" Visibility="Collapsed" Background="#141417" BorderBrush="#09090B" BorderThickness="0,2,0,0" CornerRadius="0,0,5,5" Padding="14,12">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <!-- Recessed Dot-Matrix Streak Counter Well -->
+                        <Border Grid.Column="0" Background="#08080A" BorderBrush="#24242A" BorderThickness="1.5" CornerRadius="4" Padding="8,4" Margin="0,0,12,0" VerticalAlignment="Center">
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock x:Name="StreakText" Text="Streak: 0" Foreground="#E8E8EC" FontSize="11"/>
+                                <TextBlock x:Name="BestStreakText" Text="Best: 0" Foreground="#777780" FontSize="11"/>
+                            </StackPanel>
                         </Border>
-    
-    <TextBox x:Name="ChatInput" Background="#161618" Foreground="#E0E0E0" CaretBrush="White" 
-             BorderThickness="0" Padding="12,8" FontSize="14" Margin="1.5"
-             AcceptsReturn="False" KeyDown="ChatInput_KeyDown" TextChanged="ChatInput_TextChanged" 
-             VerticalContentAlignment="Center">
-        <TextBox.Resources>
-            <Style TargetType="Border">
-                <Setter Property="CornerRadius" Value="16.5"/>
-            </Style>
-        </TextBox.Resources>
-    </TextBox>
-</Grid>
 
-                <!-- Loading Spinner / Indicator -->
-                <TextBlock x:Name="LoadingIndicator" Grid.Column="1" Text="Thinking..." Foreground="Gray" VerticalAlignment="Center" Margin="10,0" Visibility="Collapsed" FontStyle="Italic"/>
+                        <TextBox x:Name="GameInput" Grid.Column="1" Background="#0B0B0D" Foreground="#E8E8EC" CaretBrush="White" BorderBrush="#28282E" BorderThickness="1.5" Padding="12,8" FontSize="13" AcceptsReturn="False" VerticalContentAlignment="Center" KeyDown="GameInput_KeyDown" TextChanged="GameInput_TextChanged">
+                            <TextBox.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="4"/>
+                                </Style>
+                            </TextBox.Resources>
+                        </TextBox>
 
-                <Button x:Name="SendButton" Grid.Column="1" Content="Ask" Style="{StaticResource SendButtonStyle}" Margin="10,0,0,0" Padding="20,6" Click="SendButton_Click" MouseEnter="SendButton_MouseEnter" MouseLeave="SendButton_MouseLeave"/>
+                        <TextBlock x:Name="GameLoadingIndicator" Grid.Column="2" Text="CHECKING..." Foreground="#888890" FontSize="12" VerticalAlignment="Center" Margin="10,0" Visibility="Collapsed"/>
+
+                        <StackPanel x:Name="GameButtonsPanel" Grid.Column="2" Orientation="Horizontal" Margin="10,0,0,0">
+                            <!-- Recessed Dot-Matrix Tries LED Pips Indicator -->
+                            <Border Background="#08080A" BorderBrush="#24242A" BorderThickness="1.5" CornerRadius="4" Padding="8,5" Margin="0,0,10,0" VerticalAlignment="Center">
+                                <TextBlock x:Name="TriesIndicator" Text="● ● ●" ToolTip="Tries Remaining" Foreground="#E8E8EC" VerticalAlignment="Center" FontSize="11"/>
+                            </Border>
+                            <Button x:Name="GameSubmitButton" Content="SUBMIT" Style="{StaticResource SendButtonStyle}" Padding="18,6" Click="GameSubmitButton_Click" MouseEnter="GameSubmitButton_MouseEnter" MouseLeave="GameSubmitButton_MouseLeave"/>
+                            <Button x:Name="GameNextButton" Content="NEXT" Visibility="Collapsed" Style="{StaticResource SendButtonStyle}" Padding="18,6" Click="GameNextButton_Click"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Persistent 6x6 Mini Sudoku Bottom Deck -->
+                <Border x:Name="SudokuInputBar" Grid.Row="2" Visibility="Collapsed" Background="#141417" BorderBrush="#09090B" BorderThickness="0,2,0,0" CornerRadius="0,0,5,5" Padding="14,12">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.Column="0" Background="#08080A" BorderBrush="#24242A" BorderThickness="1.5" CornerRadius="4" Padding="8,4" Margin="0,0,12,0" VerticalAlignment="Center">
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock x:Name="SudokuSolvedText" Text="Streak: 0" Foreground="#E8E8EC" FontSize="11"/>
+                                <TextBlock x:Name="SudokuBestText" Text="Best: 0" Foreground="#777780" FontSize="11"/>
+                            </StackPanel>
+                        </Border>
+                        <StackPanel Grid.Column="2" Orientation="Horizontal">
+                            <Button x:Name="SudokuClearButton" Content="RESET BOARD" Style="{StaticResource SendButtonStyle}" Padding="16,6" Click="SudokuClear_Click"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Persistent Pomodoro Bottom Deck -->
+                <Border x:Name="PomodoroInputBar" Grid.Row="2" Visibility="Collapsed" Background="#141417" BorderBrush="#09090B" BorderThickness="0,2,0,0" CornerRadius="0,0,5,5" Padding="14,12">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="BG_TIMER // ACTIVE WHEN CLOSED" Foreground="#66666E" FontSize="11" VerticalAlignment="Center"/>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                            <Button x:Name="PomodoroResetButton" Content="RESET" Style="{StaticResource SendButtonStyle}" Padding="16,6" Margin="0,0,8,0" Click="PomodoroReset_Click"/>
+                            <Button x:Name="PomodoroStartPauseButton" Content="START" Style="{StaticResource SendButtonStyle}" Padding="20,6" Click="PomodoroStartPause_Click"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Persistent Calendar Reminder Bottom Deck -->
+                <Border x:Name="CalendarInputBar" Grid.Row="2" Visibility="Collapsed" Background="#141417" BorderBrush="#09090B" BorderThickness="0,2,0,0" CornerRadius="0,0,5,5" Padding="14,12">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="75"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox x:Name="ReminderTimeInput" Grid.Column="0" Text="18:00" ToolTip="24h Time (HH:mm)" Background="#0B0B0D" Foreground="#E8E8EC" CaretBrush="White" BorderBrush="#28282E" BorderThickness="1.5" Padding="8,8" FontSize="12" VerticalContentAlignment="Center" Margin="0,0,8,0">
+                            <TextBox.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="4"/>
+                                </Style>
+                            </TextBox.Resources>
+                        </TextBox>
+                        <TextBox x:Name="ReminderTitleInput" Grid.Column="1" Background="#0B0B0D" Foreground="#E8E8EC" CaretBrush="White" BorderBrush="#28282E" BorderThickness="1.5" Padding="12,8" FontSize="12" VerticalContentAlignment="Center" KeyDown="ReminderTitleInput_KeyDown" TextChanged="ReminderTitleInput_TextChanged">
+                            <TextBox.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="4"/>
+                                </Style>
+                            </TextBox.Resources>
+                        </TextBox>
+                        <Button x:Name="AddReminderButton" Grid.Column="2" Content="ADD" Style="{StaticResource SendButtonStyle}" Margin="10,0,0,0" Padding="20,6" Click="AddReminder_Click" MouseEnter="AddReminderButton_MouseEnter" MouseLeave="AddReminderButton_MouseLeave"/>
+                    </Grid>
+                </Border>
             </Grid>
         </Border>
-                    <!-- Persistent Game Input Bar at Bottom -->
-        <Border x:Name="GameInputBar" Grid.Row="2" Visibility="Collapsed" Background="#0A0A0C" BorderBrush="#1F1F22" BorderThickness="0,1,0,0" Padding="15">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <StackPanel Grid.Column="0" Orientation="Vertical" VerticalAlignment="Center" Margin="0,0,15,0">
-                    <TextBlock x:Name="StreakText" Text="Streak: 0" Foreground="#E0E0E0" FontSize="13"/>
-                    <TextBlock x:Name="BestStreakText" Text="Best: 0" Foreground="#888" FontSize="13"/>
-                </StackPanel>
-                
-                <TextBox x:Name="GameInput" Grid.Column="1" Background="#161618" Foreground="#E0E0E0" CaretBrush="White" BorderThickness="0" Padding="12,8" FontSize="13" AcceptsReturn="False" VerticalContentAlignment="Center" KeyDown="GameInput_KeyDown" TextChanged="GameInput_TextChanged">
-                    <TextBox.Resources>
-                        <Style TargetType="Border">
-                            <Setter Property="CornerRadius" Value="16.5"/>
-                        </Style>
-                    </TextBox.Resources>
-                </TextBox>
-                
-                <TextBlock x:Name="GameLoadingIndicator" Grid.Column="2" Text="Thinking..." Foreground="Gray" FontSize="13" VerticalAlignment="Center" Margin="10,0" Visibility="Collapsed"/>
-                
-                <StackPanel x:Name="GameButtonsPanel" Grid.Column="2" Orientation="Horizontal" Margin="10,0,0,0">
-                    
-                    <TextBlock x:Name="TriesIndicator" Text="3 Tries Left" Foreground="#888" VerticalAlignment="Center" Margin="0,0,15,0" FontSize="13"/><Button x:Name="GameSubmitButton" Content="Submit" Style="{StaticResource SendButtonStyle}" Padding="20,6" Click="GameSubmitButton_Click" MouseEnter="GameSubmitButton_MouseEnter" MouseLeave="GameSubmitButton_MouseLeave"/>
-                    <Button x:Name="GameNextButton" Content="Next" Visibility="Collapsed" Style="{StaticResource SendButtonStyle}" Padding="20,6" Click="GameNextButton_Click"/>
-                </StackPanel>
-            </Grid>
-        </Border>
 
-        <!-- Persistent 6x6 Mini Sudoku Bottom Bar -->
-        <Border x:Name="SudokuInputBar" Grid.Row="2" Visibility="Collapsed" Background="#0A0A0C" BorderBrush="#1F1F22" BorderThickness="0,1,0,0" Padding="15">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <StackPanel Grid.Column="0" Orientation="Vertical" VerticalAlignment="Center" Margin="0,0,15,0">
-                    <TextBlock x:Name="SudokuSolvedText" Text="Streak: 0" Foreground="#E0E0E0" FontSize="13"/>
-                    <TextBlock x:Name="SudokuBestText" Text="Best: 0" Foreground="#888" FontSize="13"/>
-                </StackPanel>
-                <StackPanel Grid.Column="2" Orientation="Horizontal">
-                    <Button x:Name="SudokuClearButton" Content="Reset Board" Style="{StaticResource SendButtonStyle}" Padding="16,6" Click="SudokuClear_Click"/>
-                </StackPanel>
-            </Grid>
-        </Border>
-
-        <!-- Persistent Pomodoro Bottom Bar -->
-        <Border x:Name="PomodoroInputBar" Grid.Row="2" Visibility="Collapsed" Background="#0A0A0C" BorderBrush="#1F1F22" BorderThickness="0,1,0,0" Padding="15">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Text="Runs in background when window is minimized or closed" Foreground="#666" FontSize="12" VerticalAlignment="Center"/>
-                <StackPanel Grid.Column="1" Orientation="Horizontal">
-                    <Button x:Name="PomodoroResetButton" Content="Reset" Style="{StaticResource SendButtonStyle}" Padding="16,6" Margin="0,0,8,0" Click="PomodoroReset_Click"/>
-                    <Button x:Name="PomodoroStartPauseButton" Content="Start" Style="{StaticResource SendButtonStyle}" Padding="20,6" Click="PomodoroStartPause_Click"/>
-                </StackPanel>
-            </Grid>
-        </Border>
-
-        <!-- Persistent Calendar Reminder Bottom Bar -->
-        <Border x:Name="CalendarInputBar" Grid.Row="2" Visibility="Collapsed" Background="#0A0A0C" BorderBrush="#1F1F22" BorderThickness="0,1,0,0" Padding="15">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="75"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <TextBox x:Name="ReminderTimeInput" Grid.Column="0" Text="18:00" ToolTip="24h Time (HH:mm)" Background="#161618" Foreground="#E0E0E0" CaretBrush="White" BorderThickness="0" Padding="10,8" FontSize="13" VerticalContentAlignment="Center" Margin="0,0,8,0">
-                    <TextBox.Resources>
-                        <Style TargetType="Border">
-                            <Setter Property="CornerRadius" Value="16.5"/>
-                        </Style>
-                    </TextBox.Resources>
-                </TextBox>
-                <TextBox x:Name="ReminderTitleInput" Grid.Column="1" Background="#161618" Foreground="#E0E0E0" CaretBrush="White" BorderThickness="0" Padding="12,8" FontSize="13" VerticalContentAlignment="Center" KeyDown="ReminderTitleInput_KeyDown" TextChanged="ReminderTitleInput_TextChanged">
-                    <TextBox.Resources>
-                        <Style TargetType="Border">
-                            <Setter Property="CornerRadius" Value="16.5"/>
-                        </Style>
-                    </TextBox.Resources>
-                </TextBox>
-                <Button x:Name="AddReminderButton" Grid.Column="2" Content="Add" Style="{StaticResource SendButtonStyle}" Margin="10,0,0,0" Padding="20,6" Click="AddReminder_Click" MouseEnter="AddReminderButton_MouseEnter" MouseLeave="AddReminderButton_MouseLeave"/>
-            </Grid>
-        </Border>
+        <!-- Protruding Flat-Orange Hardware Side Push-Button Switch (Right Edge, Lower Half) -->
+        <Button Grid.Column="1"
+                x:Name="SideSwitchButton"
+                Style="{StaticResource SideSwitchButtonStyle}"
+                ToolTip="Cycle Active Module"
+                Click="SideSwitch_Click"
+                WindowChrome.IsHitTestVisibleInChrome="True"
+                VerticalAlignment="Bottom"
+                Margin="-1,0,0,95"/>
     </Grid>
 </Window>
-
-

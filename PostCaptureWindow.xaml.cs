@@ -31,6 +31,28 @@ public partial class PostCaptureWindow : Window
         CalendarInputBar.Visibility = Visibility.Collapsed;
     }
 
+    private void SideSwitch_Click(object sender, RoutedEventArgs e)
+    {
+        switch (_activeMode)
+        {
+            case "Chat":
+                GameToggle_Click(sender, e);
+                break;
+            case "Logic":
+                SudokuMode_Click(sender, e);
+                break;
+            case "Sudoku":
+                PomodoroMode_Click(sender, e);
+                break;
+            case "Pomodoro":
+                CalendarMode_Click(sender, e);
+                break;
+            default:
+                ChatMode_Click(sender, e);
+                break;
+        }
+    }
+
     private void ChatMode_Click(object sender, RoutedEventArgs e)
     {
         _activeMode = "Chat";
@@ -39,6 +61,14 @@ public partial class PostCaptureWindow : Window
         ChatInputBar.Visibility = Visibility.Visible;
         ChatInput.Focus();
     }
+
+    private static string FormatTriesPips(int triesLeft) => triesLeft switch
+    {
+        >= 3 => "● ● ●",
+        2 => "● ● ○",
+        1 => "● ○ ○",
+        _ => "○ ○ ○"
+    };
 
     private async void GameToggle_Click(object sender, RoutedEventArgs e)
     {
@@ -67,7 +97,7 @@ public partial class PostCaptureWindow : Window
         else if (settings.DailyPuzzleDate.Date == DateTime.Today)
         {
             GameText.Text = settings.DailyPuzzleText;
-            TriesIndicator.Text = $"{settings.DailyPuzzleAttemptsLeft} Tries Left";
+            TriesIndicator.Text = FormatTriesPips(settings.DailyPuzzleAttemptsLeft);
             GameInput.Visibility = Visibility.Visible;
             GameSubmitButton.Visibility = Visibility.Visible;
             TriesIndicator.Visibility = Visibility.Visible;
@@ -362,6 +392,88 @@ public partial class PostCaptureWindow : Window
     }
 
     // ==================== POMODORO TIMER MODE ====================
+    private System.Windows.Shapes.Ellipse[,]? _pomodoroDots;
+    private static readonly SolidColorBrush _dotLitBrush = CreateFrozenBrush(0xE8, 0xE8, 0xEC);
+    private static readonly SolidColorBrush _dotUnlitBrush = CreateFrozenBrush(0x1A, 0x1A, 0x20);
+
+    private static SolidColorBrush CreateFrozenBrush(byte r, byte g, byte b)
+    {
+        var brush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(r, g, b));
+        brush.Freeze();
+        return brush;
+    }
+
+    private static readonly Dictionary<char, string[]> _font5x7 = new()
+    {
+        ['0'] = new[] { "01110", "10001", "10011", "10101", "11001", "10001", "01110" },
+        ['1'] = new[] { "00100", "01100", "00100", "00100", "00100", "00100", "01110" },
+        ['2'] = new[] { "01110", "10001", "00001", "00110", "01000", "10000", "11111" },
+        ['3'] = new[] { "11110", "00001", "00001", "01110", "00001", "00001", "11110" },
+        ['4'] = new[] { "00010", "00110", "01010", "10010", "11111", "00010", "00010" },
+        ['5'] = new[] { "11111", "10000", "11110", "00001", "00001", "10001", "01110" },
+        ['6'] = new[] { "00110", "01000", "10000", "11110", "10001", "10001", "01110" },
+        ['7'] = new[] { "11111", "00001", "00010", "00100", "01000", "01000", "01000" },
+        ['8'] = new[] { "01110", "10001", "10001", "01110", "10001", "10001", "01110" },
+        ['9'] = new[] { "01110", "10001", "10001", "01111", "00001", "00010", "01100" }
+    };
+
+    private void EnsurePomodoroMatrixInitialized()
+    {
+        if (_pomodoroDots != null || PomodoroMatrixGrid == null) return;
+        _pomodoroDots = new System.Windows.Shapes.Ellipse[7, 27];
+        PomodoroMatrixGrid.Children.Clear();
+        for (int r = 0; r < 7; r++)
+        {
+            for (int c = 0; c < 27; c++)
+            {
+                var dot = new System.Windows.Shapes.Ellipse
+                {
+                    Width = 5.5,
+                    Height = 5.5,
+                    Fill = _dotUnlitBrush,
+                    HorizontalAlignment = System.Windows.HorizontalAlignment.Center,
+                    VerticalAlignment = System.Windows.VerticalAlignment.Center
+                };
+                _pomodoroDots[r, c] = dot;
+                PomodoroMatrixGrid.Children.Add(dot);
+            }
+        }
+    }
+
+    private void RenderPomodoroMatrix(string timeStr)
+    {
+        EnsurePomodoroMatrixInitialized();
+        if (_pomodoroDots == null || timeStr.Length < 5) return;
+
+        // Clear all dots first
+        for (int r = 0; r < 7; r++)
+            for (int c = 0; c < 27; c++)
+                _pomodoroDots[r, c].Fill = _dotUnlitBrush;
+
+        void DrawDigit(char ch, int startCol)
+        {
+            if (!_font5x7.TryGetValue(ch, out var rows)) return;
+            for (int r = 0; r < 7; r++)
+            {
+                for (int c = 0; c < 5; c++)
+                {
+                    if (rows[r][c] == '1')
+                        _pomodoroDots[r, startCol + c].Fill = _dotLitBrush;
+                }
+            }
+        }
+
+        DrawDigit(timeStr[0], 0);
+        DrawDigit(timeStr[1], 6);
+
+        // Colon at column 13, rows 2 and 4
+        _pomodoroDots[2, 13].Fill = _dotLitBrush;
+        _pomodoroDots[4, 13].Fill = _dotLitBrush;
+
+        DrawDigit(timeStr[3], 16);
+        DrawDigit(timeStr[4], 22);
+    }
+
     private void PomodoroMode_Click(object sender, RoutedEventArgs e)
     {
         if (_activeMode == "Pomodoro")
@@ -385,17 +497,21 @@ public partial class PostCaptureWindow : Window
         {
             var remaining = App.PomodoroEndTime.Value - DateTime.Now;
             if (remaining.TotalSeconds < 0) remaining = TimeSpan.Zero;
-            int mins = (int)remaining.TotalMinutes;
+            int mins = Math.Min(99, (int)remaining.TotalMinutes);
             int secs = remaining.Seconds;
-            PomodoroTimeText.Text = $"{mins:D2}:{secs:D2}";
+            string formatted = $"{mins:D2}:{secs:D2}";
+            PomodoroTimeText.Text = formatted;
+            RenderPomodoroMatrix(formatted);
             PomodoroStatusLabel.Text = "Focusing...";
             PomodoroStartPauseButton.Content = "Pause";
         }
         else
         {
-            int mins = App.PomodoroRemainingPausedSeconds / 60;
+            int mins = Math.Min(99, App.PomodoroRemainingPausedSeconds / 60);
             int secs = App.PomodoroRemainingPausedSeconds % 60;
-            PomodoroTimeText.Text = $"{mins:D2}:{secs:D2}";
+            string formatted = $"{mins:D2}:{secs:D2}";
+            PomodoroTimeText.Text = formatted;
+            RenderPomodoroMatrix(formatted);
             PomodoroStatusLabel.Text = "Ready";
             PomodoroStartPauseButton.Content = "Start";
         }
@@ -721,7 +837,7 @@ public partial class PostCaptureWindow : Window
             SettingsManager.SaveSettings(settings);
 
             GameText.Text = settings.DailyPuzzleText;
-            TriesIndicator.Text = "3 Tries Left";
+            TriesIndicator.Text = FormatTriesPips(3);
         }
         catch (Exception ex)
         {
@@ -795,7 +911,7 @@ public partial class PostCaptureWindow : Window
                 else
                 {
                     SettingsManager.SaveSettings(settings);
-                    TriesIndicator.Text = $"{settings.DailyPuzzleAttemptsLeft} Tries Left";
+                    TriesIndicator.Text = FormatTriesPips(settings.DailyPuzzleAttemptsLeft);
                     GameText.Text = $"Wrong guess!\n\n" + settings.DailyPuzzleText;
                 }
             }
@@ -1042,85 +1158,94 @@ public partial class PostCaptureWindow : Window
 
     private FrameworkElement CreateMetallicLoader()
     {
-        const double d = 6;
-        var canvas = new System.Windows.Controls.Canvas
+        const int rows = 3;
+        const int cols = 8;
+
+        var well = new Border
         {
-            Width = 22,
-            Height = 20,
-            Margin = new Thickness(16, 8, 0, 12),
+            Background = CreateFrozenBrush(0x00, 0x00, 0x00),
+            BorderThickness = new Thickness(0),
+            Padding = new Thickness(8, 6, 8, 6),
+            Margin = new Thickness(0, 4, 0, 12),
             HorizontalAlignment = System.Windows.HorizontalAlignment.Left
         };
 
-        var points = new[] { new System.Windows.Point(8, 0), new System.Windows.Point(1, 11), new System.Windows.Point(15, 11) };
-        var flatGrey = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xC8, 0xC8, 0xCC));
-        flatGrey.Freeze();
-
-        for (int i = 0; i < 3; i++)
+        var grid = new System.Windows.Controls.Primitives.UniformGrid
         {
-            var scale = new System.Windows.Media.ScaleTransform(0.7, 0.7);
-            var ball = new System.Windows.Shapes.Ellipse
-            {
-                Width = d,
-                Height = d,
-                Fill = flatGrey,
-                Opacity = 0.5,
-                RenderTransformOrigin = new System.Windows.Point(0.5, 0.5),
-                RenderTransform = scale
-            };
-            System.Windows.Controls.Canvas.SetLeft(ball, points[i].X);
-            System.Windows.Controls.Canvas.SetTop(ball, points[i].Y);
-            canvas.Children.Add(ball);
+            Rows = rows,
+            Columns = cols,
+            Width = 68,
+            Height = 22
+        };
 
-            var begin = TimeSpan.FromMilliseconds(i * 250);
-            var total = TimeSpan.FromMilliseconds(1000);
+        var total = TimeSpan.FromMilliseconds(960);
 
-            System.Windows.Media.Animation.DoubleAnimationUsingKeyFrames Pulse(double idle, double peak)
+        for (int r = 0; r < rows; r++)
+        {
+            for (int c = 0; c < cols; c++)
             {
+                bool isCenterRow = (r == 1);
+                var dot = new System.Windows.Shapes.Ellipse
+                {
+                    Width = 4.5,
+                    Height = 4.5,
+                    Fill = _dotLitBrush,
+                    Opacity = 0.14,
+                    HorizontalAlignment = System.Windows.HorizontalAlignment.Center,
+                    VerticalAlignment = System.Windows.VerticalAlignment.Center
+                };
+                grid.Children.Add(dot);
+
+                // Stagger each column like a hardware step sequencer scanning left-to-right
+                var begin = TimeSpan.FromMilliseconds(c * 110 + (isCenterRow ? 0 : 45));
+                double peak = isCenterRow ? 1.0 : 0.55;
+
                 var kf = new System.Windows.Media.Animation.DoubleAnimationUsingKeyFrames
                 {
                     BeginTime = begin,
                     Duration = new Duration(total),
                     RepeatBehavior = System.Windows.Media.Animation.RepeatBehavior.Forever
                 };
-                kf.KeyFrames.Add(new System.Windows.Media.Animation.EasingDoubleKeyFrame(peak, System.Windows.Media.Animation.KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(250)),
-                    new System.Windows.Media.Animation.SineEase { EasingMode = System.Windows.Media.Animation.EasingMode.EaseOut }));
-                kf.KeyFrames.Add(new System.Windows.Media.Animation.EasingDoubleKeyFrame(idle, System.Windows.Media.Animation.KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(600)),
+                kf.KeyFrames.Add(new System.Windows.Media.Animation.DiscreteDoubleKeyFrame(peak, System.Windows.Media.Animation.KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(60))));
+                kf.KeyFrames.Add(new System.Windows.Media.Animation.EasingDoubleKeyFrame(0.14, System.Windows.Media.Animation.KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(420)),
                     new System.Windows.Media.Animation.SineEase { EasingMode = System.Windows.Media.Animation.EasingMode.EaseIn }));
-                kf.KeyFrames.Add(new System.Windows.Media.Animation.EasingDoubleKeyFrame(idle, System.Windows.Media.Animation.KeyTime.FromTimeSpan(total)));
-                return kf;
-            }
+                kf.KeyFrames.Add(new System.Windows.Media.Animation.DiscreteDoubleKeyFrame(0.14, System.Windows.Media.Animation.KeyTime.FromTimeSpan(total)));
 
-            scale.BeginAnimation(System.Windows.Media.ScaleTransform.ScaleXProperty, Pulse(0.7, 1.3));
-            scale.BeginAnimation(System.Windows.Media.ScaleTransform.ScaleYProperty, Pulse(0.7, 1.3));
-            ball.BeginAnimation(System.Windows.UIElement.OpacityProperty, Pulse(0.5, 1.0));
+                dot.BeginAnimation(System.Windows.UIElement.OpacityProperty, kf);
+            }
         }
 
-        ChatMessages.Children.Add(canvas);
+        well.Child = grid;
+        ChatMessages.Children.Add(well);
         MainScroll.ScrollToBottom();
-        return canvas;
+        return well;
     }
 
     private Border AddChatBubble(string text, bool isUser)
     {
-        var userColor = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#050508"); // Pure black
-        var aiColor = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#1C1C1E");
+        var userColor = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#1D1D22");
+        var aiColor = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#131317");
+        var borderColor = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(isUser ? "#34343C" : "#26262C");
 
         var bubble = new Border
         {
             Background = new SolidColorBrush(isUser ? userColor : aiColor),
-            CornerRadius = new CornerRadius(12),
-            Padding = new Thickness(15, 10, 15, 10),
-            Margin = new Thickness(isUser ? 50 : 0, 0, isUser ? 0 : 50, 15),
+            BorderBrush = new SolidColorBrush(borderColor),
+            BorderThickness = new Thickness(1.5),
+            CornerRadius = new CornerRadius(5),
+            Padding = new Thickness(14, 10, 14, 10),
+            Margin = new Thickness(isUser ? 50 : 0, 0, isUser ? 0 : 50, 12),
             HorizontalAlignment = isUser ? System.Windows.HorizontalAlignment.Right : System.Windows.HorizontalAlignment.Left
         };
 
         System.Windows.Controls.TextBox MakeTextBox(string t) => new System.Windows.Controls.TextBox
         {
             Text = t,
-            Foreground = System.Windows.Media.Brushes.White,
+            Foreground = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#E8E8EC")),
             Background = System.Windows.Media.Brushes.Transparent,
             BorderThickness = new Thickness(0),
-            FontSize = 14,
+            FontFamily = new System.Windows.Media.FontFamily("Consolas, Segoe UI"),
+            FontSize = 13,
             TextWrapping = TextWrapping.Wrap,
             IsReadOnly = true,
             Cursor = System.Windows.Input.Cursors.IBeam
