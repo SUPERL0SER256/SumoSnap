@@ -47,36 +47,26 @@ public static class HardwareAudio
         return 0.0;
     });
 
-    private static readonly byte[] _wheelTickUpWav = GenerateWav(22, (t) =>
+    private static readonly byte[] _wheelTickUpWav = GenerateWav(24, (t) =>
     {
-        // Audible two-stage rotary ratchet detent click (step UP / right)
-        if (t < 0.008)
-        {
-            double env = Math.Exp(-t * 380.0);
-            return Math.Cos(2.0 * Math.PI * 980.0 * t) * env * 0.25;
-        }
-        else
-        {
-            double t2 = t - 0.008;
-            double env = Math.Exp(-t2 * 340.0);
-            return Math.Cos(2.0 * Math.PI * 1580.0 * t2) * env * 0.28;
-        }
+        // Delay 8ms past Windows SoundPlayer fade-in ramp, then fire a sharp high-frequency metallic tick
+        if (t < 0.008) return 0.0;
+        double t2 = t - 0.008;
+        double env = Math.Exp(-t2 * 720.0);
+        double snap = Math.Cos(2.0 * Math.PI * 2850.0 * t2) * 0.70
+                    + Math.Sin(2.0 * Math.PI * 4200.0 * t2) * 0.30;
+        return snap * env * 0.22;
     });
 
-    private static readonly byte[] _wheelTickDownWav = GenerateWav(22, (t) =>
+    private static readonly byte[] _wheelTickDownWav = GenerateWav(24, (t) =>
     {
-        // Audible two-stage rotary ratchet detent click (step DOWN / left)
-        if (t < 0.008)
-        {
-            double env = Math.Exp(-t * 380.0);
-            return Math.Cos(2.0 * Math.PI * 1420.0 * t) * env * 0.25;
-        }
-        else
-        {
-            double t2 = t - 0.008;
-            double env = Math.Exp(-t2 * 340.0);
-            return Math.Cos(2.0 * Math.PI * 860.0 * t2) * env * 0.28;
-        }
+        // Delay 8ms past Windows SoundPlayer fade-in ramp, then fire a sharp metallic tick (slightly lower pitch)
+        if (t < 0.008) return 0.0;
+        double t2 = t - 0.008;
+        double env = Math.Exp(-t2 * 720.0);
+        double snap = Math.Cos(2.0 * Math.PI * 2400.0 * t2) * 0.70
+                    + Math.Sin(2.0 * Math.PI * 3600.0 * t2) * 0.30;
+        return snap * env * 0.22;
     });
 
     public static void PlayKeyClick() => PlayBytes(_keyClickWav);
