@@ -76,36 +76,28 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Grid>
-                            <!-- Hardware Keycap Base Bevel -->
-                            <Border CornerRadius="6" Background="#0A0A0C" BorderBrush="#2D2D32" BorderThickness="1,1,1,3" Padding="1">
+                            <!-- Hardware Keycap Base Bevel (Thinner & Darker Grey Outline) -->
+                            <Border CornerRadius="6" Background="#0A0A0C" BorderBrush="#1A1A1E" BorderThickness="1,1,1,2" Padding="1">
                                 <Border.Effect>
                                     <DropShadowEffect Color="Black" BlurRadius="4" ShadowDepth="1" Opacity="0.6"/>
                                 </Border.Effect>
                             </Border>
 
                             <!-- Hover/Active Monochrome Indicator Rim (Compatible with UpdateLiquidGlow) -->
-                            <Border x:Name="OuterRingHover" CornerRadius="6" Padding="1.5" Opacity="0" BorderBrush="#D0D0D8" BorderThickness="1.5">
-                                <Border.Background>
-                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                        <GradientStop Color="#44444A" Offset="0.0"/>
-                                        <GradientStop Color="#FFFFFF" Offset="0.5"/>
-                                        <GradientStop Color="#44444A" Offset="1.0"/>
-                                    </LinearGradientBrush>
-                                </Border.Background>
-                            </Border>
+                            <Border x:Name="OuterRingHover" CornerRadius="6" Padding="1" Opacity="0" BorderBrush="#383840" BorderThickness="1" Background="#28282E"/>
 
                             <!-- Inner Keycap Cap -->
-                            <Border x:Name="InnerButton" Background="#222227" CornerRadius="4.5" Margin="1.5,1.5,1.5,3">
+                            <Border x:Name="InnerButton" Background="#222227" CornerRadius="4.5" Margin="1,1,1,2">
                                 <Grid>
                                     <Border x:Name="InnerHoverOverlay" Background="#2C2C32" Opacity="0" CornerRadius="4.5"/>
-                                    <Border BorderBrush="#383840" BorderThickness="0,1,0,0" CornerRadius="4.5"/>
+                                    <Border BorderBrush="#26262C" BorderThickness="0,1,0,0" CornerRadius="4.5"/>
                                     <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="16,6"/>
                                 </Grid>
                             </Border>
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="InnerButton" Property="Margin" Value="1.5,3,1.5,1.5"/>
+                                <Setter TargetName="InnerButton" Property="Margin" Value="1,2,1,1"/>
                                 <Setter TargetName="InnerButton" Property="Background" Value="#16161A"/>
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
@@ -207,7 +199,7 @@
         </Grid.ColumnDefinitions>
 
         <!-- Outer Matte Hardware Chassis Frame -->
-        <Border Grid.Column="0" BorderBrush="#2A2A30" BorderThickness="2" Background="#161619" CornerRadius="6">
+        <Border Grid.Column="0" BorderThickness="0" Background="#161619" CornerRadius="6">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/> <!-- Top Deck -->
@@ -416,11 +408,11 @@
                                 </EventTrigger>
                             </Grid.Triggers>
 
-                            <Border CornerRadius="5" Background="#09090B" BorderBrush="#28282E" BorderThickness="1.5"/>
-                            <Border x:Name="ChatChromeFocused" CornerRadius="5" Opacity="0" Margin="0" BorderBrush="#888890" BorderThickness="1.5"/>
+                            <Border CornerRadius="5" Background="#09090B" BorderBrush="#1A1A1E" BorderThickness="1"/>
+                            <Border x:Name="ChatChromeFocused" CornerRadius="5" Opacity="0" Margin="0" BorderBrush="#383840" BorderThickness="1"/>
 
                             <TextBox x:Name="ChatInput" Background="#0B0B0D" Foreground="#E8E8EC" CaretBrush="White"
-                                     BorderThickness="0" Padding="12,8" FontSize="13" Margin="2"
+                                     BorderThickness="0" Padding="12,8" FontSize="13" Margin="1"
                                      AcceptsReturn="False" KeyDown="ChatInput_KeyDown" TextChanged="ChatInput_TextChanged"
                                      VerticalContentAlignment="Center">
                                 <TextBox.Resources>
@@ -516,20 +508,60 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBox x:Name="ReminderTimeInput" Grid.Column="0" Text="18:00" ToolTip="24h Time (HH:mm)" Background="#0B0B0D" Foreground="#E8E8EC" CaretBrush="White" BorderBrush="#28282E" BorderThickness="1.5" Padding="8,8" FontSize="12" VerticalContentAlignment="Center" Margin="0,0,8,0">
-                            <TextBox.Resources>
-                                <Style TargetType="Border">
-                                    <Setter Property="CornerRadius" Value="4"/>
-                                </Style>
-                            </TextBox.Resources>
-                        </TextBox>
-                        <TextBox x:Name="ReminderTitleInput" Grid.Column="1" Background="#0B0B0D" Foreground="#E8E8EC" CaretBrush="White" BorderBrush="#28282E" BorderThickness="1.5" Padding="12,8" FontSize="12" VerticalContentAlignment="Center" KeyDown="ReminderTitleInput_KeyDown" TextChanged="ReminderTitleInput_TextChanged">
-                            <TextBox.Resources>
-                                <Style TargetType="Border">
-                                    <Setter Property="CornerRadius" Value="4"/>
-                                </Style>
-                            </TextBox.Resources>
-                        </TextBox>
+                        <Grid Grid.Column="0" Margin="0,0,8,0">
+                            <Grid.Triggers>
+                                <EventTrigger RoutedEvent="TextBox.GotKeyboardFocus">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="ReminderTimeChromeFocused" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.2"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                                <EventTrigger RoutedEvent="TextBox.LostKeyboardFocus">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="ReminderTimeChromeFocused" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.3"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Grid.Triggers>
+                            <Border CornerRadius="5" Background="#09090B" BorderBrush="#1A1A1E" BorderThickness="1"/>
+                            <Border x:Name="ReminderTimeChromeFocused" CornerRadius="5" Opacity="0" BorderBrush="#383840" BorderThickness="1"/>
+                            <TextBox x:Name="ReminderTimeInput" Text="18:00" ToolTip="24h Time (HH:mm)" Background="#0B0B0D" Foreground="#E8E8EC" CaretBrush="White" BorderThickness="0" Padding="8,8" FontSize="12" Margin="1" VerticalContentAlignment="Center">
+                                <TextBox.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius" Value="4"/>
+                                    </Style>
+                                </TextBox.Resources>
+                            </TextBox>
+                        </Grid>
+                        <Grid Grid.Column="1">
+                            <Grid.Triggers>
+                                <EventTrigger RoutedEvent="TextBox.GotKeyboardFocus">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="ReminderTitleChromeFocused" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.2"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                                <EventTrigger RoutedEvent="TextBox.LostKeyboardFocus">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="ReminderTitleChromeFocused" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.3"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Grid.Triggers>
+                            <Border CornerRadius="5" Background="#09090B" BorderBrush="#1A1A1E" BorderThickness="1"/>
+                            <Border x:Name="ReminderTitleChromeFocused" CornerRadius="5" Opacity="0" BorderBrush="#383840" BorderThickness="1"/>
+                            <TextBox x:Name="ReminderTitleInput" Background="#0B0B0D" Foreground="#E8E8EC" CaretBrush="White" BorderThickness="0" Padding="12,8" FontSize="12" Margin="1" VerticalContentAlignment="Center" KeyDown="ReminderTitleInput_KeyDown" TextChanged="ReminderTitleInput_TextChanged">
+                                <TextBox.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius" Value="4"/>
+                                    </Style>
+                                </TextBox.Resources>
+                            </TextBox>
+                        </Grid>
                         <Button x:Name="AddReminderButton" Grid.Column="2" Content="ADD" Style="{StaticResource SendButtonStyle}" Margin="10,0,0,0" Padding="20,6" Click="AddReminder_Click" MouseEnter="AddReminderButton_MouseEnter" MouseLeave="AddReminderButton_MouseLeave"/>
                     </Grid>
                 </Border>

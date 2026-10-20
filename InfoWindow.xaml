@@ -95,7 +95,7 @@
     </Window.Resources>
 
     <!-- Outer Matte Hardware Chassis Frame -->
-    <Border BorderBrush="#2A2A30" BorderThickness="2" Background="#161619">
+    <Border BorderThickness="0" Background="#161619">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
