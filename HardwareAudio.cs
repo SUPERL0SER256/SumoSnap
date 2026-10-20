@@ -47,9 +47,42 @@ public static class HardwareAudio
         return 0.0;
     });
 
+    private static readonly byte[] _wheelTickUpWav = GenerateWav(22, (t) =>
+    {
+        // Audible two-stage rotary ratchet detent click (step UP / right)
+        if (t < 0.008)
+        {
+            double env = Math.Exp(-t * 380.0);
+            return Math.Cos(2.0 * Math.PI * 980.0 * t) * env * 0.25;
+        }
+        else
+        {
+            double t2 = t - 0.008;
+            double env = Math.Exp(-t2 * 340.0);
+            return Math.Cos(2.0 * Math.PI * 1580.0 * t2) * env * 0.28;
+        }
+    });
+
+    private static readonly byte[] _wheelTickDownWav = GenerateWav(22, (t) =>
+    {
+        // Audible two-stage rotary ratchet detent click (step DOWN / left)
+        if (t < 0.008)
+        {
+            double env = Math.Exp(-t * 380.0);
+            return Math.Cos(2.0 * Math.PI * 1420.0 * t) * env * 0.25;
+        }
+        else
+        {
+            double t2 = t - 0.008;
+            double env = Math.Exp(-t2 * 340.0);
+            return Math.Cos(2.0 * Math.PI * 860.0 * t2) * env * 0.28;
+        }
+    });
+
     public static void PlayKeyClick() => PlayBytes(_keyClickWav);
     public static void PlaySideSwitch() => PlayBytes(_sideSwitchWav);
     public static void PlayChime() => PlayBytes(_chimeWav);
+    public static void PlayWheelTick(bool zoomIn) => PlayBytes(zoomIn ? _wheelTickUpWav : _wheelTickDownWav);
 
     private static void PlayBytes(byte[] wavBytes)
     {

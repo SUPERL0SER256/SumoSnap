@@ -9,7 +9,7 @@
         Background="Transparent">
 
     <WindowChrome.WindowChrome>
-        <WindowChrome CaptionHeight="44" ResizeBorderThickness="6" GlassFrameThickness="0" CornerRadius="0"/>
+        <WindowChrome CaptionHeight="54" ResizeBorderThickness="6" GlassFrameThickness="0" CornerRadius="0"/>
     </WindowChrome.WindowChrome>
 
     <Window.Resources>
@@ -193,13 +193,61 @@
     </Window.Resources>
 
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
 
+        <!-- Protruding Top-Left Flat Ribbed Rotary Zoom Wheel -->
+        <Border x:Name="TopZoomWheel"
+                Grid.Row="0" Grid.Column="0"
+                Width="76" Height="14"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Bottom"
+                Margin="28,0,0,-1"
+                CornerRadius="3,3,0,0"
+                Background="#202025"
+                BorderThickness="0"
+                ClipToBounds="True"
+                Cursor="SizeWE"
+                ToolTip="Drag Left / Right or Scroll to Zoom Viewport (Double-Click to Reset)"
+                WindowChrome.IsHitTestVisibleInChrome="True"
+                MouseLeftButtonDown="TopZoomWheel_MouseLeftButtonDown"
+                MouseLeftButtonUp="TopZoomWheel_MouseLeftButtonUp"
+                MouseMove="TopZoomWheel_MouseMove"
+                MouseWheel="TopZoomWheel_MouseWheel">
+            <!-- Flat Repeating Knurled Vertical Ribs (Shifts X as user turns) -->
+            <Rectangle>
+                <Rectangle.Fill>
+                    <DrawingBrush Viewport="0,0,6,14" ViewportUnits="Absolute" TileMode="Tile">
+                        <DrawingBrush.Transform>
+                            <TranslateTransform x:Name="WheelRibTransform" X="0" Y="0"/>
+                        </DrawingBrush.Transform>
+                        <DrawingBrush.Drawing>
+                            <DrawingGroup>
+                                <GeometryDrawing Brush="#151519">
+                                    <GeometryDrawing.Geometry>
+                                        <RectangleGeometry Rect="0,0,3,14"/>
+                                    </GeometryDrawing.Geometry>
+                                </GeometryDrawing>
+                                <GeometryDrawing Brush="#26262C">
+                                    <GeometryDrawing.Geometry>
+                                        <RectangleGeometry Rect="3,0,3,14"/>
+                                    </GeometryDrawing.Geometry>
+                                </GeometryDrawing>
+                            </DrawingGroup>
+                        </DrawingBrush.Drawing>
+                    </DrawingBrush>
+                </Rectangle.Fill>
+            </Rectangle>
+        </Border>
+
         <!-- Outer Matte Hardware Chassis Frame -->
-        <Border Grid.Column="0" BorderThickness="0" Background="#161619" CornerRadius="6">
+        <Border Grid.Row="1" Grid.Column="0" BorderThickness="0" Background="#161619" CornerRadius="6">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/> <!-- Top Deck -->
@@ -275,109 +323,131 @@
                 </Border>
 
                 <!-- Recessed Dot-Matrix LCD Bezel Housing (Grid.Row=1) -->
-                <Border Grid.Row="1" Margin="14,10,14,10" Background="#000000" BorderBrush="#28282E" BorderThickness="2" CornerRadius="6">
+                <Border Grid.Row="1" Margin="14,10,14,10" Background="#000000" BorderBrush="#28282E" BorderThickness="2" CornerRadius="6" ClipToBounds="True">
                     <Grid>
-                        <!-- Scrollable Chat Content -->
-                        <ScrollViewer x:Name="MainScroll" VerticalScrollBarVisibility="Auto">
-                            <StackPanel Margin="16,14,16,16">
-                                <!-- Framed Image Preview Well -->
-                                <Border BorderBrush="#242429" BorderThickness="1.5" CornerRadius="4" Background="#000000" Margin="0,0,0,16" Padding="8">
-                                    <StackPanel>
-                                        <TextBlock Text="[ SNAPSHOT_BUFFER ]" Foreground="#666670" FontSize="10" Margin="2,0,0,6"/>
-                                        <Image x:Name="PreviewImage" Stretch="Uniform" MaxHeight="360" HorizontalAlignment="Center"/>
-                                    </StackPanel>
-                                </Border>
+                        <!-- Scalable Viewport Container -->
+                        <Grid>
+                            <Grid.LayoutTransform>
+                                <ScaleTransform x:Name="ViewportScaleTransform" ScaleX="1.0" ScaleY="1.0"/>
+                            </Grid.LayoutTransform>
 
-                                <!-- Chat Messages Flow Below Image -->
-                                <StackPanel x:Name="ChatMessages"/>
-                            </StackPanel>
-                        </ScrollViewer>
+                            <!-- Scrollable Chat Content -->
+                            <ScrollViewer x:Name="MainScroll" VerticalScrollBarVisibility="Auto">
+                                <StackPanel Margin="16,14,16,16">
+                                    <!-- Framed Image Preview Well -->
+                                    <Border BorderBrush="#242429" BorderThickness="1.5" CornerRadius="4" Background="#000000" Margin="0,0,0,16" Padding="8">
+                                        <StackPanel>
+                                            <TextBlock Text="[ SNAPSHOT_BUFFER ]" Foreground="#666670" FontSize="10" Margin="2,0,0,6"/>
+                                            <Image x:Name="PreviewImage" Stretch="Uniform" MaxHeight="360" HorizontalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Border>
 
-                        <!-- Daily Logic Puzzle Content -->
-                        <ScrollViewer x:Name="GamePanel" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
-                            <StackPanel Margin="16,14,16,16">
-                                <TextBlock Text="[ MODULE // DAILY_LOGIC ]" Foreground="#666670" FontSize="11" Margin="2,0,0,8"/>
-                                <Border Background="#141418" BorderBrush="#2E2E36" BorderThickness="1.5" CornerRadius="5" Padding="15,12,15,12" Margin="0,0,40,15" HorizontalAlignment="Left">
-                                    <TextBlock x:Name="GameText" Foreground="#E8E8EC" FontSize="13" TextWrapping="Wrap" TextAlignment="Left" />
-                                </Border>
-                            </StackPanel>
-                        </ScrollViewer>
-
-                        <!-- 6x6 Mini Sudoku Content -->
-                        <Grid x:Name="SudokuPanel" Visibility="Collapsed" Margin="16,10,16,10">
-                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                                <TextBlock Text="[ MODULE // SUDOKU_6X6 ]" Foreground="#666670" FontSize="11" HorizontalAlignment="Center" Margin="0,0,0,4"/>
-                                <TextBlock x:Name="SudokuStatusText" Text="Fill each row, column, and 2x3 box with 1-6. Click a cell to cycle." Foreground="#9999A0" FontSize="12" HorizontalAlignment="Center" Margin="0,0,0,12"/>
-                                <Border Background="Transparent" BorderThickness="0" Padding="6" HorizontalAlignment="Center">
-                                    <UniformGrid x:Name="SudokuGrid" Rows="6" Columns="6" Width="288" Height="288"/>
-                                </Border>
-                            </StackPanel>
-                        </Grid>
-
-                        <!-- Pomodoro Timer Content (True 5x7 Dot-Matrix LED Readout) -->
-                        <Grid x:Name="PomodoroPanel" Visibility="Collapsed" Margin="16">
-                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                                <TextBlock Text="[ CHRONO // FOCUS_TIMER ]" Foreground="#666670" FontSize="11" HorizontalAlignment="Center" Margin="0,0,0,10"/>
-                                <Border Width="280" Height="150" BorderThickness="0" Background="#000000" Margin="0,0,0,18" Padding="16">
-                                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                        <!-- 5x7 Dot-Matrix Display Grid (7 rows x 27 columns) -->
-                                        <UniformGrid x:Name="PomodoroMatrixGrid" Rows="7" Columns="27" Width="216" Height="56" HorizontalAlignment="Center" Margin="0,4,0,8"/>
-                                        <TextBlock x:Name="PomodoroTimeText" Text="25:00" Visibility="Collapsed"/>
-                                        <TextBlock x:Name="PomodoroStatusLabel" Text="READY" Foreground="#888890" FontSize="11" HorizontalAlignment="Center" Margin="0,4,0,0"/>
-                                    </StackPanel>
-                                </Border>
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,6">
-                                    <Button Content="-5M" Style="{StaticResource IconButtonStyle}" Padding="10,5" Margin="3,0" Click="PomodoroMinus_Click"/>
-                                    <Button Content="15M" Style="{StaticResource IconButtonStyle}" Padding="10,5" Margin="3,0" Click="PomodoroPreset15_Click"/>
-                                    <Button Content="25M" Style="{StaticResource IconButtonStyle}" Padding="10,5" Margin="3,0" Click="PomodoroPreset25_Click"/>
-                                    <Button Content="45M" Style="{StaticResource IconButtonStyle}" Padding="10,5" Margin="3,0" Click="PomodoroPreset45_Click"/>
-                                    <Button Content="+5M" Style="{StaticResource IconButtonStyle}" Padding="10,5" Margin="3,0" Click="PomodoroPlus_Click"/>
+                                    <!-- Chat Messages Flow Below Image -->
+                                    <StackPanel x:Name="ChatMessages"/>
                                 </StackPanel>
-                            </StackPanel>
+                            </ScrollViewer>
+
+                            <!-- Daily Logic Puzzle Content -->
+                            <ScrollViewer x:Name="GamePanel" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                                <StackPanel Margin="16,14,16,16">
+                                    <TextBlock Text="[ MODULE // DAILY_LOGIC ]" Foreground="#666670" FontSize="11" Margin="2,0,0,8"/>
+                                    <Border Background="#141418" BorderBrush="#2E2E36" BorderThickness="1.5" CornerRadius="5" Padding="15,12,15,12" Margin="0,0,40,15" HorizontalAlignment="Left">
+                                        <TextBlock x:Name="GameText" Foreground="#E8E8EC" FontSize="13" TextWrapping="Wrap" TextAlignment="Left" />
+                                    </Border>
+                                </StackPanel>
+                            </ScrollViewer>
+
+                            <!-- 6x6 Mini Sudoku Content -->
+                            <Grid x:Name="SudokuPanel" Visibility="Collapsed" Margin="16,10,16,10">
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <TextBlock Text="[ MODULE // SUDOKU_6X6 ]" Foreground="#666670" FontSize="11" HorizontalAlignment="Center" Margin="0,0,0,4"/>
+                                    <TextBlock x:Name="SudokuStatusText" Text="Fill each row, column, and 2x3 box with 1-6. Click a cell to cycle." Foreground="#9999A0" FontSize="12" HorizontalAlignment="Center" Margin="0,0,0,12"/>
+                                    <Border Background="Transparent" BorderThickness="0" Padding="6" HorizontalAlignment="Center">
+                                        <UniformGrid x:Name="SudokuGrid" Rows="6" Columns="6" Width="288" Height="288"/>
+                                    </Border>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Pomodoro Timer Content (True 5x7 Dot-Matrix LED Readout) -->
+                            <Grid x:Name="PomodoroPanel" Visibility="Collapsed" Margin="16">
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <TextBlock Text="[ CHRONO // FOCUS_TIMER ]" Foreground="#666670" FontSize="11" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                                    <Border Width="280" Height="150" BorderThickness="0" Background="#000000" Margin="0,0,0,18" Padding="16">
+                                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                            <!-- 5x7 Dot-Matrix Display Grid (7 rows x 27 columns) -->
+                                            <UniformGrid x:Name="PomodoroMatrixGrid" Rows="7" Columns="27" Width="216" Height="56" HorizontalAlignment="Center" Margin="0,4,0,8"/>
+                                            <TextBlock x:Name="PomodoroTimeText" Text="25:00" Visibility="Collapsed"/>
+                                            <TextBlock x:Name="PomodoroStatusLabel" Text="READY" Foreground="#888890" FontSize="11" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                                        </StackPanel>
+                                    </Border>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,6">
+                                        <Button Content="-5M" Style="{StaticResource IconButtonStyle}" Padding="10,5" Margin="3,0" Click="PomodoroMinus_Click"/>
+                                        <Button Content="15M" Style="{StaticResource IconButtonStyle}" Padding="10,5" Margin="3,0" Click="PomodoroPreset15_Click"/>
+                                        <Button Content="25M" Style="{StaticResource IconButtonStyle}" Padding="10,5" Margin="3,0" Click="PomodoroPreset25_Click"/>
+                                        <Button Content="45M" Style="{StaticResource IconButtonStyle}" Padding="10,5" Margin="3,0" Click="PomodoroPreset45_Click"/>
+                                        <Button Content="+5M" Style="{StaticResource IconButtonStyle}" Padding="10,5" Margin="3,0" Click="PomodoroPlus_Click"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Calendar & Reminders Content -->
+                            <Grid x:Name="CalendarPanel" Visibility="Collapsed" Margin="16,10,16,10">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Grid Grid.Row="0" Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Button Grid.Column="0" Content="‹" Style="{StaticResource IconButtonStyle}" Padding="10,2" Click="CalendarPrevMonth_Click"/>
+                                    <TextBlock x:Name="CalendarMonthLabel" Grid.Column="1" Text="OCTOBER 2026" Foreground="#E0E0E0" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    <Button Grid.Column="2" Content="›" Style="{StaticResource IconButtonStyle}" Padding="10,2" Click="CalendarNextMonth_Click"/>
+                                </Grid>
+                                <StackPanel Grid.Row="1" Margin="0,0,0,10">
+                                    <UniformGrid Columns="7" Margin="0,0,0,4">
+                                        <TextBlock Text="SU" Foreground="#66666E" FontSize="11" HorizontalAlignment="Center"/>
+                                        <TextBlock Text="MO" Foreground="#66666E" FontSize="11" HorizontalAlignment="Center"/>
+                                        <TextBlock Text="TU" Foreground="#66666E" FontSize="11" HorizontalAlignment="Center"/>
+                                        <TextBlock Text="WE" Foreground="#66666E" FontSize="11" HorizontalAlignment="Center"/>
+                                        <TextBlock Text="TH" Foreground="#66666E" FontSize="11" HorizontalAlignment="Center"/>
+                                        <TextBlock Text="FR" Foreground="#66666E" FontSize="11" HorizontalAlignment="Center"/>
+                                        <TextBlock Text="SA" Foreground="#66666E" FontSize="11" HorizontalAlignment="Center"/>
+                                    </UniformGrid>
+                                    <UniformGrid x:Name="CalendarDaysGrid" Columns="7" Rows="6" Height="162"/>
+                                </StackPanel>
+                                <Border Grid.Row="2" Background="#070709" BorderBrush="#26262E" BorderThickness="1.5" CornerRadius="4" Padding="10">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock x:Name="SelectedDateLabel" Grid.Row="0" Text="REMINDERS" Foreground="#888890" FontSize="11" Margin="0,0,0,6"/>
+                                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                            <StackPanel x:Name="RemindersListPanel"/>
+                                        </ScrollViewer>
+                                    </Grid>
+                                </Border>
+                            </Grid>
                         </Grid>
 
-                        <!-- Calendar & Reminders Content -->
-                        <Grid x:Name="CalendarPanel" Visibility="Collapsed" Margin="16,10,16,10">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
-                            <Grid Grid.Row="0" Margin="0,0,0,8">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <Button Grid.Column="0" Content="‹" Style="{StaticResource IconButtonStyle}" Padding="10,2" Click="CalendarPrevMonth_Click"/>
-                                <TextBlock x:Name="CalendarMonthLabel" Grid.Column="1" Text="OCTOBER 2026" Foreground="#E0E0E0" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                <Button Grid.Column="2" Content="›" Style="{StaticResource IconButtonStyle}" Padding="10,2" Click="CalendarNextMonth_Click"/>
-                            </Grid>
-                            <StackPanel Grid.Row="1" Margin="0,0,0,10">
-                                <UniformGrid Columns="7" Margin="0,0,0,4">
-                                    <TextBlock Text="SU" Foreground="#66666E" FontSize="11" HorizontalAlignment="Center"/>
-                                    <TextBlock Text="MO" Foreground="#66666E" FontSize="11" HorizontalAlignment="Center"/>
-                                    <TextBlock Text="TU" Foreground="#66666E" FontSize="11" HorizontalAlignment="Center"/>
-                                    <TextBlock Text="WE" Foreground="#66666E" FontSize="11" HorizontalAlignment="Center"/>
-                                    <TextBlock Text="TH" Foreground="#66666E" FontSize="11" HorizontalAlignment="Center"/>
-                                    <TextBlock Text="FR" Foreground="#66666E" FontSize="11" HorizontalAlignment="Center"/>
-                                    <TextBlock Text="SA" Foreground="#66666E" FontSize="11" HorizontalAlignment="Center"/>
-                                </UniformGrid>
-                                <UniformGrid x:Name="CalendarDaysGrid" Columns="7" Rows="6" Height="162"/>
-                            </StackPanel>
-                            <Border Grid.Row="2" Background="#070709" BorderBrush="#26262E" BorderThickness="1.5" CornerRadius="4" Padding="10">
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="*"/>
-                                    </Grid.RowDefinitions>
-                                    <TextBlock x:Name="SelectedDateLabel" Grid.Row="0" Text="REMINDERS" Foreground="#888890" FontSize="11" Margin="0,0,0,6"/>
-                                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                                        <StackPanel x:Name="RemindersListPanel"/>
-                                    </ScrollViewer>
-                                </Grid>
-                            </Border>
-                        </Grid>
+                        <!-- Brief On-Screen Hardware Zoom Readout Badge (Unscaled Overlay) -->
+                        <Border x:Name="ZoomHudBadge"
+                                Opacity="0"
+                                IsHitTestVisible="False"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Top"
+                                Margin="0,10,12,0"
+                                Background="#D90C0C0F"
+                                BorderBrush="#2A2A32"
+                                BorderThickness="1"
+                                CornerRadius="3"
+                                Padding="8,3">
+                            <TextBlock x:Name="ZoomHudText" Text="ZOOM // 100%" Foreground="#E8E8EC" FontSize="10"/>
+                        </Border>
                     </Grid>
                 </Border>
 
@@ -569,7 +639,7 @@
         </Border>
 
         <!-- Protruding Flat-Orange Hardware Side Push-Button Switch (Right Edge, Lower Half) -->
-        <Button Grid.Column="1"
+        <Button Grid.Row="1" Grid.Column="1"
                 x:Name="SideSwitchButton"
                 Style="{StaticResource SideSwitchButtonStyle}"
                 ToolTip="Cycle Active Module"

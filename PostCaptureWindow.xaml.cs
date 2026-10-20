@@ -82,6 +82,116 @@ public partial class PostCaptureWindow : Window
         CalendarInputBar.Visibility = Visibility.Collapsed;
     }
 
+    // ==================== TOP ROTARY KNURLED ZOOM WHEEL ====================
+    private bool _isDraggingZoomWheel = false;
+    private double _lastWheelMouseX = 0;
+    private double _wheelDragAccumulator = 0;
+    private double _viewportZoom = 1.0;
+
+    private void TopZoomWheel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ClickCount == 2)
+        {
+            SetViewportZoom(1.0, zoomInSound: true);
+            e.Handled = true;
+            return;
+        }
+
+        _isDraggingZoomWheel = true;
+        _lastWheelMouseX = e.GetPosition(this).X;
+        _wheelDragAccumulator = 0;
+        TopZoomWheel.CaptureMouse();
+        e.Handled = true;
+    }
+
+    private void TopZoomWheel_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        if (_isDraggingZoomWheel)
+        {
+            _isDraggingZoomWheel = false;
+            TopZoomWheel.ReleaseMouseCapture();
+            e.Handled = true;
+        }
+    }
+
+    private void TopZoomWheel_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+    {
+        if (!_isDraggingZoomWheel) return;
+
+        double currentX = e.GetPosition(this).X;
+        double dx = currentX - _lastWheelMouseX;
+        _lastWheelMouseX = currentX;
+
+        if (Math.Abs(dx) < 0.01) return;
+
+        // Visually roll the knurled vertical ribs along with the horizontal drag
+        if (WheelRibTransform != null)
+        {
+            double nextOffset = (WheelRibTransform.X + dx * 0.75) % 6.0;
+            if (nextOffset < 0) nextOffset += 6.0;
+            WheelRibTransform.X = nextOffset;
+        }
+
+        _wheelDragAccumulator += dx;
+        const double pixelsPerDetent = 10.0;
+
+        while (_wheelDragAccumulator >= pixelsPerDetent)
+        {
+            _wheelDragAccumulator -= pixelsPerDetent;
+            StepViewportZoom(+0.05);
+        }
+
+        while (_wheelDragAccumulator <= -pixelsPerDetent)
+        {
+            _wheelDragAccumulator += pixelsPerDetent;
+            StepViewportZoom(-0.05);
+        }
+    }
+
+    private void TopZoomWheel_MouseWheel(object sender, MouseWheelEventArgs e)
+    {
+        if (e.Delta == 0) return;
+
+        bool zoomIn = e.Delta > 0;
+        if (WheelRibTransform != null)
+        {
+            double nextOffset = (WheelRibTransform.X + (zoomIn ? 3.0 : -3.0)) % 6.0;
+            if (nextOffset < 0) nextOffset += 6.0;
+            WheelRibTransform.X = nextOffset;
+        }
+
+        StepViewportZoom(zoomIn ? +0.05 : -0.05);
+        e.Handled = true;
+    }
+
+    private void StepViewportZoom(double delta)
+    {
+        double target = Math.Clamp(Math.Round((_viewportZoom + delta) * 20.0) / 20.0, 0.70, 1.45);
+        SetViewportZoom(target, zoomInSound: delta > 0);
+    }
+
+    private void SetViewportZoom(double targetZoom, bool zoomInSound)
+    {
+        _viewportZoom = targetZoom;
+        HardwareAudio.PlayWheelTick(zoomInSound);
+
+        if (ViewportScaleTransform != null)
+        {
+            ViewportScaleTransform.ScaleX = _viewportZoom;
+            ViewportScaleTransform.ScaleY = _viewportZoom;
+        }
+
+        if (ZoomHudBadge != null && ZoomHudText != null)
+        {
+            ZoomHudText.Text = $"ZOOM // {(int)Math.Round(_viewportZoom * 100)}%";
+            var fade = new System.Windows.Media.Animation.DoubleAnimationUsingKeyFrames();
+            fade.KeyFrames.Add(new System.Windows.Media.Animation.DiscreteDoubleKeyFrame(1.0, System.Windows.Media.Animation.KeyTime.FromTimeSpan(TimeSpan.Zero)));
+            fade.KeyFrames.Add(new System.Windows.Media.Animation.DiscreteDoubleKeyFrame(1.0, System.Windows.Media.Animation.KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(650))));
+            fade.KeyFrames.Add(new System.Windows.Media.Animation.LinearDoubleKeyFrame(0.0, System.Windows.Media.Animation.KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(950))));
+            ZoomHudBadge.BeginAnimation(UIElement.OpacityProperty, fade);
+        }
+    }
+
     private void SideSwitch_Click(object sender, RoutedEventArgs e)
     {
         HardwareAudio.PlaySideSwitch();
