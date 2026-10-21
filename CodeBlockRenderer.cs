@@ -37,7 +37,7 @@ public static class CodeBlockRenderer
         {
             if (m.Index > last)
             {
-                string before = text.Substring(last, m.Index - last).Trim('\r', '\n');
+                string before = CleanMarkdown(text.Substring(last, m.Index - last).Trim('\r', '\n'));
                 if (before.Trim().Length > 0) segments.Add(new TextSegment(before));
             }
             segments.Add(new CodeSegment(m.Groups[1].Value.Trim(), m.Groups[2].Value.TrimEnd()));
@@ -45,10 +45,30 @@ public static class CodeBlockRenderer
         }
         if (last < text.Length)
         {
-            string rest = text.Substring(last).Trim('\r', '\n');
+            string rest = CleanMarkdown(text.Substring(last).Trim('\r', '\n'));
             if (rest.Trim().Length > 0) segments.Add(new TextSegment(rest));
         }
         return segments;
+    }
+
+    public static string CleanMarkdown(string input)
+    {
+        if (string.IsNullOrEmpty(input)) return input;
+
+        // 1. Convert leading markdown bullet asterisks ("* item") to clean "• item"
+        string s = Regex.Replace(input, @"(?m)^(\s*)\*\s+", "$1• ");
+
+        // 2. Strip markdown heading hashes ("### Heading" -> "Heading")
+        s = Regex.Replace(s, @"(?m)^(\s*)#{1,6}\s+", "$1");
+
+        // 3. Strip bold/italic asterisks (***text***, **text**, *text*)
+        s = s.Replace("**", "");
+        s = Regex.Replace(s, @"(?<!\*)\*([^\*\r\n]+)\*(?!\*)", "$1");
+
+        // 4. Strip inline backticks (`code` -> code)
+        s = Regex.Replace(s, @"`([^`\r\n]+)`", "$1");
+
+        return s;
     }
 
     // ---- Palette (muted, to sit inside the grayscale UI) ----

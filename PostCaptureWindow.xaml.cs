@@ -1450,7 +1450,7 @@ public partial class PostCaptureWindow : Window
         var segments = isUser ? null : CodeBlockRenderer.Parse(text);
         if (segments == null || !segments.Exists(s => s is CodeBlockRenderer.CodeSegment))
         {
-            bubble.Child = MakeTextBox(text);
+            bubble.Child = MakeTextBox(isUser ? text : CodeBlockRenderer.CleanMarkdown(text));
         }
         else
         {
