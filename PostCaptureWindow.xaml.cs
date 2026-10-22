@@ -279,7 +279,7 @@ public partial class PostCaptureWindow : Window
             GameSubmitButton.Visibility = Visibility.Collapsed;
             TriesIndicator.Visibility = Visibility.Collapsed;
         }
-        else if (settings.DailyPuzzleDate.Date == DateTime.Today)
+        else if (settings.DailyPuzzleDate.Date == DateTime.Today && !string.IsNullOrWhiteSpace(settings.DailyPuzzleText))
         {
             GameText.Text = settings.DailyPuzzleText;
             TriesIndicator.Text = FormatTriesPips(settings.DailyPuzzleAttemptsLeft);
@@ -1058,7 +1058,11 @@ public partial class PostCaptureWindow : Window
         }
         catch (Exception ex)
         {
-            GameText.Text = "Failed to generate puzzle. " + ex.Message;
+            GameText.Text = "The AI server is temporarily busy. Click RETRY below to generate today's puzzle.";
+            GameSubmitButton.Visibility = Visibility.Collapsed;
+            TriesIndicator.Visibility = Visibility.Collapsed;
+            GameNextButton.Content = "RETRY";
+            GameNextButton.Visibility = Visibility.Visible;
         }
         finally
         {
@@ -1071,7 +1075,14 @@ public partial class PostCaptureWindow : Window
 
     private void GameNextButton_Click(object sender, RoutedEventArgs e)
     {
-        GameToggle_Click(this, new RoutedEventArgs());
+        GameNextButton.Visibility = Visibility.Collapsed;
+        _ = StartNewGameAsync();
+    }
+
+    private static string NormalizeAnswerToken(string s)
+    {
+        if (string.IsNullOrWhiteSpace(s)) return "";
+        return new string(s.Trim().ToLowerInvariant().Where(char.IsLetterOrDigit).ToArray());
     }
 
     private async void GameSubmitButton_Click(object sender, RoutedEventArgs e)
@@ -1091,7 +1102,9 @@ public partial class PostCaptureWindow : Window
         {
             var aiClient = AiProviderFactory.CreateClient();
             string prompt = $"The puzzle was:\n{settings.DailyPuzzleText}\n\nThe correct answer is: {settings.DailyPuzzleAnswer}\n\nThe user guessed: '{answer}'. Evaluate their guess. If they are completely correct or conceptually correct, reply EXACTLY with 'CORRECT'. If they are wrong, reply EXACTLY with 'WRONG'. Do not include markdown.";
-            AiResponse response = await aiClient.ChatAsync(prompt, "You are a puzzle master evaluating a user's guess.");
+            AiResponse response = NormalizeAnswerToken(answer).Length > 0 && NormalizeAnswerToken(answer) == NormalizeAnswerToken(settings.DailyPuzzleAnswer ?? "")
+                ? new AiResponse { Text = "CORRECT" }
+                : await aiClient.ChatAsync(prompt, "You are a puzzle master evaluating a user's guess.");
             
             string reply = response.Text.Trim().ToUpper();
             if (reply.StartsWith("CORRECT"))

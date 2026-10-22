@@ -25,7 +25,7 @@ public class GeminiClient : IAiClient
         _modelName = isPro ? "gemini-3.1-pro" : "gemini-3.6-flash";
     }
 
-        public async Task<AiResponse> ChatAsync(string userMessage, string systemPrompt)
+    public async Task<AiResponse> ChatAsync(string userMessage, string systemPrompt)
     {
         var requestBody = new
         {
@@ -39,12 +39,7 @@ public class GeminiClient : IAiClient
             }
         };
         var json = JsonSerializer.Serialize(requestBody);
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
-        var request = new HttpRequestMessage(HttpMethod.Post, $"https://generativelanguage.googleapis.com/v1beta/models/{_modelName}:generateContent?key={_apiKey}") { Content = content };
-        using var response = await _httpClient.SendAsync(request);
-        var responseJson = await response.Content.ReadAsStringAsync();
-        if (!response.IsSuccessStatusCode) throw new Exception($"Gemini API Error: {responseJson}");
-        return ExtractTextFromResponse(responseJson);
+        return await SendWithRetryAndFallbackAsync(json);
     }
 
     public async Task<AiResponse> ChatWithImageAsync(BitmapSource image, string userMessage)
@@ -74,19 +69,48 @@ public class GeminiClient : IAiClient
         };
 
         var json = JsonSerializer.Serialize(requestBody);
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
+        return await SendWithRetryAndFallbackAsync(json);
+    }
 
-        var url = $"https://generativelanguage.googleapis.com/v1beta/models/{_modelName}:generateContent?key={_apiKey}";
-        var response = await _httpClient.PostAsync(url, content);
-
-        if (!response.IsSuccessStatusCode)
+    private async Task<AiResponse> SendWithRetryAndFallbackAsync(string jsonPayload)
+    {
+        // Primary configured model (gemini-3.6-flash / gemini-3.1-pro), then 3.x fallbacks if 503/502/500/429 occurs
+        string[] candidateModels = new[]
         {
-            var errorBody = await response.Content.ReadAsStringAsync();
-            throw new Exception($"Gemini API failed: {response.StatusCode} - {errorBody}");
+            _modelName,
+            _modelName,
+            "gemini-3.8-flash",
+            "gemini-3.6-flash",
+            "gemini-3.1-pro"
+        };
+
+        string lastError = "";
+        for (int attempt = 0; attempt < candidateModels.Length; attempt++)
+        {
+            string model = candidateModels[attempt];
+            var url = $"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={_apiKey}";
+            using var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+            using var response = await _httpClient.PostAsync(url, content);
+            var responseJson = await response.Content.ReadAsStringAsync();
+
+            if (response.IsSuccessStatusCode)
+            {
+                return ExtractTextFromResponse(responseJson);
+            }
+
+            lastError = $"{(int)response.StatusCode} {response.StatusCode} - {responseJson}";
+            int code = (int)response.StatusCode;
+
+            bool isTransientOrModelBusy = code == 503 || code == 502 || code == 500 || code == 429 || code == 404;
+            if (!isTransientOrModelBusy || attempt == candidateModels.Length - 1)
+            {
+                break;
+            }
+
+            await Task.Delay(attempt == 0 ? 800 : 1100);
         }
 
-        var responseJson = await response.Content.ReadAsStringAsync();
-        return ExtractTextFromResponse(responseJson);
+        throw new Exception($"Gemini API failed: {lastError}");
     }
 
     private string ImageToBase64(BitmapSource image)
