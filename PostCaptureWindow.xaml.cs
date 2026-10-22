@@ -15,7 +15,7 @@ namespace SumoSnap;
 public partial class PostCaptureWindow : Window
 {
     private string _activeMode = "Chat"; // "Chat", "Logic", "Sudoku", "Pomodoro", "Calendar"
-    private string _gameSystemPrompt = @"You are a diverse logic puzzle generator. Generate a short logic puzzle. Mix it up randomly between: number patterns, spatial reasoning described in text, letter sequences, and classic logic riddles. Output ONLY a valid JSON object without markdown. Schema: { ""puzzle"": ""the puzzle text"", ""answer"": ""the exact brief answer"" }. Make it very concise to save tokens.";
+    private string _gameSystemPrompt = @"You are an analytical logic puzzle designer. Generate a concise, rigorous deduction puzzle with a single unambiguous answer. Strictly avoid elementary single-step sequences (like +2, x2, primes, Fibonacci) and avoid cliché word riddles (like shadow, echo, footsteps, clock). Output ONLY a valid JSON object without markdown. Schema: { ""puzzle"": ""the puzzle text"", ""answer"": ""the exact brief answer"" }. Keep the text concise.";
 
     private bool _suppressKeyClick = false;
     private static readonly SolidColorBrush _ledLitBrush = CreateFrozenBrush(0xFF, 0xFF, 0xFF);
@@ -243,6 +243,14 @@ public partial class PostCaptureWindow : Window
         _ => "○ ○ ○"
     };
 
+    private void UpdateGameLevelHeader(int streak)
+    {
+        if (GameModuleHeaderText == null) return;
+        GameModuleHeaderText.Text = streak >= 6
+            ? $"[ MODULE // DAILY_LOGIC // LEVEL: ADVANCED +{streak - 5} ]"
+            : "[ MODULE // DAILY_LOGIC // LEVEL: STANDARD ]";
+    }
+
     private async void GameToggle_Click(object sender, RoutedEventArgs e)
     {
         if (_activeMode == "Logic")
@@ -262,6 +270,7 @@ public partial class PostCaptureWindow : Window
         var settings = SettingsManager.LoadSettings();
         StreakText.Text = $"Streak: {settings.DailyLogicStreak}";
         BestStreakText.Text = $"Best: {settings.HighestLogicStreak}";
+        UpdateGameLevelHeader(settings.DailyLogicStreak);
 
         if (settings.LastPuzzleSolvedDate.Date == DateTime.Today)
         {
@@ -999,7 +1008,22 @@ public partial class PostCaptureWindow : Window
                 ? "\n\nCRITICAL: NEVER repeat or closely resemble any of these previously used puzzles or answers:\n- " + string.Join("\n- ", settings.PastPuzzles)
                 : "";
 
-            string userPrompt = $"Generate a brand new, unique daily logic puzzle for {DateTime.Today:yyyy-MM-dd}. Today's required theme is: {todayCategory}. Avoid cliché riddles (like footsteps, echo, shadow, clock, etc.).{historyContext}";
+            int streak = settings.DailyLogicStreak;
+            UpdateGameLevelHeader(streak);
+
+            string difficultySpec;
+            if (streak <= 5)
+            {
+                difficultySpec = "Difficulty: LEVEL // STANDARD (Medium 2-Step Deduction). The puzzle must require combining at least 2 distinct logical steps, constraints, or compound rules (e.g., interleaved/two-operation sequences, 3-entity truth/liar deduction, or multi-clue elimination). Do NOT generate trivial 1-step patterns.";
+            }
+            else
+            {
+                int advTier = streak - 5; // Tier 1 at streak 6, Tier 2 at streak 7, etc.
+                int requiredSteps = Math.Min(5, 2 + (advTier + 1) / 2);
+                difficultySpec = $"Difficulty: LEVEL // ADVANCED +{advTier} (Incremental Streak Challenge, Streak={streak}). Make this puzzle noticeably harder than standard: require {requiredSteps}-step deductive chaining, indirect constraints, compound mathematical/cipher operations, or 1 subtle red-herring clue that must be ruled out logically while still having a single provable answer.";
+            }
+
+            string userPrompt = $"Generate a brand new, unique daily logic puzzle for {DateTime.Today:yyyy-MM-dd}. Today's required theme is: {todayCategory}. {difficultySpec} Avoid cliché riddles (like footsteps, echo, shadow, clock, etc.).{historyContext}";
 
             var aiClient = AiProviderFactory.CreateClient();
             AiResponse response = await aiClient.ChatAsync(userPrompt, _gameSystemPrompt);
@@ -1081,6 +1105,7 @@ public partial class PostCaptureWindow : Window
 
                 StreakText.Text = $"Streak: {settings.DailyLogicStreak}";
                 BestStreakText.Text = $"Best: {settings.HighestLogicStreak}";
+        UpdateGameLevelHeader(settings.DailyLogicStreak);
                 GameText.Text = "Correct! Come back tomorrow for the next puzzle.\n\n" + settings.DailyPuzzleText;
                 
                 GameInput.Visibility = Visibility.Collapsed;
@@ -1097,6 +1122,7 @@ public partial class PostCaptureWindow : Window
                     SettingsManager.SaveSettings(settings);
 
                     StreakText.Text = "Streak: 0";
+                    UpdateGameLevelHeader(0);
                     GameText.Text = $"Out of tries! The correct answer was: {settings.DailyPuzzleAnswer}\n\nCome back tomorrow for the next puzzle.\n\n{settings.DailyPuzzleText}";
                     
                     GameInput.Visibility = Visibility.Collapsed;
