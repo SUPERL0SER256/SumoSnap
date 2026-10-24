@@ -15,7 +15,7 @@ namespace SumoSnap;
 public partial class PostCaptureWindow : Window
 {
     private string _activeMode = "Chat"; // "Chat", "Logic", "Sudoku", "Pomodoro", "Calendar"
-    private string _gameSystemPrompt = @"You are an analytical logic puzzle designer. Generate a concise, rigorous deduction puzzle with a single unambiguous answer. Strictly avoid elementary single-step sequences (like +2, x2, primes, Fibonacci) and avoid cliché word riddles (like shadow, echo, footsteps, clock). Output ONLY a valid JSON object without markdown. Schema: { ""puzzle"": ""the puzzle text"", ""answer"": ""the exact brief answer"" }. Keep the text concise.";
+    private string _gameSystemPrompt = @"You are a master puzzle designer creating varied, natural-prose brain-teasers. Write every puzzle as a cohesive 2-4 sentence scenario with a single unambiguous answer. CRITICAL FORMATTING RULES: 1) Do NOT use numbered clue lists ('1) ... 2) ... 3) ...'). 2) Do NOT use algebraic variable labels like P, Q, R, S or L1, L2, L3, L4. 3) NEVER write meta-labels like '(Distractor Clue: ...)' or '(Note: ...)'. 4) Never use A=1..Z=26 letter-sum algebra. Output ONLY a valid JSON object without markdown. Schema: { ""puzzle"": ""the puzzle text"", ""answer"": ""the exact brief answer"" }.";
 
     private bool _suppressKeyClick = false;
     private static readonly SolidColorBrush _ledLitBrush = CreateFrozenBrush(0xFF, 0xFF, 0xFF);
@@ -1011,19 +1011,51 @@ public partial class PostCaptureWindow : Window
             int streak = settings.DailyLogicStreak;
             UpdateGameLevelHeader(streak);
 
-            string difficultySpec;
-            if (streak <= 5)
+            int catIdx = DateTime.Today.DayOfYear % 7;
+            (string themeName, string standardHow, string advancedHow) = catIdx switch
             {
-                difficultySpec = "Difficulty: LEVEL // STANDARD (Medium 2-Step Deduction). The puzzle must require combining at least 2 distinct logical steps, constraints, or compound rules (e.g., interleaved/two-operation sequences, 3-entity truth/liar deduction, or multi-clue elimination). Do NOT generate trivial 1-step patterns.";
-            }
-            else
-            {
-                int advTier = streak - 5; // Tier 1 at streak 6, Tier 2 at streak 7, etc.
-                int requiredSteps = Math.Min(5, 2 + (advTier + 1) / 2);
-                difficultySpec = $"Difficulty: LEVEL // ADVANCED +{advTier} (Incremental Streak Challenge, Streak={streak}). Make this puzzle noticeably harder than standard: require {requiredSteps}-step deductive chaining, indirect constraints, compound mathematical/cipher operations, or 1 subtle red-herring clue that must be ruled out logically while still having a single provable answer.";
-            }
+                0 => (
+                    "Game Theory & Turn-Based Strategy",
+                    "Create a two-player game (coins, matches, grid moves, or Nim variant) where the solver must find the winning first move or winning player.",
+                    "Use an asymmetric rule, a poison/pass mechanic, or a parity invariant where the winning strategy requires working backward from the terminal state."
+                ),
+                1 => (
+                    "Spatial, Parity, or State-Transition Invariant",
+                    "Create a physical or geometric state puzzle (gears, cube faces, grid walks, or pouring jugs) solvable by tracking orientation or distance.",
+                    "Require a parity/checkerboard-coloring invariant, 3D rotational tracking, or graph-cycle deduction to find the exact final state or minimum moves."
+                ),
+                2 => (
+                    "Information Theory, Weighing, or Hat/Switch Deduction",
+                    "Create an optimal-testing or information puzzle (balance scale, hidden switches, or colored hats) asking for the minimum guaranteed steps or exact deduction.",
+                    "Introduce a twist constraint (e.g., a coin that may be heavier OR lighter, limited simultaneous observations, or chained knowledge) requiring tight information-bound reasoning."
+                ),
+                3 => (
+                    "Pure Linguistic & Structural Wordplay (NO A=1..Z=26 Math)",
+                    "Create a structural word puzzle based on letter removal/insertion chains, heterograms, reversals, or phonetic/orthographic transformations.",
+                    "Require satisfying two simultaneous linguistic constraints (e.g., removing one letter at a time to form valid words, or a word that transforms meaning when shifted/reversed) without using any arithmetic on letter positions."
+                ),
+                4 => (
+                    "Self-Referential Truth, Liar, & Epistemic Logic",
+                    "Create a truth-teller / liar scenario with 3 characters where their statements reference each other.",
+                    "Include an alternator/random-speaker ('Spy') or a biconditional/self-referential statement ('If I am telling the truth, then...') where only one global assignment is consistent."
+                ),
+                5 => (
+                    "Relative Ordering, Seating, or Timing Paradox",
+                    "Create a narrative scheduling, circular seating, or relative-rate scenario written in flowing prose (no numbered lists).",
+                    "Use circular/modular adjacency or relative speed/meeting-time invariants where an obvious intuitive assumption is wrong and must be resolved precisely."
+                ),
+                _ => (
+                    "Counter-Intuitive Conditional Probability & Expected Value",
+                    "Create a conditional probability or sampling puzzle (cards, dice, random walks, or coins) with a clean fraction or integer answer.",
+                    "Involve Bayesian conditioning (restricted sample space after partial information is revealed) or a Markov/symmetry shortcut."
+                )
+            };
 
-            string userPrompt = $"Generate a brand new, unique daily logic puzzle for {DateTime.Today:yyyy-MM-dd}. Today's required theme is: {todayCategory}. {difficultySpec} Avoid cliché riddles (like footsteps, echo, shadow, clock, etc.).{historyContext}";
+            string difficultySpec = streak <= 5
+                ? $"Difficulty: LEVEL // STANDARD (Streak={streak}). {standardHow}"
+                : $"Difficulty: LEVEL // ADVANCED +{streak - 5} (Streak={streak}). {advancedHow} Scale the subtlety of the twist to match Advanced Tier +{streak - 5}, while keeping the scenario natural, concise, and free of numbered clue lists or algebraic variable codes.";
+
+            string userPrompt = $"Generate a brand new, unique daily logic puzzle for {DateTime.Today:yyyy-MM-dd}. Today's cognitive archetype is: {themeName}. {difficultySpec}{historyContext}";
 
             var aiClient = AiProviderFactory.CreateClient();
             AiResponse response = await aiClient.ChatAsync(userPrompt, _gameSystemPrompt);
