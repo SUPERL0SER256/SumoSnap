@@ -335,7 +335,7 @@
                             <ScrollViewer x:Name="MainScroll" VerticalScrollBarVisibility="Auto">
                                 <StackPanel Margin="16,14,16,16">
                                     <!-- Framed Image Preview Well -->
-                                    <Border BorderBrush="#242429" BorderThickness="1.5" CornerRadius="4" Background="#000000" Margin="0,0,0,16" Padding="8">
+                                    <Border x:Name="SnapshotBufferBorder" BorderBrush="#242429" BorderThickness="1.5" CornerRadius="4" Background="#000000" Margin="0,0,0,16" Padding="8">
                                         <StackPanel>
                                             <TextBlock Text="[ SNAPSHOT_BUFFER ]" Foreground="#666670" FontSize="10" Margin="2,0,0,6"/>
                                             <Image x:Name="PreviewImage" Stretch="Uniform" MaxHeight="360" HorizontalAlignment="Center"/>

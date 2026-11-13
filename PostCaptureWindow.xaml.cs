@@ -223,6 +223,34 @@ public partial class PostCaptureWindow : Window
         }
     }
 
+    public void OpenInMode(string mode)
+    {
+        if (this.WindowState == WindowState.Minimized)
+            this.WindowState = WindowState.Normal;
+
+        this.Show();
+        this.Activate();
+
+        switch (mode)
+        {
+            case "Calendar":
+                if (_activeMode != "Calendar") CalendarMode_Click(this, new RoutedEventArgs());
+                break;
+            case "Pomodoro":
+                if (_activeMode != "Pomodoro") PomodoroMode_Click(this, new RoutedEventArgs());
+                break;
+            case "Sudoku":
+                if (_activeMode != "Sudoku") SudokuMode_Click(this, new RoutedEventArgs());
+                break;
+            case "Logic":
+                if (_activeMode != "Logic") GameToggle_Click(this, new RoutedEventArgs());
+                break;
+            default:
+                if (_activeMode != "Chat") ChatMode_Click(this, new RoutedEventArgs());
+                break;
+        }
+    }
+
     private void ChatMode_Click(object sender, RoutedEventArgs e)
     {
         PlayModeSound();
@@ -1215,12 +1243,12 @@ public partial class PostCaptureWindow : Window
     // Completely destroy the session on close
     private void Close_Click(object sender, RoutedEventArgs e) { this.Close(); }
 
-    public PostCaptureWindow(BitmapSource capturedImage)
+    public PostCaptureWindow(BitmapSource? capturedImage = null)
     {
         InitializeComponent();
         ThemeManager.ApplyDarkTitleBar(this);
         _currentImage = capturedImage;
-        PreviewImage.Source = _currentImage;
+        SetCapturedImage(capturedImage);
         
         
         
@@ -1235,10 +1263,12 @@ public partial class PostCaptureWindow : Window
         };
     }
 
+    public void SetCapturedImage(BitmapSource? capturedImage) { _currentImage = capturedImage!; PreviewImage.Source = _currentImage; if (SnapshotBufferBorder != null) SnapshotBufferBorder.Visibility = _currentImage != null ? Visibility.Visible : Visibility.Collapsed; }
     private void CopyButton_Click(object sender, RoutedEventArgs e)
     {
         try
         {
+            if (_currentImage == null) return;
             var dataObject = new System.Windows.DataObject();
             dataObject.SetImage(_currentImage);
 
@@ -1259,6 +1289,7 @@ public partial class PostCaptureWindow : Window
 
     private void SaveButton_Click(object sender, RoutedEventArgs e)
     {
+        if (_currentImage == null) return;
         var saveFileDialog = new Microsoft.Win32.SaveFileDialog
         {
             Filter = "PNG Image|*.png|JPEG Image|*.jpg",
@@ -1377,7 +1408,7 @@ public partial class PostCaptureWindow : Window
             thinkingBubble = CreateMetallicLoader();
 
             var aiClient = AiProviderFactory.CreateClient();
-            AiResponse response = await aiClient.ChatWithImageAsync(_currentImage, userMessage);
+            AiResponse response = _currentImage != null ? await aiClient.ChatWithImageAsync(_currentImage, userMessage) : await aiClient.ChatAsync(userMessage, "You are a concise, helpful desktop AI assistant. Reply in clean plain text without markdown asterisks or LaTeX.");
             
             if (thinkingBubble != null) ChatMessages.Children.Remove(thinkingBubble);
             AddChatBubble(response.Text, isUser: false);

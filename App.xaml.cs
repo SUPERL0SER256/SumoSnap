@@ -45,15 +45,26 @@ public partial class App : System.Windows.Application
         var contextMenu = new System.Windows.Forms.ContextMenuStrip();
         contextMenu.Items.Add("Show Active Chat", null, OnShowChatClicked);
         contextMenu.Items.Add("New Screenshot", null, OnNewScreenshotClicked);
-        contextMenu.Items.Add("Toggle Floating Buddy", null, OnToggleBuddyClicked);
+        contextMenu.Items.Add("Toggle Hardware Notch", null, OnToggleBuddyClicked);
         contextMenu.Items.Add("Settings", null, OnSettingsClicked);
         contextMenu.Items.Add(new System.Windows.Forms.ToolStripSeparator());
         contextMenu.Items.Add("Quit", null, OnQuitClicked);
         
         _notifyIcon.ContextMenuStrip = contextMenu;
 
-        _buddyWindow = new BuddyWindow(HandleScreenshot);
-        if (SettingsManager.LoadSettings().ShowFloatingBuddy)
+        var bootSettings = SettingsManager.LoadSettings();
+        if (!bootSettings.HasMigratedToHardwareNotch)
+        {
+            bootSettings.ShowFloatingBuddy = true;
+            bootSettings.HasMigratedToHardwareNotch = true;
+            SettingsManager.SaveSettings(bootSettings);
+        }
+
+        _buddyWindow = new BuddyWindow(
+            onCaptureRequested: HandleScreenshot,
+            onOpenModuleRequested: OpenModuleFromNotch,
+            onSettingsRequested: () => OnSettingsClicked(null, EventArgs.Empty));
+        if (bootSettings.ShowFloatingBuddy)
         {
             _buddyWindow.Show();
         }
@@ -92,10 +103,12 @@ public partial class App : System.Windows.Application
             HardwareAudio.PlayChime();
             NotificationWindow.ShowDarkCard("Pomodoro Timer", $"Your {PomodoroDurationMinutes}-minute focus session is complete.");
             _currentSessionWindow?.SyncPomodoroUI();
+            _buddyWindow?.RefreshPulse();
         }
         else if (PomodoroEndTime.HasValue)
         {
             _currentSessionWindow?.SyncPomodoroUI();
+            _buddyWindow?.RefreshPulse();
         }
 
         // 2. Check Calendar Reminders (every 5 seconds to minimize disk reads)
@@ -153,6 +166,7 @@ public partial class App : System.Windows.Application
                 }
 
                 _currentSessionWindow = new PostCaptureWindow(imageSource);
+                _currentSessionWindow.Closed += (_, _) => _currentSessionWindow = null;
                 _currentSessionWindow.Show();
             }
         }
@@ -185,17 +199,19 @@ public partial class App : System.Windows.Application
         }
     }
 
+    private void OpenModuleFromNotch(string mode)
+    {
+        if (_currentSessionWindow == null || !_currentSessionWindow.IsLoaded)
+        {
+            _currentSessionWindow = new PostCaptureWindow(null);
+            _currentSessionWindow.Closed += (_, _) => _currentSessionWindow = null;
+        }
+        _currentSessionWindow.OpenInMode(mode);
+    }
+
     private void OnShowChatClicked(object? sender, EventArgs e)
     {
-        if (_currentSessionWindow != null)
-        {
-            _currentSessionWindow.Show();
-            _currentSessionWindow.Activate();
-        }
-        else
-        {
-            System.Windows.MessageBox.Show("No active chat. Take a screenshot first (Ctrl+Shift+Q).", "SumoSnap", MessageBoxButton.OK, MessageBoxImage.Information);
-        }
+        OpenModuleFromNotch("Chat");
     }
 
     private void OnNewScreenshotClicked(object? sender, EventArgs e)

@@ -20,6 +20,7 @@ public class AppSettings
     public string AnthropicApiKey { get; set; } = "";
     public string ActiveProvider { get; set; } = "Gemini"; // "Gemini", "OpenAI", or "Anthropic"
     public bool ShowFloatingBuddy { get; set; } = true;
+    public bool HasMigratedToHardwareNotch { get; set; } = false;
     public bool RunOnStartup { get; set; } = true;
     public bool HasSeenOnboarding { get; set; } = false;
     

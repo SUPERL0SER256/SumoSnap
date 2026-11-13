@@ -1,21 +1,137 @@
 <Window x:Class="SumoSnap.BuddyWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="SumoSnap Buddy" Height="120" Width="120"
+        Title="SumoSnap Notch" Width="56" Height="248"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
         Topmost="True" ShowInTaskbar="False" ResizeMode="NoResize"
-        Opacity="0.05"
-        MouseLeftButtonDown="Window_MouseLeftButtonDown" MouseMove="Window_MouseMove" MouseLeftButtonUp="Window_MouseLeftButtonUp"
+        FontFamily="Consolas, Segoe UI"
         Loaded="Window_Loaded" Closed="Window_Closed">
-    <Grid x:Name="ContainerGrid" Background="#01000000" Cursor="Hand" RenderTransformOrigin="0.5,0.5"> 
-        <Grid.RenderTransform>
-            <ScaleTransform x:Name="BuddyScale" ScaleX="0.4" ScaleY="0.4"/>
-        </Grid.RenderTransform>
-        
-        <Image Source="pack://application:,,,/buddy_icon.png" Stretch="Uniform" Margin="0" RenderOptions.BitmapScalingMode="HighQuality">
-            <Image.Effect>
-                <DropShadowEffect x:Name="BuddyGlow" Color="#FFAA00" BlurRadius="0" ShadowDepth="0" Opacity="0"/>
-            </Image.Effect>
-        </Image>
+
+    <Window.Resources>
+        <!-- Pure Monochrome Black Keycap Button -->
+        <Style x:Key="NotchVerticalButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#121215"/>
+            <Setter Property="Foreground" Value="#9E9EA6"/>
+            <Setter Property="BorderBrush" Value="#050507"/>
+            <Setter Property="BorderThickness" Value="1,1,1,2"/>
+            <Setter Property="Width" Value="32"/>
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="KeycapBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4">
+                            <Border x:Name="KeycapTopEdge" BorderBrush="#222228" BorderThickness="0,1,0,0" CornerRadius="3">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="KeycapBorder" Property="Background" Value="#1E1E24"/>
+                                <Setter TargetName="KeycapTopEdge" Property="BorderBrush" Value="#3E3E48"/>
+                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="KeycapBorder" Property="BorderThickness" Value="1,2,1,1"/>
+                                <Setter TargetName="KeycapBorder" Property="Background" Value="#0A0A0D"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <!-- Transparent Root Viewport (only NotchChassis receives mouse events; rest is 100% click-through) -->
+    <Grid x:Name="RootViewport" Background="{x:Null}">
+        <!-- Thin Black Notch jammed against screen edge when idle (5x48); morphs to 40x216 on hover -->
+        <Border x:Name="NotchChassis"
+                Width="5" Height="48"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Right"
+                Margin="0,0,-1,0"
+                Background="#060608"
+                BorderBrush="#16161B"
+                BorderThickness="1,1,0,1"
+                CornerRadius="4,0,0,4"
+                ClipToBounds="True"
+                MouseEnter="NotchChassis_MouseEnter"
+                MouseLeave="NotchChassis_MouseLeave"
+                MouseLeftButtonDown="NotchChassis_MouseLeftButtonDown"
+                MouseMove="NotchChassis_MouseMove"
+                MouseLeftButtonUp="NotchChassis_MouseLeftButtonUp">
+            <Border.Effect>
+                <DropShadowEffect Color="#000000" BlurRadius="8" ShadowDepth="1" Opacity="0.75"/>
+            </Border.Effect>
+
+            <StackPanel x:Name="ButtonsStack"
+                        Orientation="Vertical"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"
+                        Opacity="0"
+                        IsHitTestVisible="False"
+                        Margin="0,6">
+                <!-- Top 3 Buttons -->
+                <!-- Screenshot (SNAP) -->
+                <Button x:Name="SnapButton" Style="{StaticResource NotchVerticalButtonStyle}"
+                        Content="&#xE722;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                        ToolTip="Take Screenshot (Ctrl+Shift+Q)"
+                        Click="SnapButton_Click" Margin="0,0,0,3"/>
+
+                <!-- Daily Logic Puzzle -->
+                <Button Style="{StaticResource NotchVerticalButtonStyle}"
+                        Content="&#xE7FC;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                        ToolTip="Daily Logic Puzzle"
+                        Click="LogicButton_Click" Margin="0,0,0,3"/>
+
+                <!-- 6x6 Mini Sudoku -->
+                <Button Style="{StaticResource NotchVerticalButtonStyle}"
+                        Content="&#xE80A;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                        ToolTip="6x6 Mini Sudoku"
+                        Click="SudokuButton_Click"/>
+
+                <!-- Center Draggable Grip Dots (Symmetrically in the Middle, Not at the End) -->
+                <Border x:Name="CenterGripZone" Height="18" Width="34" Background="Transparent" Cursor="SizeAll"
+                        Margin="0,3,0,3" ToolTip="Drag to reposition">
+                    <Rectangle Width="18" Height="6" VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="0.65">
+                        <Rectangle.Fill>
+                            <DrawingBrush Viewport="0,0,4.5,3" ViewportUnits="Absolute" TileMode="Tile">
+                                <DrawingBrush.Drawing>
+                                    <GeometryDrawing Brush="#52525C">
+                                        <GeometryDrawing.Geometry>
+                                            <EllipseGeometry Center="2.25,1.5" RadiusX="0.85" RadiusY="0.85"/>
+                                        </GeometryDrawing.Geometry>
+                                    </GeometryDrawing>
+                                </DrawingBrush.Drawing>
+                            </DrawingBrush>
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </Border>
+
+                <!-- Bottom 3 Buttons -->
+                <!-- Pomodoro Timer -->
+                <Button x:Name="PomodoroNotchButton" Style="{StaticResource NotchVerticalButtonStyle}"
+                        Content="&#xE916;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                        ToolTip="Pomodoro Timer"
+                        Click="PomodoroButton_Click" Margin="0,0,0,3"/>
+
+                <!-- Calendar & Reminders -->
+                <Button Style="{StaticResource NotchVerticalButtonStyle}"
+                        Content="&#xE787;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                        ToolTip="Calendar &amp; Reminders"
+                        Click="CalendarButton_Click" Margin="0,0,0,3"/>
+
+                <!-- Settings -->
+                <Button Style="{StaticResource NotchVerticalButtonStyle}"
+                        Content="&#xE713;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                        ToolTip="Settings"
+                        Click="SettingsButton_Click"/>
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>
