@@ -65,7 +65,7 @@ public class OpenAiClient : IAiClient
                     content = new object[]
                     {
                         new { type = "text", text = userMessage },
-                        new { type = "image_url", image_url = new { url = $"data:image/png;base64,{base64Image}" } }
+                        new { type = "image_url", image_url = new { url = $"data:image/jpeg;base64,{base64Image}" } }
                     }
                 }
             },
@@ -116,14 +116,7 @@ public class OpenAiClient : IAiClient
         return doc.RootElement.GetProperty("text").GetString() ?? "";
     }
 
-    private string ImageToBase64(BitmapSource image)
-    {
-        using var ms = new MemoryStream();
-        var encoder = new PngBitmapEncoder();
-        encoder.Frames.Add(BitmapFrame.Create(image));
-        encoder.Save(ms);
-        return Convert.ToBase64String(ms.ToArray());
-    }
+    private string ImageToBase64(BitmapSource image) => GeminiClient.GetOrEncodeFastJpegBase64(image);
 
     private AiResponse ExtractTextFromResponse(string responseJson)
     {

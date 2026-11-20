@@ -62,7 +62,7 @@ public class AnthropicClient : IAiClient
                     role = "user",
                     content = new object[]
                     {
-                        new { type = "image", source = new { type = "base64", media_type = "image/png", data = base64Image } },
+                        new { type = "image", source = new { type = "base64", media_type = "image/jpeg", data = base64Image } },
                         new { type = "text", text = userMessage }
                     }
                 }
@@ -89,14 +89,7 @@ public class AnthropicClient : IAiClient
         return ExtractTextFromResponse(responseJson);
     }
 
-    private string ImageToBase64(BitmapSource image)
-    {
-        using var ms = new MemoryStream();
-        var encoder = new PngBitmapEncoder();
-        encoder.Frames.Add(BitmapFrame.Create(image));
-        encoder.Save(ms);
-        return Convert.ToBase64String(ms.ToArray());
-    }
+    private string ImageToBase64(BitmapSource image) => GeminiClient.GetOrEncodeFastJpegBase64(image);
 
     private AiResponse ExtractTextFromResponse(string responseJson)
     {

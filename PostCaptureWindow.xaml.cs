@@ -1263,7 +1263,7 @@ public partial class PostCaptureWindow : Window
         };
     }
 
-    public void SetCapturedImage(BitmapSource? capturedImage) { _currentImage = capturedImage!; PreviewImage.Source = _currentImage; if (SnapshotBufferBorder != null) SnapshotBufferBorder.Visibility = _currentImage != null ? Visibility.Visible : Visibility.Collapsed; }
+    public void SetCapturedImage(BitmapSource? capturedImage) { _currentImage = capturedImage!; PreviewImage.Source = _currentImage; if (SnapshotBufferBorder != null) SnapshotBufferBorder.Visibility = _currentImage != null ? Visibility.Visible : Visibility.Collapsed; if (_currentImage != null) Dispatcher.BeginInvoke(new Action(() => GeminiClient.GetOrEncodeFastJpegBase64(_currentImage)), System.Windows.Threading.DispatcherPriority.Background); }
     private void CopyButton_Click(object sender, RoutedEventArgs e)
     {
         try

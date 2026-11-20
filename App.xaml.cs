@@ -23,15 +23,33 @@ public partial class App : System.Windows.Application
 
     private void Application_Startup(object sender, StartupEventArgs e)
     {
+        bool launchedAtBoot = Array.IndexOf(e.Args, "--startup") >= 0;
+
+        // If manually launched by the user, replace any older running instance so updates take effect immediately
+        if (!launchedAtBoot)
+        {
+            try
+            {
+                int currentPid = Environment.ProcessId;
+                foreach (var proc in System.Diagnostics.Process.GetProcessesByName("SumoSnap"))
+                {
+                    if (proc.Id != currentPid)
+                    {
+                        try { proc.Kill(); proc.WaitForExit(1500); } catch { }
+                    }
+                }
+            }
+            catch { }
+        }
+
         // Only one SumoSnap may run; otherwise a manual launch would fight the boot instance for the hotkey
         _singleInstanceMutex = new System.Threading.Mutex(true, "SumoSnap_SingleInstance_Mutex", out bool isFirstInstance);
-        if (!isFirstInstance)
+        if (!isFirstInstance && launchedAtBoot)
         {
             Shutdown();
             return;
         }
 
-        bool launchedAtBoot = Array.IndexOf(e.Args, "--startup") >= 0;
         StartupManager.Apply(SettingsManager.LoadSettings().RunOnStartup);
 
         CreateStartMenuShortcut();
@@ -53,7 +71,7 @@ public partial class App : System.Windows.Application
         _notifyIcon.ContextMenuStrip = contextMenu;
 
         var bootSettings = SettingsManager.LoadSettings();
-        if (!bootSettings.HasMigratedToHardwareNotch)
+        if (!bootSettings.HasMigratedToHardwareNotch || !launchedAtBoot)
         {
             bootSettings.ShowFloatingBuddy = true;
             bootSettings.HasMigratedToHardwareNotch = true;
@@ -273,20 +291,17 @@ public partial class App : System.Windows.Application
         try
         {
             string startMenuPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Programs), "SumoSnap.lnk");
-            if (!File.Exists(startMenuPath))
+            Type? shellType = Type.GetTypeFromProgID("WScript.Shell");
+            if (shellType != null)
             {
-                Type? shellType = Type.GetTypeFromProgID("WScript.Shell");
-                if (shellType != null)
-                {
-                    object shell = Activator.CreateInstance(shellType)!;
-                    object shortcut = shellType.InvokeMember("CreateShortcut", System.Reflection.BindingFlags.InvokeMethod, null, shell, new object[] { startMenuPath })!;
-                    
-                    Type shortcutType = shortcut.GetType();
-                    shortcutType.InvokeMember("TargetPath", System.Reflection.BindingFlags.SetProperty, null, shortcut, new object[] { Environment.ProcessPath! });
-                    shortcutType.InvokeMember("WorkingDirectory", System.Reflection.BindingFlags.SetProperty, null, shortcut, new object[] { Path.GetDirectoryName(Environment.ProcessPath)! });
-                    shortcutType.InvokeMember("Description", System.Reflection.BindingFlags.SetProperty, null, shortcut, new object[] { "AI-Powered Screenshot Utility" });
-                    shortcutType.InvokeMember("Save", System.Reflection.BindingFlags.InvokeMethod, null, shortcut, null);
-                }
+                object shell = Activator.CreateInstance(shellType)!;
+                object shortcut = shellType.InvokeMember("CreateShortcut", System.Reflection.BindingFlags.InvokeMethod, null, shell, new object[] { startMenuPath })!;
+                
+                Type shortcutType = shortcut.GetType();
+                shortcutType.InvokeMember("TargetPath", System.Reflection.BindingFlags.SetProperty, null, shortcut, new object[] { Environment.ProcessPath! });
+                shortcutType.InvokeMember("WorkingDirectory", System.Reflection.BindingFlags.SetProperty, null, shortcut, new object[] { Path.GetDirectoryName(Environment.ProcessPath)! });
+                shortcutType.InvokeMember("Description", System.Reflection.BindingFlags.SetProperty, null, shortcut, new object[] { "AI-Powered Screenshot Utility" });
+                shortcutType.InvokeMember("Save", System.Reflection.BindingFlags.InvokeMethod, null, shortcut, null);
             }
         }
         catch

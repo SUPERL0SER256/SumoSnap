@@ -71,12 +71,19 @@ public static class SettingsManager
 
     public static void SaveSettings(AppSettings settings)
     {
-        if (!Directory.Exists(AppDataFolder))
+        try
         {
-            Directory.CreateDirectory(AppDataFolder);
-        }
+            if (!Directory.Exists(AppDataFolder))
+            {
+                Directory.CreateDirectory(AppDataFolder);
+            }
 
-        var json = JsonSerializer.Serialize(settings, new JsonSerializerOptions { WriteIndented = true });
-        File.WriteAllText(SettingsFilePath, json);
+            var json = JsonSerializer.Serialize(settings, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(SettingsFilePath, json);
+        }
+        catch
+        {
+            // Ignore transient file lock or permission errors so the app never crashes
+        }
     }
 }
